@@ -56,11 +56,23 @@ func main() {
 			Name:   "delete",
 			Usage:  "Delete a post",
 			Action: cmdDelete,
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "tor, t",
+					Usage: "Delete from Tor hidden service",
+				},
+			},
 		},
 		{
 			Name:   "get",
 			Usage:  "Read a raw post",
 			Action: cmdGet,
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "tor, t",
+					Usage: "Get from Tor hidden service",
+				},
+			},
 		},
 	}
 
@@ -142,7 +154,10 @@ func cmdDelete(c *cli.Context) {
 		fmt.Println("usage: writeas delete <postId> <token>")
 		os.Exit(1)
 	}
-	DoDelete(friendlyId, token)
+
+	tor := c.Bool("tor") || c.Bool("t")
+
+	DoDelete(friendlyId, token, tor)
 }
 
 func cmdGet(c *cli.Context) {
@@ -151,7 +166,10 @@ func cmdGet(c *cli.Context) {
 		fmt.Println("usage: writeas get <postId>")
 		os.Exit(1)
 	}
-	DoFetch(friendlyId)
+
+	tor := c.Bool("tor") || c.Bool("t")
+
+	DoFetch(friendlyId, tor)
 }
 
 func cmdDecrypt(c *cli.Context) {
@@ -160,30 +178,53 @@ func cmdDecrypt(c *cli.Context) {
 	// TODO: Decrypt and output
 }
 
-func DoFetch(friendlyId string) {
-	var path string
-	path = friendlyId
-	/*
-		if len(friendlyId) == 12 {
-			// Original (pre-alpha) plain text URLs
-			path = friendlyId
-		} else if len(friendlyId) == 13 {
-			// Alpha phase HTML-based URLs
-			path = friendlyId + ".txt"
+func client(read, tor bool, path, query string) (string, *http.Client) {
+	var u *url.URL
+	var client *http.Client
+	if tor {
+		u, _ = url.ParseRequestURI(hiddenApiUrl)
+		if read {
+			u.Path = "/" + path
 		} else {
-			// Fallback path. Plan is to always support .txt file for raw files
-			path = friendlyId + ".txt"
+			u.Path = "/api"
 		}
-	*/
-
-	u, _ := url.ParseRequestURI(readApiUrl)
-	u.Path = "/" + path
+		client = torClient()
+	} else {
+		if read {
+			u, _ = url.ParseRequestURI(readApiUrl)
+		} else {
+			u, _ = url.ParseRequestURI(apiUrl)
+		}
+		u.Path = "/" + path
+		client = &http.Client{}
+	}
+	if query != "" {
+		u.RawQuery = query
+	}
 	urlStr := fmt.Sprintf("%v", u)
+
+	return urlStr, client
+}
+
+func DoFetch(friendlyId string, tor bool) {
+	path := friendlyId
+	if len(friendlyId) == 12 {
+		// Original (pre-alpha) plain text URLs
+		path = friendlyId
+	} else if len(friendlyId) == 13 {
+		// Alpha phase HTML-based URLs
+		path = friendlyId + ".txt"
+	} else {
+		// Fallback path. Plan is to always support .txt file for raw files
+		path = friendlyId + ".txt"
+	}
+
+	urlStr, client := client(true, tor, path, "")
 
 	r, _ := http.NewRequest("GET", urlStr, nil)
 	r.Header.Add("User-Agent", "writeas-cli v"+VERSION)
 
-	resp, err := http.DefaultClient.Do(r)
+	resp, err := client.Do(r)
 	check(err)
 	defer resp.Body.Close()
 
@@ -203,18 +244,7 @@ func DoPost(post []byte, encrypt, tor bool) {
 		data.Add("e", "")
 	}
 
-	var u *url.URL
-	var client *http.Client
-	if tor {
-		u, _ = url.ParseRequestURI(hiddenApiUrl)
-		u.Path = "/api"
-		client = torClient()
-	} else {
-		u, _ = url.ParseRequestURI(apiUrl)
-		u.Path = "/"
-		client = &http.Client{}
-	}
-	urlStr := fmt.Sprintf("%v", u)
+	urlStr, client := client(false, tor, "", "")
 
 	r, _ := http.NewRequest("POST", urlStr, bytes.NewBufferString(data.Encode()))
 	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
@@ -233,21 +263,22 @@ func DoPost(post []byte, encrypt, tor bool) {
 	}
 }
 
-func DoDelete(friendlyId, token string) {
-	u, _ := url.ParseRequestURI(apiUrl)
-	u.Path = "/"
-	u.RawQuery = fmt.Sprintf("id=%s&t=%s", friendlyId, token)
-	urlStr := fmt.Sprintf("%v", u)
+func DoDelete(friendlyId, token string, tor bool) {
+	urlStr, client := client(false, tor, "", fmt.Sprintf("id=%s&t=%s", friendlyId, token))
 
 	r, _ := http.NewRequest("DELETE", urlStr, nil)
 	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
-	resp, err := http.DefaultClient.Do(r)
+	resp, err := client.Do(r)
 	check(err)
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusOK {
-		fmt.Println("Post deleted.")
+		if tor {
+			fmt.Println("Post deleted from hidden service.")
+		} else {
+			fmt.Println("Post deleted.")
+		}
 	} else {
 		fmt.Printf("Problem deleting: %s\n", resp.Status)
 	}
