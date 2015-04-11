@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -22,6 +23,9 @@ const (
 )
 
 func main() {
+	initialize()
+
+	// Run the app
 	app := cli.NewApp()
 	app.Name = "writeas"
 	app.Version = VERSION
@@ -76,6 +80,13 @@ func main() {
 	}
 
 	app.Run(os.Args)
+}
+
+func initialize() {
+	// Ensure we have a data directory to use
+	if !dataDirExists() {
+		createDataDir()
+	}
 }
 
 func readStdIn() []byte {
@@ -241,7 +252,16 @@ func DoPost(post []byte, encrypt, tor bool) {
 	if resp.StatusCode == http.StatusOK {
 		content, err := ioutil.ReadAll(resp.Body)
 		check(err)
-		fmt.Printf("%s\n", string(content))
+
+		nlPos := strings.Index(string(content), "\n")
+		url := content[:nlPos]
+		idPos := strings.LastIndex(string(url), "/") + 1
+		id := string(url[idPos:])
+		token := string(content[nlPos+1:])
+
+		addPost(id, token)
+
+		fmt.Printf("%s\n", url)
 	} else {
 		fmt.Printf("Unable to post: %s\n", resp.Status)
 	}
