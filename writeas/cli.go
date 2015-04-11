@@ -267,7 +267,7 @@ func DoPost(post []byte, encrypt, tor bool) {
 		url := content[:nlPos]
 		idPos := strings.LastIndex(string(url), "/") + 1
 		id := string(url[idPos:])
-		token := string(content[nlPos+1:])
+		token := string(content[nlPos+1 : len(content)-1])
 
 		addPost(id, token)
 
