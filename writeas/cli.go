@@ -145,14 +145,6 @@ func check(err error) {
 	}
 }
 
-func getPass() []byte {
-	// TODO: don't show passphrase in the terminal
-	var p string
-	_, err := fmt.Scanln(&p)
-	check(err)
-	return []byte(p)
-}
-
 func cmdPost(c *cli.Context) {
 	fullPost := readStdIn()
 
