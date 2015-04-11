@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/codegangsta/cli"
-	"github.com/writeas/libwriteprivate"
 	"io"
 	"io/ioutil"
 	"log"
@@ -126,17 +125,6 @@ func getPass() []byte {
 func cmdPost(c *cli.Context) {
 	fullPost := readStdIn()
 
-	// Encrypt post, if needed
-	encrypt := c.Bool("encrypt") || c.Bool("e")
-	if encrypt {
-		// Prompt for passphrase
-		fmt.Printf("Enter a passphrase: ")
-		pass := getPass()
-		var err error
-		fullPost, err = writeprivate.Encrypt(pass, fullPost)
-		check(err)
-	}
-
 	tor := c.Bool("tor") || c.Bool("t")
 	if tor {
 		fmt.Println("Posting to hidden service...")
@@ -144,7 +132,7 @@ func cmdPost(c *cli.Context) {
 		fmt.Println("Posting...")
 	}
 
-	DoPost(fullPost, encrypt, tor)
+	DoPost(fullPost, false, tor)
 }
 
 func cmdDelete(c *cli.Context) {
@@ -170,12 +158,6 @@ func cmdGet(c *cli.Context) {
 	tor := c.Bool("tor") || c.Bool("t")
 
 	DoFetch(friendlyId, tor)
-}
-
-func cmdDecrypt(c *cli.Context) {
-	// TODO: Fetch post
-	// TODO: Prompt for passphrase
-	// TODO: Decrypt and output
 }
 
 func client(read, tor bool, path, query string) (string, *http.Client) {
