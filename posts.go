@@ -21,19 +21,26 @@ func dataDirExists() bool {
 }
 
 func createDataDir() {
-	os.Mkdir(userDataDir(), 0700)
+	err := os.Mkdir(userDataDir(), 0700)
+	if err != nil && DEBUG {
+		panic(err)
+	}
 }
 
 func addPost(id, token string) {
 	f, err := os.OpenFile(filepath.Join(userDataDir(), POSTS_FILE), os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0600)
 	if err != nil {
-		panic(err)
+		if DEBUG {
+			panic(err)
+		} else {
+			return
+		}
 	}
 	defer f.Close()
 
 	l := fmt.Sprintf("%s%s%s\n", id, SEPARATOR, token)
 
-	if _, err = f.WriteString(l); err != nil {
+	if _, err = f.WriteString(l); err != nil && DEBUG {
 		panic(err)
 	}
 }
