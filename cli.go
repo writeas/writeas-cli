@@ -214,6 +214,8 @@ func DoFetch(friendlyId string, tor bool) {
 		content, err := ioutil.ReadAll(resp.Body)
 		check(err)
 		fmt.Printf("%s\n", string(content))
+	} else if resp.StatusCode == http.StatusNotFound {
+		fmt.Printf("Post not found.\n")
 	} else {
 		fmt.Printf("Problem getting post: %s\n", resp.Status)
 	}
