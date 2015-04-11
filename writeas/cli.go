@@ -42,6 +42,11 @@ func main() {
 			Name:  "tor, t",
 			Usage: "Perform action on Tor hidden service",
 		},
+		cli.IntFlag{
+			Name:  "tor-port",
+			Usage: "Use a different port to connect to Tor",
+			Value: 9150,
+		},
 	}
 	app.Commands = []cli.Command{
 		{
@@ -52,6 +57,11 @@ func main() {
 				cli.BoolFlag{
 					Name:  "tor, t",
 					Usage: "Post to Tor hidden service",
+				},
+				cli.IntFlag{
+					Name:  "tor-port",
+					Usage: "Use a different port to connect to Tor",
+					Value: 9150,
 				},
 			},
 		},
@@ -64,6 +74,11 @@ func main() {
 					Name:  "tor, t",
 					Usage: "Delete from Tor hidden service",
 				},
+				cli.IntFlag{
+					Name:  "tor-port",
+					Usage: "Use a different port to connect to Tor",
+					Value: 9150,
+				},
 			},
 		},
 		{
@@ -74,6 +89,11 @@ func main() {
 				cli.BoolFlag{
 					Name:  "tor, t",
 					Usage: "Get from Tor hidden service",
+				},
+				cli.IntFlag{
+					Name:  "tor-port",
+					Usage: "Use a different port to connect to Tor",
+					Value: 9150,
 				},
 			},
 		},
@@ -137,6 +157,9 @@ func cmdPost(c *cli.Context) {
 	fullPost := readStdIn()
 
 	tor := c.Bool("tor") || c.Bool("t")
+	if c.Int("tor-port") != 0 {
+		torPort = c.Int("tor-port")
+	}
 	if tor {
 		fmt.Println("Posting to hidden service...")
 	} else {
@@ -165,6 +188,9 @@ func cmdDelete(c *cli.Context) {
 	}
 
 	tor := c.Bool("tor") || c.Bool("t")
+	if c.Int("tor-port") != 0 {
+		torPort = c.Int("tor-port")
+	}
 
 	DoDelete(friendlyId, token, tor)
 }
@@ -177,6 +203,9 @@ func cmdGet(c *cli.Context) {
 	}
 
 	tor := c.Bool("tor") || c.Bool("t")
+	if c.Int("tor-port") != 0 {
+		torPort = c.Int("tor-port")
+	}
 
 	DoFetch(friendlyId, tor)
 }
