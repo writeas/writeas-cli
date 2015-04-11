@@ -3,12 +3,11 @@
 package main
 
 import (
-	"github.com/luisiturrios/gowin"
+	"os"
 )
 
 const DATA_DIR_NAME = "Write.as"
 
 func parentDataDir() string {
-	folders := gowin.ShellFolders{gowin.USER}
-	return folders.AppData()
+	return os.Getenv("APPDATA")
 }

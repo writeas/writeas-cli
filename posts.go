@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/writeas/writeas-cli/utils"
 	"os"
+	"path/filepath"
 )
 
 const (
@@ -12,7 +13,7 @@ const (
 )
 
 func userDataDir() string {
-	return fmt.Sprintf("%s/%s", parentDataDir(), DATA_DIR_NAME)
+	return filepath.Join(parentDataDir(), DATA_DIR_NAME)
 }
 
 func dataDirExists() bool {
@@ -24,7 +25,7 @@ func createDataDir() {
 }
 
 func addPost(id, token string) {
-	f, err := os.OpenFile(userDataDir()+"/"+POSTS_FILE, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0600)
+	f, err := os.OpenFile(filepath.Join(userDataDir(), POSTS_FILE), os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0600)
 	if err != nil {
 		panic(err)
 	}
