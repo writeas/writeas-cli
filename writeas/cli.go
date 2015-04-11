@@ -149,9 +149,19 @@ func cmdPost(c *cli.Context) {
 func cmdDelete(c *cli.Context) {
 	friendlyId := c.Args().Get(0)
 	token := c.Args().Get(1)
-	if friendlyId == "" || token == "" {
-		fmt.Println("usage: writeas delete <postId> <token>")
+	if friendlyId == "" {
+		fmt.Println("usage: writeas delete <postId> [<token>]")
 		os.Exit(1)
+	}
+
+	if token == "" {
+		// Search for the token locally
+		token = tokenFromID(friendlyId)
+		if token == "" {
+			fmt.Println("Couldn't find an edit token locally. Did you create this post here?")
+			fmt.Printf("If you have an edit token, use: writeas delete %s <token>\n", friendlyId)
+			os.Exit(1)
+		}
 	}
 
 	tor := c.Bool("tor") || c.Bool("t")
@@ -283,6 +293,7 @@ func DoDelete(friendlyId, token string, tor bool) {
 		} else {
 			fmt.Println("Post deleted.")
 		}
+		removePost(friendlyId)
 	} else {
 		if DEBUG {
 			fmt.Printf("Problem deleting: %s\n", resp.Status)

@@ -5,6 +5,7 @@ import (
 	"github.com/writeas/writeas-cli/utils"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 const (
@@ -43,4 +44,22 @@ func addPost(id, token string) {
 	if _, err = f.WriteString(l); err != nil && DEBUG {
 		panic(err)
 	}
+}
+
+func tokenFromID(id string) string {
+	post := fileutils.FindLine(filepath.Join(userDataDir(), POSTS_FILE), id)
+	if post == "" {
+		return ""
+	}
+
+	parts := strings.Split(post, SEPARATOR)
+	if len(parts) < 2 {
+		return ""
+	}
+
+	return parts[1]
+}
+
+func removePost(id string) {
+	fileutils.RemoveLine(filepath.Join(userDataDir(), POSTS_FILE), id)
 }
