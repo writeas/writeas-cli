@@ -311,7 +311,7 @@ func DoDelete(friendlyId, token string, tor bool) {
 		if DEBUG {
 			fmt.Printf("Problem deleting: %s\n", resp.Status)
 		} else {
-			fmt.Printf("Post doesn't exist, or bad edit token given.")
+			fmt.Printf("Post doesn't exist, or bad edit token given.\n")
 		}
 	}
 }
