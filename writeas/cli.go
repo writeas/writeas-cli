@@ -207,6 +207,12 @@ func client(read, tor bool, path, query string) (string, *http.Client) {
 	var client *http.Client
 	if tor {
 		u, _ = url.ParseRequestURI(hiddenApiUrl)
+
+		if len(path) != 12 {
+			// Handle alpha phase HTML-based URLs
+			path += ".txt"
+		}
+
 		if read {
 			u.Path = "/" + path
 		} else {
@@ -214,11 +220,7 @@ func client(read, tor bool, path, query string) (string, *http.Client) {
 		}
 		client = torClient()
 	} else {
-		if read {
-			u, _ = url.ParseRequestURI(readApiUrl)
-		} else {
-			u, _ = url.ParseRequestURI(apiUrl)
-		}
+		u, _ = url.ParseRequestURI(apiUrl)
 		u.Path = "/" + path
 		client = &http.Client{}
 	}
@@ -232,16 +234,6 @@ func client(read, tor bool, path, query string) (string, *http.Client) {
 
 func DoFetch(friendlyId string, tor bool) {
 	path := friendlyId
-	if len(friendlyId) == 12 {
-		// Original (pre-alpha) plain text URLs
-		path = friendlyId
-	} else if len(friendlyId) == 13 {
-		// Alpha phase HTML-based URLs
-		path = friendlyId + ".txt"
-	} else {
-		// Fallback path. Plan is to always support .txt file for raw files
-		path = friendlyId + ".txt"
-	}
 
 	urlStr, client := client(true, tor, path, "")
 
