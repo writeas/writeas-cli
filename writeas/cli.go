@@ -97,6 +97,11 @@ func main() {
 				},
 			},
 		},
+		{
+			Name:   "add",
+			Usage:  "Add a post locally for easy modification",
+			Action: cmdAdd,
+		},
 	}
 
 	app.Run(os.Args)
@@ -200,6 +205,17 @@ func cmdGet(c *cli.Context) {
 	}
 
 	DoFetch(friendlyId, tor)
+}
+
+func cmdAdd(c *cli.Context) {
+	friendlyId := c.Args().Get(0)
+	token := c.Args().Get(1)
+	if friendlyId == "" || token == "" {
+		fmt.Println("usage: writeas add <postId> <token>")
+		os.Exit(1)
+	}
+
+	addPost(friendlyId, token)
 }
 
 func client(read, tor bool, path, query string) (string, *http.Client) {
