@@ -30,6 +30,27 @@ func WriteData(path string, data []byte) {
 	}
 }
 
+func ReadData(p string) *[]string {
+	f, err := os.Open(p)
+	if err != nil {
+		return nil
+	}
+	defer f.Close()
+
+	lines := []string{}
+
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+
+	if err := scanner.Err(); err != nil {
+		return nil
+	}
+
+	return &lines
+}
+
 func RemoveLine(p, startsWith string) {
 	f, err := os.Open(p)
 	if err != nil {
