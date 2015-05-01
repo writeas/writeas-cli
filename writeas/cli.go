@@ -310,6 +310,7 @@ func DoPost(post []byte, encrypt, tor bool) {
 	if encrypt {
 		data.Add("e", "")
 	}
+	data.Add("font", "mono")
 
 	urlStr, client := client(false, tor, "", "")
 
