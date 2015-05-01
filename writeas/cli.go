@@ -99,7 +99,7 @@ func main() {
 		},
 		{
 			Name:   "add",
-			Usage:  "Add a post locally for easy modification",
+			Usage:  "Add a post locally",
 			Action: cmdAdd,
 		},
 		{

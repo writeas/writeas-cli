@@ -13,7 +13,7 @@ COMMANDS:
    post     Alias for default action: create post from stdin
    delete   Delete a post
    get      Read a raw post
-   add      Add a post locally for easy modification
+   add      Add a post locally
    help, h  Shows a list of commands or help for one command
    
 GLOBAL OPTIONS:
