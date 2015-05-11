@@ -14,6 +14,7 @@ writeas [global options] command [command options] [arguments...]
 COMMANDS:
    post     Alias for default action: create post from stdin
    delete   Delete a post
+   update   Update (overwrite) a post
    get      Read a raw post
    add      Add a post locally
    list     List local posts
