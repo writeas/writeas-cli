@@ -2,7 +2,9 @@ writeas-cli
 ===========
 Command line interface for [Write.as](https://write.as) and [Write.as on Tor](http://writeas7pm7rcdqg.onion/). Works on Windows, OS X, and Linux.
 
-Like the [Android app](https://play.google.com/store/apps/details?id=com.abunchtell.writeas), the command line client keeps track of the posts you make, so future editing / deleting is easier than [doing it with cURL](http://cmd.write.as/). It is currently **ALPHA**, so only basic functionality is available. But the goal is for this to hold the logic behind any future GUI app we build for the desktop.
+Like the [Android app](https://play.google.com/store/apps/details?id=com.abunchtell.writeas), the command line client keeps track of the posts you make, so future editing / deleting is easier than [doing it with cURL](http://cmd.write.as/). The goal is for this to serve as the backend for any future GUI app we build for the desktop.
+
+It is currently **alpha**, so a) functionality is basic and b) everything is subject to change — i.e., watch the [changelog](https://write.as/changelog-cli.html).
 
 ## Usage
 
@@ -13,6 +15,8 @@ COMMANDS:
    post     Alias for default action: create post from stdin
    delete   Delete a post
    get      Read a raw post
+   add      Add a post locally
+   list     List local posts
    help, h  Shows a list of commands or help for one command
    
 GLOBAL OPTIONS:

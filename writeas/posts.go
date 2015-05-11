@@ -13,6 +13,11 @@ const (
 	SEPARATOR  = `|`
 )
 
+type Post struct {
+	ID        string
+	EditToken string
+}
+
 func userDataDir() string {
 	return filepath.Join(parentDataDir(), DATA_DIR_NAME)
 }
@@ -62,4 +67,22 @@ func tokenFromID(id string) string {
 
 func removePost(id string) {
 	fileutils.RemoveLine(filepath.Join(userDataDir(), POSTS_FILE), id)
+}
+
+func getPosts() *[]Post {
+	lines := fileutils.ReadData(filepath.Join(userDataDir(), POSTS_FILE))
+
+	posts := []Post{}
+	parts := make([]string, 2)
+
+	for _, l := range *lines {
+		parts = strings.Split(l, SEPARATOR)
+		if len(parts) < 2 {
+			continue
+		}
+		posts = append(posts, Post{ID: parts[0], EditToken: parts[1]})
+	}
+
+	return &posts
+
 }

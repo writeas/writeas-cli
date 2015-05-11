@@ -97,6 +97,26 @@ func main() {
 				},
 			},
 		},
+		{
+			Name:   "add",
+			Usage:  "Add a post locally",
+			Action: cmdAdd,
+		},
+		{
+			Name:   "list",
+			Usage:  "List local posts",
+			Action: cmdList,
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "id",
+					Usage: "Show list with post IDs (default)",
+				},
+				cli.BoolFlag{
+					Name:  "url",
+					Usage: "Show list with URLs",
+				},
+			},
+		},
 	}
 
 	app.Run(os.Args)
@@ -200,6 +220,35 @@ func cmdGet(c *cli.Context) {
 	}
 
 	DoFetch(friendlyId, tor)
+}
+
+func cmdAdd(c *cli.Context) {
+	friendlyId := c.Args().Get(0)
+	token := c.Args().Get(1)
+	if friendlyId == "" || token == "" {
+		fmt.Println("usage: writeas add <postId> <token>")
+		os.Exit(1)
+	}
+
+	addPost(friendlyId, token)
+}
+
+func cmdList(c *cli.Context) {
+	urls := c.Bool("url")
+	ids := c.Bool("id")
+
+	var p Post
+	posts := getPosts()
+	for i := range *posts {
+		p = (*posts)[len(*posts)-1-i]
+		if ids || !urls {
+			fmt.Printf("%s ", p.ID)
+		}
+		if urls {
+			fmt.Printf("https://write.as/%s ", p.ID)
+		}
+		fmt.Print("\n")
+	}
 }
 
 func client(read, tor bool, path, query string) (string, *http.Client) {
