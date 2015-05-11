@@ -56,7 +56,7 @@ func main() {
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "tor, t",
-					Usage: "Post to Tor hidden service",
+					Usage: "Post via Tor hidden service",
 				},
 				cli.IntFlag{
 					Name:  "tor-port",
@@ -72,7 +72,23 @@ func main() {
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "tor, t",
-					Usage: "Delete from Tor hidden service",
+					Usage: "Delete via Tor hidden service",
+				},
+				cli.IntFlag{
+					Name:  "tor-port",
+					Usage: "Use a different port to connect to Tor",
+					Value: 9150,
+				},
+			},
+		},
+		{
+			Name:   "update",
+			Usage:  "Update (overwrite) a post",
+			Action: cmdUpdate,
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "tor, t",
+					Usage: "Update via Tor hidden service",
 				},
 				cli.IntFlag{
 					Name:  "tor-port",
@@ -207,6 +223,35 @@ func cmdDelete(c *cli.Context) {
 	DoDelete(friendlyId, token, tor)
 }
 
+func cmdUpdate(c *cli.Context) {
+	friendlyId := c.Args().Get(0)
+	token := c.Args().Get(1)
+	if friendlyId == "" {
+		fmt.Println("usage: writeas update <postId> [<token>]")
+		os.Exit(1)
+	}
+
+	if token == "" {
+		// Search for the token locally
+		token = tokenFromID(friendlyId)
+		if token == "" {
+			fmt.Println("Couldn't find an edit token locally. Did you create this post here?")
+			fmt.Printf("If you have an edit token, use: writeas update %s <token>\n", friendlyId)
+			os.Exit(1)
+		}
+	}
+
+	// Read post body
+	fullPost := readStdIn()
+
+	tor := c.Bool("tor") || c.Bool("t")
+	if c.Int("tor-port") != 0 {
+		torPort = c.Int("tor-port")
+	}
+
+	DoUpdate(fullPost, friendlyId, token, tor)
+}
+
 func cmdGet(c *cli.Context) {
 	friendlyId := c.Args().Get(0)
 	if friendlyId == "" {
@@ -310,6 +355,7 @@ func DoPost(post []byte, encrypt, tor bool) {
 	if encrypt {
 		data.Add("e", "")
 	}
+	data.Add("font", "mono")
 
 	urlStr, client := client(false, tor, "", "")
 
@@ -336,6 +382,35 @@ func DoPost(post []byte, encrypt, tor bool) {
 		fmt.Printf("%s\n", url)
 	} else {
 		fmt.Printf("Unable to post: %s\n", resp.Status)
+	}
+}
+
+func DoUpdate(post []byte, friendlyId, token string, tor bool) {
+	urlStr, client := client(false, tor, "", fmt.Sprintf("id=%s&t=%s", friendlyId, token))
+
+	data := url.Values{}
+	data.Set("w", string(post))
+
+	r, _ := http.NewRequest("POST", urlStr, bytes.NewBufferString(data.Encode()))
+	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	r.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
+
+	resp, err := client.Do(r)
+	check(err)
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusOK {
+		if tor {
+			fmt.Println("Post updated via hidden service.")
+		} else {
+			fmt.Println("Post updated.")
+		}
+	} else {
+		if DEBUG {
+			fmt.Printf("Problem updating: %s\n", resp.Status)
+		} else {
+			fmt.Printf("Post doesn't exist, or bad edit token given.\n")
+		}
 	}
 }
 
