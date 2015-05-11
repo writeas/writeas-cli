@@ -56,7 +56,7 @@ func main() {
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "tor, t",
-					Usage: "Post to Tor hidden service",
+					Usage: "Post via Tor hidden service",
 				},
 				cli.IntFlag{
 					Name:  "tor-port",
@@ -72,7 +72,7 @@ func main() {
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "tor, t",
-					Usage: "Delete from Tor hidden service",
+					Usage: "Delete via Tor hidden service",
 				},
 				cli.IntFlag{
 					Name:  "tor-port",
