@@ -63,6 +63,10 @@ func main() {
 					Usage: "Use a different port to connect to Tor",
 					Value: 9150,
 				},
+				cli.BoolFlag{
+					Name:  "code",
+					Usage: "Specifies this post is code",
+				},
 			},
 		},
 		{
@@ -194,7 +198,7 @@ func cmdPost(c *cli.Context) {
 		fmt.Println("Posting...")
 	}
 
-	DoPost(fullPost, false, tor)
+	DoPost(fullPost, false, tor, c.Bool("code"))
 }
 
 func cmdDelete(c *cli.Context) {
@@ -349,13 +353,17 @@ func DoFetch(friendlyId string, tor bool) {
 	}
 }
 
-func DoPost(post []byte, encrypt, tor bool) {
+func DoPost(post []byte, encrypt, tor, code bool) {
 	data := url.Values{}
 	data.Set("w", string(post))
 	if encrypt {
 		data.Add("e", "")
 	}
-	data.Add("font", "mono")
+	font := "mono"
+	if code {
+		font = "code"
+	}
+	data.Add("font", font)
 
 	urlStr, client := client(false, tor, "", "")
 
