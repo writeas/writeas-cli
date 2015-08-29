@@ -274,6 +274,11 @@ func cmdDelete(c *cli.Context) {
 	if c.Int("tor-port") != 0 {
 		torPort = c.Int("tor-port")
 	}
+	if tor {
+		fmt.Println("Deleting via hidden service...")
+	} else {
+		fmt.Println("Deleting...")
+	}
 
 	DoDelete(friendlyId, token, tor)
 }
@@ -303,6 +308,11 @@ func cmdUpdate(c *cli.Context) {
 	if c.Int("tor-port") != 0 {
 		torPort = c.Int("tor-port")
 	}
+	if tor {
+		fmt.Println("Updating via hidden service...")
+	} else {
+		fmt.Println("Updating...")
+	}
 
 	DoUpdate(fullPost, friendlyId, token, tor)
 }
@@ -317,6 +327,11 @@ func cmdGet(c *cli.Context) {
 	tor := c.Bool("tor") || c.Bool("t")
 	if c.Int("tor-port") != 0 {
 		torPort = c.Int("tor-port")
+	}
+	if tor {
+		fmt.Println("Getting via hidden service...")
+	} else {
+		fmt.Println("Getting...")
 	}
 
 	DoFetch(friendlyId, tor)
