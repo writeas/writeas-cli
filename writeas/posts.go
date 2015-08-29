@@ -28,8 +28,13 @@ func dataDirExists() bool {
 
 func createDataDir() {
 	err := os.Mkdir(userDataDir(), 0700)
-	if err != nil && DEBUG {
-		panic(err)
+	if err != nil {
+		if DEBUG {
+			panic(err)
+		} else {
+			fmt.Printf("Error creating data directory: %s\n", err)
+			return
+		}
 	}
 }
 
@@ -39,6 +44,7 @@ func addPost(id, token string) {
 		if DEBUG {
 			panic(err)
 		} else {
+			fmt.Printf("Error creating local posts list: %s\n", err)
 			return
 		}
 	}
@@ -46,8 +52,13 @@ func addPost(id, token string) {
 
 	l := fmt.Sprintf("%s%s%s\n", id, SEPARATOR, token)
 
-	if _, err = f.WriteString(l); err != nil && DEBUG {
-		panic(err)
+	if _, err = f.WriteString(l); err != nil {
+		if DEBUG {
+			panic(err)
+		} else {
+			fmt.Printf("Error writing to local posts list: %s\n", err)
+			return
+		}
 	}
 }
 
