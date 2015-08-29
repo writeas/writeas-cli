@@ -360,6 +360,7 @@ func DoPost(post []byte, encrypt, tor bool) {
 	urlStr, client := client(false, tor, "", "")
 
 	r, _ := http.NewRequest("POST", urlStr, bytes.NewBufferString(data.Encode()))
+	r.Header.Add("User-Agent", "writeas-cli v"+VERSION)
 	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	r.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
 
@@ -392,6 +393,7 @@ func DoUpdate(post []byte, friendlyId, token string, tor bool) {
 	data.Set("w", string(post))
 
 	r, _ := http.NewRequest("POST", urlStr, bytes.NewBufferString(data.Encode()))
+	r.Header.Add("User-Agent", "writeas-cli v"+VERSION)
 	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	r.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
 
@@ -418,6 +420,7 @@ func DoDelete(friendlyId, token string, tor bool) {
 	urlStr, client := client(false, tor, "", fmt.Sprintf("id=%s&t=%s", friendlyId, token))
 
 	r, _ := http.NewRequest("DELETE", urlStr, nil)
+	r.Header.Add("User-Agent", "writeas-cli v"+VERSION)
 	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 	resp, err := client.Do(r)
