@@ -20,3 +20,7 @@ func editPostCmd(fname string) *exec.Cmd {
 	// NOTE this won't work if fname contains spaces.
 	return exec.Command("cmd", "/C start /WAIT "+fname)
 }
+
+func messageRetryCompose(fname string) string {
+	return fmt.Sprintf("To retry this post, run:\n  type %s | writeas.exe", fname)
+}

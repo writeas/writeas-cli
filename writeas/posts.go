@@ -98,41 +98,47 @@ func getPosts() *[]Post {
 	return &posts
 }
 
-func composeNewPost() *[]byte {
+func composeNewPost() (string, *[]byte) {
 	f, err := fileutils.TempFile(os.TempDir(), "WApost", "txt")
 	if err != nil {
 		if DEBUG {
 			panic(err)
 		} else {
 			fmt.Printf("Error creating temp file: %s\n", err)
-			return nil
+			return "", nil
 		}
 	}
-	defer os.Remove(f.Name())
 	f.Close()
 
 	cmd := editPostCmd(f.Name())
 	if cmd == nil {
+		os.Remove(f.Name())
+
 		fmt.Println(NO_EDITOR_ERR)
-		return nil
+		return "", nil
 	}
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Start(); err != nil {
+		os.Remove(f.Name())
+
 		if DEBUG {
 			panic(err)
 		} else {
 			fmt.Printf("Error starting editor: %s\n", err)
-			return nil
+			return "", nil
 		}
 	}
+
+	// If something fails past this point, the temporary post file won't be
+	// removed automatically. Calling function should handle this.
 	if err := cmd.Wait(); err != nil {
 		if DEBUG {
 			panic(err)
 		} else {
 			fmt.Printf("Editor finished with error: %s\n", err)
-			return nil
+			return "", nil
 		}
 	}
 
@@ -142,8 +148,8 @@ func composeNewPost() *[]byte {
 			panic(err)
 		} else {
 			fmt.Printf("Error reading post: %s\n", err)
-			return nil
+			return "", nil
 		}
 	}
-	return &post
+	return f.Name(), &post
 }

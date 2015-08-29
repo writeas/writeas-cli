@@ -38,3 +38,7 @@ func editPostCmd(fname string) *exec.Cmd {
 	}
 	return exec.Command(editor, fname)
 }
+
+func messageRetryCompose(fname string) string {
+	return fmt.Sprintf("To retry this post, run:\n  cat %s | writeas", fname)
+}

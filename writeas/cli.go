@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
 	"github.com/codegangsta/cli"
 	"io"
@@ -201,7 +202,7 @@ func check(err error) {
 	}
 }
 
-func handlePost(fullPost []byte, c *cli.Context) {
+func handlePost(fullPost []byte, c *cli.Context) error {
 	tor := c.Bool("tor") || c.Bool("t")
 	if c.Int("tor-port") != 0 {
 		torPort = c.Int("tor-port")
@@ -212,15 +213,16 @@ func handlePost(fullPost []byte, c *cli.Context) {
 		fmt.Println("Posting...")
 	}
 
-	DoPost(fullPost, false, tor, c.Bool("code"))
+	return DoPost(fullPost, false, tor, c.Bool("code"))
 }
 
 func cmdPost(c *cli.Context) {
-	handlePost(readStdIn(), c)
+	err := handlePost(readStdIn(), c)
+	check(err)
 }
 
 func cmdNew(c *cli.Context) {
-	p := composeNewPost()
+	fname, p := composeNewPost()
 	if p == nil {
 		// Assume composeNewPost already told us what the error was. Abort now.
 		os.Exit(1)
@@ -228,11 +230,26 @@ func cmdNew(c *cli.Context) {
 
 	// Ensure we have something to post
 	if len(*p) == 0 {
+		// Clean up temporary post
+		if fname != "" {
+			os.Remove(fname)
+		}
+
 		fmt.Println("Empty post. Bye!")
 		os.Exit(0)
 	}
 
-	handlePost(*p, c)
+	err := handlePost(*p, c)
+	if err != nil {
+		fmt.Printf("Error posting: %s\n", err)
+		fmt.Println(messageRetryCompose(fname))
+		os.Exit(1)
+	}
+
+	// Clean up temporary post
+	if fname != "" {
+		os.Remove(fname)
+	}
 }
 
 func cmdDelete(c *cli.Context) {
@@ -387,7 +404,7 @@ func DoFetch(friendlyId string, tor bool) {
 	}
 }
 
-func DoPost(post []byte, encrypt, tor, code bool) {
+func DoPost(post []byte, encrypt, tor, code bool) error {
 	data := url.Values{}
 	data.Set("w", string(post))
 	if encrypt {
@@ -407,12 +424,16 @@ func DoPost(post []byte, encrypt, tor, code bool) {
 	r.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
 
 	resp, err := client.Do(r)
-	check(err)
+	if err != nil {
+		return err
+	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusOK {
 		content, err := ioutil.ReadAll(resp.Body)
-		check(err)
+		if err != nil {
+			return err
+		}
 
 		nlPos := strings.Index(string(content), "\n")
 		url := content[:nlPos]
@@ -424,8 +445,10 @@ func DoPost(post []byte, encrypt, tor, code bool) {
 
 		fmt.Printf("%s\n", url)
 	} else {
-		fmt.Printf("Unable to post: %s\n", resp.Status)
+		return errors.New(fmt.Sprintf("Unable to post: %s", resp.Status))
 	}
+
+	return nil
 }
 
 func DoUpdate(post []byte, friendlyId, token string, tor bool) {
