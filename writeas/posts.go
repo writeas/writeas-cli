@@ -117,9 +117,7 @@ func composeNewPost() (string, *[]byte) {
 		fmt.Println(NO_EDITOR_ERR)
 		return "", nil
 	}
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	cmd.Stdin, cmd.Stdout, cmd.Stderr = os.Stdin, os.Stdout, os.Stderr
 	if err := cmd.Start(); err != nil {
 		os.Remove(f.Name())
 
