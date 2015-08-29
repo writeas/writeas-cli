@@ -20,7 +20,7 @@ const (
 	apiUrl       = "http://i.write.as"
 	hiddenApiUrl = "http://writeas7pm7rcdqg.onion"
 	readApiUrl   = "http://i.write.as"
-	VERSION      = "0.2"
+	VERSION      = "0.3"
 )
 
 func main() {
