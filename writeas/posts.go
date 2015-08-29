@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/writeas/writeas-cli/utils"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -95,5 +96,53 @@ func getPosts() *[]Post {
 	}
 
 	return &posts
+}
 
+func composeNewPost() *[]byte {
+	f, err := ioutil.TempFile(os.TempDir(), "WApost")
+	if err != nil {
+		if DEBUG {
+			panic(err)
+		} else {
+			fmt.Printf("Error creating temp file: %s\n", err)
+			return nil
+		}
+	}
+	defer os.Remove(f.Name())
+
+	cmd := editPostCmd(f.Name())
+	if cmd == nil {
+		fmt.Println(NO_EDITOR_ERR)
+		return nil
+	}
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Start(); err != nil {
+		if DEBUG {
+			panic(err)
+		} else {
+			fmt.Printf("Error starting editor: %s\n", err)
+			return nil
+		}
+	}
+	if err := cmd.Wait(); err != nil {
+		if DEBUG {
+			panic(err)
+		} else {
+			fmt.Printf("Editor finished with error: %s\n", err)
+			return nil
+		}
+	}
+
+	post, err := ioutil.ReadFile(f.Name())
+	if err != nil {
+		if DEBUG {
+			panic(err)
+		} else {
+			fmt.Printf("Error reading post: %s\n", err)
+			return nil
+		}
+	}
+	return &post
 }

@@ -66,6 +66,22 @@ func main() {
 			},
 		},
 		{
+			Name:   "new",
+			Usage:  "Create a new post with your default text editor and publish",
+			Action: cmdNew,
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "tor, t",
+					Usage: "Post via Tor hidden service",
+				},
+				cli.IntFlag{
+					Name:  "tor-port",
+					Usage: "Use a different port to connect to Tor",
+					Value: 9150,
+				},
+			},
+		},
+		{
 			Name:   "delete",
 			Usage:  "Delete a post",
 			Action: cmdDelete,
@@ -181,9 +197,7 @@ func check(err error) {
 	}
 }
 
-func cmdPost(c *cli.Context) {
-	fullPost := readStdIn()
-
+func handlePost(fullPost []byte, c *cli.Context) {
 	tor := c.Bool("tor") || c.Bool("t")
 	if c.Int("tor-port") != 0 {
 		torPort = c.Int("tor-port")
@@ -195,6 +209,26 @@ func cmdPost(c *cli.Context) {
 	}
 
 	DoPost(fullPost, false, tor)
+}
+
+func cmdPost(c *cli.Context) {
+	handlePost(readStdIn(), c)
+}
+
+func cmdNew(c *cli.Context) {
+	p := composeNewPost()
+	if p == nil {
+		// Assume composeNewPost already told us what the error was. Abort now.
+		os.Exit(1)
+	}
+
+	// Ensure we have something to post
+	if len(*p) == 0 {
+		fmt.Println("Empty post. Bye!")
+		os.Exit(0)
+	}
+
+	handlePost(*p, c)
 }
 
 func cmdDelete(c *cli.Context) {
