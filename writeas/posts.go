@@ -99,7 +99,7 @@ func getPosts() *[]Post {
 }
 
 func composeNewPost() *[]byte {
-	f, err := ioutil.TempFile(os.TempDir(), "WApost")
+	f, err := fileutils.TempFile(os.TempDir(), "WApost", "txt")
 	if err != nil {
 		if DEBUG {
 			panic(err)
@@ -109,6 +109,7 @@ func composeNewPost() *[]byte {
 		}
 	}
 	defer os.Remove(f.Name())
+	f.Close()
 
 	cmd := editPostCmd(f.Name())
 	if cmd == nil {

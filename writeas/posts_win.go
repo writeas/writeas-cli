@@ -17,5 +17,6 @@ func parentDataDir() string {
 }
 
 func editPostCmd(fname string) *exec.Cmd {
-	return exec.Command(fname)
+	// NOTE this won't work if fname contains spaces.
+	return exec.Command("cmd", "/C start /WAIT "+fname)
 }
