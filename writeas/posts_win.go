@@ -19,7 +19,7 @@ func parentDataDir() string {
 
 func editPostCmd(fname string) *exec.Cmd {
 	// NOTE this won't work if fname contains spaces.
-	return exec.Command("cmd", "/C start /WAIT "+fname)
+	return exec.Command("cmd", "/C copy con "+fname)
 }
 
 func messageRetryCompose(fname string) string {
