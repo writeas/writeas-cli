@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/atotto/clipboard"
 	"github.com/codegangsta/cli"
 	"io"
 	"io/ioutil"
@@ -458,6 +459,15 @@ func DoPost(post []byte, encrypt, tor, code bool) error {
 
 		addPost(id, token)
 
+		// Copy URL to clipboard
+		err = clipboard.WriteAll(string(url))
+		if err != nil {
+			fmt.Printf("Didn't copy to clipboard: %s\n", err)
+		} else {
+			fmt.Println("Copied to clipboard.")
+		}
+
+		// Output URL
 		fmt.Printf("%s\n", url)
 	} else {
 		return errors.New(fmt.Sprintf("Unable to post: %s", resp.Status))
