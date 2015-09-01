@@ -13,10 +13,11 @@ writeas [global options] command [command options] [arguments...]
 
 COMMANDS:
    post     Alias for default action: create post from stdin
+   new      Compose a new post from the command-line and publish
    delete   Delete a post
    update   Update (overwrite) a post
    get      Read a raw post
-   add      Add a post locally
+   add      Add an existing post locally
    list     List local posts
    help, h  Shows a list of commands or help for one command
    

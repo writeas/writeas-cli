@@ -72,8 +72,17 @@ func main() {
 			},
 		},
 		{
-			Name:   "new",
-			Usage:  "Create a new post with your default text editor and publish",
+			Name:  "new",
+			Usage: "Compose a new post from the command-line and publish",
+			Description: `An alternative to piping data to the program.
+
+   On Windows, this will use 'copy con' to start reading what you input from the
+   prompt. Press F6 or Ctrl-Z then Enter to end input.
+   On *nix, this will use the best available text editor, starting with the 
+   value set to the EDITOR environment variable, or vim, or finally nano.
+   
+   If posting fails for any reason, 'writeas' will show you the temporary file
+   location and how to pipe it to 'writeas' to retry.`,
 			Action: cmdNew,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
@@ -136,8 +145,13 @@ func main() {
 			},
 		},
 		{
-			Name:   "add",
-			Usage:  "Add a post locally",
+			Name:  "add",
+			Usage: "Add an existing post locally",
+			Description: `A way to add an existing post to your local store for easy editing later.
+			
+   This requires a post ID (from https://write.as/[ID]) and an Edit Token
+   (exported from another Write.as client, such as the Android app).
+`,
 			Action: cmdAdd,
 		},
 		{
