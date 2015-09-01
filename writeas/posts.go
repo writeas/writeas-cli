@@ -85,14 +85,16 @@ func getPosts() *[]Post {
 	lines := fileutils.ReadData(filepath.Join(userDataDir(), POSTS_FILE))
 
 	posts := []Post{}
-	parts := make([]string, 2)
 
-	for _, l := range *lines {
-		parts = strings.Split(l, SEPARATOR)
-		if len(parts) < 2 {
-			continue
+	if lines != nil && len(*lines) > 0 {
+		parts := make([]string, 2)
+		for _, l := range *lines {
+			parts = strings.Split(l, SEPARATOR)
+			if len(parts) < 2 {
+				continue
+			}
+			posts = append(posts, Post{ID: parts[0], EditToken: parts[1]})
 		}
-		posts = append(posts, Post{ID: parts[0], EditToken: parts[1]})
 	}
 
 	return &posts
