@@ -18,9 +18,9 @@ import (
 )
 
 const (
-	apiUrl       = "http://i.write.as"
+	apiUrl       = "https://write.as"
 	hiddenApiUrl = "http://writeas7pm7rcdqg.onion"
-	readApiUrl   = "http://i.write.as"
+	readApiUrl   = "https://write.as"
 	VERSION      = "0.3"
 )
 
@@ -400,21 +400,11 @@ func client(read, tor bool, path, query string) (string, *http.Client) {
 	var client *http.Client
 	if tor {
 		u, _ = url.ParseRequestURI(hiddenApiUrl)
-
-		if len(path) != 12 {
-			// Handle alpha phase HTML-based URLs
-			path += ".txt"
-		}
-
-		if read {
-			u.Path = "/" + path
-		} else {
-			u.Path = "/api"
-		}
+		u.Path = "/api/" + path
 		client = torClient()
 	} else {
 		u, _ = url.ParseRequestURI(apiUrl)
-		u.Path = "/" + path
+		u.Path = "/api/" + path
 		client = &http.Client{}
 	}
 	if query != "" {
