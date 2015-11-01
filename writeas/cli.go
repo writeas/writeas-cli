@@ -24,6 +24,22 @@ const (
 	VERSION      = "0.3"
 )
 
+var postFlags = []cli.Flag{
+	cli.BoolFlag{
+		Name:  "tor, t",
+		Usage: "Perform action on Tor hidden service",
+	},
+	cli.IntFlag{
+		Name:  "tor-port",
+		Usage: "Use a different port to connect to Tor",
+		Value: 9150,
+	},
+	cli.BoolFlag{
+		Name:  "code",
+		Usage: "Specifies this post is code",
+	},
+}
+
 func main() {
 	initialize()
 
@@ -39,37 +55,13 @@ func main() {
 		},
 	}
 	app.Action = cmdPost
-	app.Flags = []cli.Flag{
-		cli.BoolFlag{
-			Name:  "tor, t",
-			Usage: "Perform action on Tor hidden service",
-		},
-		cli.IntFlag{
-			Name:  "tor-port",
-			Usage: "Use a different port to connect to Tor",
-			Value: 9150,
-		},
-	}
+	app.Flags = postFlags
 	app.Commands = []cli.Command{
 		{
 			Name:   "post",
 			Usage:  "Alias for default action: create post from stdin",
 			Action: cmdPost,
-			Flags: []cli.Flag{
-				cli.BoolFlag{
-					Name:  "tor, t",
-					Usage: "Post via Tor hidden service",
-				},
-				cli.IntFlag{
-					Name:  "tor-port",
-					Usage: "Use a different port to connect to Tor",
-					Value: 9150,
-				},
-				cli.BoolFlag{
-					Name:  "code",
-					Usage: "Specifies this post is code",
-				},
-			},
+			Flags:  postFlags,
 		},
 		{
 			Name:  "new",
