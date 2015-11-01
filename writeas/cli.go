@@ -495,7 +495,7 @@ func DoPost(post []byte, encrypt, tor, code bool) error {
 }
 
 func DoUpdate(post []byte, friendlyId, token string, tor bool) {
-	urlStr, client := client(false, tor, "", fmt.Sprintf("id=%s&t=%s", friendlyId, token))
+	urlStr, client := client(false, tor, friendlyId, fmt.Sprintf("t=%s", token))
 
 	data := url.Values{}
 	data.Set("w", string(post))
@@ -525,7 +525,7 @@ func DoUpdate(post []byte, friendlyId, token string, tor bool) {
 }
 
 func DoDelete(friendlyId, token string, tor bool) {
-	urlStr, client := client(false, tor, "", fmt.Sprintf("id=%s&t=%s", friendlyId, token))
+	urlStr, client := client(false, tor, friendlyId, fmt.Sprintf("t=%s", token))
 
 	r, _ := http.NewRequest("DELETE", urlStr, nil)
 	r.Header.Add("User-Agent", "writeas-cli v"+VERSION)
