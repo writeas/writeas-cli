@@ -24,6 +24,11 @@ const (
 	VERSION      = "0.3"
 )
 
+// Defaults for posts on Write.as.
+const (
+	defaultFont = PostFontMono
+)
+
 var postFlags = []cli.Flag{
 	cli.BoolFlag{
 		Name:  "tor, t",
@@ -37,6 +42,11 @@ var postFlags = []cli.Flag{
 	cli.BoolFlag{
 		Name:  "code",
 		Usage: "Specifies this post is code",
+	},
+	cli.StringFlag{
+		Name:  "font",
+		Usage: "Sets post font to given value",
+		Value: defaultFont,
 	},
 }
 
@@ -234,7 +244,7 @@ func handlePost(fullPost []byte, c *cli.Context) error {
 		fmt.Println("Posting...")
 	}
 
-	return DoPost(fullPost, false, tor, c.Bool("code"))
+	return DoPost(fullPost, c.String("font"), false, tor, c.Bool("code"))
 }
 
 func cmdPost(c *cli.Context) {
@@ -430,15 +440,25 @@ func DoFetch(friendlyId string, tor bool) {
 	}
 }
 
-func DoPost(post []byte, encrypt, tor, code bool) error {
+func DoPost(post []byte, font string, encrypt, tor, code bool) error {
 	data := url.Values{}
 	data.Set("w", string(post))
 	if encrypt {
 		data.Add("e", "")
 	}
-	font := "mono"
 	if code {
+		if font != defaultFont {
+			fmt.Printf("A non-default font '%s' and --code flag given. 'code' type takes precedence.\n", font)
+		}
 		font = "code"
+	} else {
+		// Validate font value
+		if f, ok := postFontMap[font]; ok {
+			font = string(f)
+		} else {
+			fmt.Printf("Font '%s' invalid. Using default '%s'\n", font, defaultFont)
+			font = string(defaultFont)
+		}
 	}
 	data.Add("font", font)
 
