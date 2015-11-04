@@ -86,17 +86,7 @@ func main() {
    If posting fails for any reason, 'writeas' will show you the temporary file
    location and how to pipe it to 'writeas' to retry.`,
 			Action: cmdNew,
-			Flags: []cli.Flag{
-				cli.BoolFlag{
-					Name:  "tor, t",
-					Usage: "Post via Tor hidden service",
-				},
-				cli.IntFlag{
-					Name:  "tor-port",
-					Usage: "Use a different port to connect to Tor",
-					Value: 9150,
-				},
-			},
+			Flags:  postFlags,
 		},
 		{
 			Name:   "delete",
