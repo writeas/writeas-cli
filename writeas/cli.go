@@ -72,6 +72,12 @@ func main() {
 			Usage:  "Alias for default action: create post from stdin",
 			Action: cmdPost,
 			Flags:  postFlags,
+			Description: `Create a new post on Write.as from stdin.
+
+   Use the --code flag to indicate that the post should use syntax 
+   highlighting. Or use the --font [value] argument to set the post's 
+   appearance, where [value] is mono, monospace (default), wrap (monospace 
+   font with word wrapping), serif, or sans.`,
 		},
 		{
 			Name:  "new",
@@ -82,6 +88,11 @@ func main() {
    prompt. Press F6 or Ctrl-Z then Enter to end input.
    On *nix, this will use the best available text editor, starting with the 
    value set to the EDITOR environment variable, or vim, or finally nano.
+
+   Use the --code flag to indicate that the post should use syntax 
+   highlighting. Or use the --font [value] argument to set the post's 
+   appearance, where [value] is mono, monospace (default), wrap (monospace 
+   font with word wrapping), serif, or sans.
    
    If posting fails for any reason, 'writeas' will show you the temporary file
    location and how to pipe it to 'writeas' to retry.`,
