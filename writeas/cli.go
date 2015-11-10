@@ -129,6 +129,14 @@ func main() {
 					Usage: "Use a different port to connect to Tor",
 					Value: 9150,
 				},
+				cli.BoolFlag{
+					Name:  "code",
+					Usage: "Specifies this post is code",
+				},
+				cli.StringFlag{
+					Name:  "font",
+					Usage: "Sets post font to given value",
+				},
 			},
 		},
 		{
@@ -346,7 +354,7 @@ func cmdUpdate(c *cli.Context) {
 		fmt.Println("Updating...")
 	}
 
-	DoUpdate(fullPost, friendlyId, token, tor)
+	DoUpdate(fullPost, friendlyId, token, c.String("font"), tor, c.Bool("code"))
 }
 
 func cmdGet(c *cli.Context) {
@@ -447,21 +455,7 @@ func DoPost(post []byte, font string, encrypt, tor, code bool) error {
 	if encrypt {
 		data.Add("e", "")
 	}
-	if code {
-		if font != defaultFont {
-			fmt.Printf("A non-default font '%s' and --code flag given. 'code' type takes precedence.\n", font)
-		}
-		font = "code"
-	} else {
-		// Validate font value
-		if f, ok := postFontMap[font]; ok {
-			font = string(f)
-		} else {
-			fmt.Printf("Font '%s' invalid. Using default '%s'\n", font, defaultFont)
-			font = string(defaultFont)
-		}
-	}
-	data.Add("font", font)
+	data.Add("font", getFont(code, font))
 
 	urlStr, client := client(false, tor, "", "")
 
@@ -507,11 +501,16 @@ func DoPost(post []byte, font string, encrypt, tor, code bool) error {
 	return nil
 }
 
-func DoUpdate(post []byte, friendlyId, token string, tor bool) {
+func DoUpdate(post []byte, friendlyId, token, font string, tor, code bool) {
 	urlStr, client := client(false, tor, friendlyId, fmt.Sprintf("t=%s", token))
 
 	data := url.Values{}
 	data.Set("w", string(post))
+
+	if code || font != "" {
+		// Only update font if explicitly changed
+		data.Add("font", getFont(code, font))
+	}
 
 	r, _ := http.NewRequest("POST", urlStr, bytes.NewBufferString(data.Encode()))
 	r.Header.Add("User-Agent", "writeas-cli v"+VERSION)

@@ -1,5 +1,9 @@
 package main
 
+import (
+	"fmt"
+)
+
 // postFont represents a valid post appearance value in the API.
 type postFont string
 
@@ -22,4 +26,21 @@ var postFontMap = map[string]postFont{
 	"monospace": PostFontMono,
 	"wrap":      PostFontWrap,
 	"code":      PostFontCode,
+}
+
+func getFont(code bool, font string) string {
+	if code {
+		if font != "" && font != defaultFont {
+			fmt.Printf("A non-default font '%s' and --code flag given. 'code' type takes precedence.\n", font)
+		}
+		return "code"
+	} else {
+		// Validate font value
+		if f, ok := postFontMap[font]; ok {
+			return string(f)
+		} else {
+			fmt.Printf("Font '%s' invalid. Using default '%s'\n", font, defaultFont)
+			return string(defaultFont)
+		}
+	}
 }
