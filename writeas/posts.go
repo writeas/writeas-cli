@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	POSTS_FILE = "posts.psv"
-	SEPARATOR  = `|`
+	postsFile = "posts.psv"
+	separator = `|`
 )
 
 type Post struct {
@@ -20,7 +20,7 @@ type Post struct {
 }
 
 func userDataDir() string {
-	return filepath.Join(parentDataDir(), DATA_DIR_NAME)
+	return filepath.Join(parentDataDir(), dataDirName)
 }
 
 func dataDirExists() bool {
@@ -30,7 +30,7 @@ func dataDirExists() bool {
 func createDataDir() {
 	err := os.Mkdir(userDataDir(), 0700)
 	if err != nil {
-		if DEBUG {
+		if debug {
 			panic(err)
 		} else {
 			fmt.Printf("Error creating data directory: %s\n", err)
@@ -40,9 +40,9 @@ func createDataDir() {
 }
 
 func addPost(id, token string) {
-	f, err := os.OpenFile(filepath.Join(userDataDir(), POSTS_FILE), os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0600)
+	f, err := os.OpenFile(filepath.Join(userDataDir(), postsFile), os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0600)
 	if err != nil {
-		if DEBUG {
+		if debug {
 			panic(err)
 		} else {
 			fmt.Printf("Error creating local posts list: %s\n", err)
@@ -51,10 +51,10 @@ func addPost(id, token string) {
 	}
 	defer f.Close()
 
-	l := fmt.Sprintf("%s%s%s\n", id, SEPARATOR, token)
+	l := fmt.Sprintf("%s%s%s\n", id, separator, token)
 
 	if _, err = f.WriteString(l); err != nil {
-		if DEBUG {
+		if debug {
 			panic(err)
 		} else {
 			fmt.Printf("Error writing to local posts list: %s\n", err)
@@ -64,12 +64,12 @@ func addPost(id, token string) {
 }
 
 func tokenFromID(id string) string {
-	post := fileutils.FindLine(filepath.Join(userDataDir(), POSTS_FILE), id)
+	post := fileutils.FindLine(filepath.Join(userDataDir(), postsFile), id)
 	if post == "" {
 		return ""
 	}
 
-	parts := strings.Split(post, SEPARATOR)
+	parts := strings.Split(post, separator)
 	if len(parts) < 2 {
 		return ""
 	}
@@ -78,18 +78,18 @@ func tokenFromID(id string) string {
 }
 
 func removePost(id string) {
-	fileutils.RemoveLine(filepath.Join(userDataDir(), POSTS_FILE), id)
+	fileutils.RemoveLine(filepath.Join(userDataDir(), postsFile), id)
 }
 
 func getPosts() *[]Post {
-	lines := fileutils.ReadData(filepath.Join(userDataDir(), POSTS_FILE))
+	lines := fileutils.ReadData(filepath.Join(userDataDir(), postsFile))
 
 	posts := []Post{}
 
 	if lines != nil && len(*lines) > 0 {
 		parts := make([]string, 2)
 		for _, l := range *lines {
-			parts = strings.Split(l, SEPARATOR)
+			parts = strings.Split(l, separator)
 			if len(parts) < 2 {
 				continue
 			}
@@ -103,7 +103,7 @@ func getPosts() *[]Post {
 func composeNewPost() (string, *[]byte) {
 	f, err := fileutils.TempFile(os.TempDir(), "WApost", "txt")
 	if err != nil {
-		if DEBUG {
+		if debug {
 			panic(err)
 		} else {
 			fmt.Printf("Error creating temp file: %s\n", err)
@@ -116,14 +116,14 @@ func composeNewPost() (string, *[]byte) {
 	if cmd == nil {
 		os.Remove(f.Name())
 
-		fmt.Println(NO_EDITOR_ERR)
+		fmt.Println(noEditorErr)
 		return "", nil
 	}
 	cmd.Stdin, cmd.Stdout, cmd.Stderr = os.Stdin, os.Stdout, os.Stderr
 	if err := cmd.Start(); err != nil {
 		os.Remove(f.Name())
 
-		if DEBUG {
+		if debug {
 			panic(err)
 		} else {
 			fmt.Printf("Error starting editor: %s\n", err)
@@ -134,7 +134,7 @@ func composeNewPost() (string, *[]byte) {
 	// If something fails past this point, the temporary post file won't be
 	// removed automatically. Calling function should handle this.
 	if err := cmd.Wait(); err != nil {
-		if DEBUG {
+		if debug {
 			panic(err)
 		} else {
 			fmt.Printf("Editor finished with error: %s\n", err)
@@ -144,7 +144,7 @@ func composeNewPost() (string, *[]byte) {
 
 	post, err := ioutil.ReadFile(f.Name())
 	if err != nil {
-		if DEBUG {
+		if debug {
 			panic(err)
 		} else {
 			fmt.Printf("Error reading post: %s\n", err)

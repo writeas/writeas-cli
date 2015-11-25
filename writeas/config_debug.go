@@ -3,5 +3,5 @@
 package main
 
 const (
-	DEBUG = true
+	debug = true
 )

@@ -528,7 +528,7 @@ func DoUpdate(post []byte, friendlyId, token, font string, tor, code bool) {
 			fmt.Println("Post updated.")
 		}
 	} else {
-		if DEBUG {
+		if debug {
 			fmt.Printf("Problem updating: %s\n", resp.Status)
 		} else {
 			fmt.Printf("Post doesn't exist, or bad edit token given.\n")
@@ -555,7 +555,7 @@ func DoDelete(friendlyId, token string, tor bool) {
 		}
 		removePost(friendlyId)
 	} else {
-		if DEBUG {
+		if debug {
 			fmt.Printf("Problem deleting: %s\n", resp.Status)
 		} else {
 			fmt.Printf("Post doesn't exist, or bad edit token given.\n")

@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	DATA_DIR_NAME = ".writeas"
-	NO_EDITOR_ERR = "Couldn't find default editor. Try setting $EDITOR environment variable in ~/.profile"
+	dataDirName = ".writeas"
+	noEditorErr = "Couldn't find default editor. Try setting $EDITOR environment variable in ~/.profile"
 )
 
 func parentDataDir() string {
