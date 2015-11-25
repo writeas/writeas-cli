@@ -21,7 +21,11 @@ const (
 	apiUrl       = "https://write.as"
 	hiddenApiUrl = "http://writeas7pm7rcdqg.onion"
 	readApiUrl   = "https://write.as"
-	VERSION      = "0.3"
+)
+
+// Application constants.
+const (
+	VERSION = "0.4"
 )
 
 // Defaults for posts on Write.as.
