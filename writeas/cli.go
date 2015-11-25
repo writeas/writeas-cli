@@ -17,6 +17,7 @@ import (
 	"strings"
 )
 
+// API constants for communicating with Write.as.
 const (
 	apiUrl       = "https://write.as"
 	hiddenApiUrl = "http://writeas7pm7rcdqg.onion"
@@ -25,7 +26,7 @@ const (
 
 // Application constants.
 const (
-	VERSION = "0.4"
+	version = "0.4"
 )
 
 // Defaults for posts on Write.as.
@@ -33,6 +34,7 @@ const (
 	defaultFont = PostFontMono
 )
 
+// Available flags for creating posts
 var postFlags = []cli.Flag{
 	cli.BoolFlag{
 		Name:  "tor, t",
@@ -60,7 +62,7 @@ func main() {
 	// Run the app
 	app := cli.NewApp()
 	app.Name = "writeas"
-	app.Version = VERSION
+	app.Version = version
 	app.Usage = "Simple text pasting and publishing"
 	app.Authors = []cli.Author{
 		{
@@ -436,7 +438,7 @@ func DoFetch(friendlyId string, tor bool) {
 	urlStr, client := client(true, tor, path, "")
 
 	r, _ := http.NewRequest("GET", urlStr, nil)
-	r.Header.Add("User-Agent", "writeas-cli v"+VERSION)
+	r.Header.Add("User-Agent", "writeas-cli v"+version)
 
 	resp, err := client.Do(r)
 	check(err)
@@ -464,7 +466,7 @@ func DoPost(post []byte, font string, encrypt, tor, code bool) error {
 	urlStr, client := client(false, tor, "", "")
 
 	r, _ := http.NewRequest("POST", urlStr, bytes.NewBufferString(data.Encode()))
-	r.Header.Add("User-Agent", "writeas-cli v"+VERSION)
+	r.Header.Add("User-Agent", "writeas-cli v"+version)
 	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	r.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
 
@@ -517,7 +519,7 @@ func DoUpdate(post []byte, friendlyId, token, font string, tor, code bool) {
 	}
 
 	r, _ := http.NewRequest("POST", urlStr, bytes.NewBufferString(data.Encode()))
-	r.Header.Add("User-Agent", "writeas-cli v"+VERSION)
+	r.Header.Add("User-Agent", "writeas-cli v"+version)
 	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	r.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
 
@@ -544,7 +546,7 @@ func DoDelete(friendlyId, token string, tor bool) {
 	urlStr, client := client(false, tor, friendlyId, fmt.Sprintf("t=%s", token))
 
 	r, _ := http.NewRequest("DELETE", urlStr, nil)
-	r.Header.Add("User-Agent", "writeas-cli v"+VERSION)
+	r.Header.Add("User-Agent", "writeas-cli v"+version)
 	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 	resp, err := client.Do(r)
