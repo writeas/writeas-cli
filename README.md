@@ -1,5 +1,7 @@
 writeas-cli
 ===========
+[![Public Slack discussion](http://slack.write.as/badge.svg)](http://slack.write.as/)
+
 Command line interface for [Write.as](https://write.as) and [Write.as on Tor](http://writeas7pm7rcdqg.onion/). Works on Windows, OS X, and Linux.
 
 Like the [Android app](https://play.google.com/store/apps/details?id=com.abunchtell.writeas), the command line client keeps track of the posts you make, so future editing / deleting is easier than [doing it with cURL](http://cmd.write.as/). The goal is for this to serve as the backend for any future GUI app we build for the desktop.
