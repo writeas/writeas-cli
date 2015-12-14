@@ -1,12 +1,26 @@
 writeas-cli
 ===========
-[![Public Slack discussion](http://slack.write.as/badge.svg)](http://slack.write.as/)
+![MIT license](https://img.shields.io/github/license/writeas/writeas-cli.svg) [![Public Slack discussion](http://slack.write.as/badge.svg)](http://slack.write.as/)
 
 Command line interface for [Write.as](https://write.as) and [Write.as on Tor](http://writeas7pm7rcdqg.onion/). Works on Windows, OS X, and Linux.
 
 Like the [Android app](https://play.google.com/store/apps/details?id=com.abunchtell.writeas), the command line client keeps track of the posts you make, so future editing / deleting is easier than [doing it with cURL](http://cmd.write.as/). The goal is for this to serve as the backend for any future GUI app we build for the desktop.
 
 It is currently **alpha**, so a) functionality is basic and b) everything is subject to change — i.e., watch the [changelog](https://write.as/changelog-cli.html).
+
+## Download
+[![Latest release](https://img.shields.io/github/release/writeas/writeas-cli.svg)](https://github.com/writeas/writeas-cli/releases/latest) ![Total downloads](https://img.shields.io/github/downloads/writeas/writeas-cli/total.svg) 
+
+Get the latest version for your operating system as a standalone executable.
+
+**Windows**: [64-bit](https://github.com/writeas/writeas-cli/releases/download/v0.4/writeas_0.4_windows_amd64.zip) – [32-bit](https://github.com/writeas/writeas-cli/releases/download/v0.4/writeas_0.4_windows_386.zip)
+
+**OS X**: [64-bit](https://github.com/writeas/writeas-cli/releases/download/v0.4/writeas_0.4_darwin_amd64.zip) – [32-bit](https://github.com/writeas/writeas-cli/releases/download/v0.4/writeas_0.4_darwin_386.zip)
+
+**Linux**: [64-bit](https://github.com/writeas/writeas-cli/releases/download/v0.4/writeas_0.4_linux_amd64.tar.gz) – [32-bit](https://github.com/writeas/writeas-cli/releases/download/v0.4/writeas_0.4_linux_386.tar.gz)
+
+### Go get it
+`go get github.com/writeas/writeas-cli/writeas`
 
 ## Usage
 
@@ -30,9 +44,5 @@ GLOBAL OPTIONS:
    --version, -v	 print the version
 ```
 
-## Download
 
-Get it on the [web](https://write.as/cli.html) or [hidden service](http://writeas7pm7rcdqg.onion/cli.html).
 
-## Go get it
-`go get github.com/writeas/writeas-cli/writeas`
