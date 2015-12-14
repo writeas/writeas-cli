@@ -44,5 +44,18 @@ GLOBAL OPTIONS:
    --version, -v	 print the version
 ```
 
+### Examples
 
+These are a few common uses for `writeas`. If you get stuck or want to know more, run `writeas [command] --help`. If you still have questions, [ask us](https://write.as/contact).
 
+#### Share something
+Basic use: `echo "Hello world!" | writeas`
+
+#### Create post from command output
+Share some code (*nix): `cat writeas/cli.go | writeas --code`
+
+Share some code (Windows): `type writeas/cli.go | writeas.exe --code`
+
+#### Compose a new post
+
+[Start composing](https://asciinema.org/a/25818) a post, publishing with a sans-serif font: `writeas new --font sans`
