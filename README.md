@@ -35,4 +35,4 @@ GLOBAL OPTIONS:
 Get it on the [web](https://write.as/cli.html) or [hidden service](http://writeas7pm7rcdqg.onion/cli.html).
 
 ## Go get it
-`go get github.com/writeas/writeas-cli`
+`go get github.com/writeas/writeas-cli/writeas`
