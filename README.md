@@ -49,13 +49,36 @@ GLOBAL OPTIONS:
 These are a few common uses for `writeas`. If you get stuck or want to know more, run `writeas [command] --help`. If you still have questions, [ask us](https://write.as/contact).
 
 #### Share something
-Basic use: `echo "Hello world!" | writeas`
 
-#### Create post from command output
-Share some code (*nix): `cat writeas/cli.go | writeas --code`
+Without any flags, `writeas` creates a post with a `monospace` typeface that doesn't word wrap (scrolls horizontally):
 
-Share some code (Windows): `type writeas/cli.go | writeas.exe --code`
+```bash
+$ echo "Hello world!" | writeas
+Posting...
+Copied to clipboard.
+https://write.as/aaaaaaaaaaaa
+```
 
-#### Compose a new post
+This is generally more useful for posting terminal output or code, like so (the `--code` flag turns on syntax highlighting):
 
-[Start composing](https://asciinema.org/a/25818) a post, publishing with a sans-serif font: `writeas new --font sans`
+OS X / *nix: `cat writeas/cli.go | writeas --code`
+
+Windows: `type writeas/cli.go | writeas.exe --code`
+
+#### Composing posts
+
+If you simply have a penchant for never leaving your keyboard, `writeas` is great for composing new posts from the command-line. Just use the `new` subcommand.
+
+`writeas new` will open your favorite command-line editor, as specified by your `EDITOR` environment variable, falling back to `vim` on OS X / *nix.
+
+Customize your post's appearance with the `--font` flag:
+
+| Argument | Appearance (Typeface) | Word Wrap? |
+| -------- | --------------------- | ---------- |
+| `sans` | Sans-serif (Open Sans) | Yes |
+| `serif` | Serif (Lora) | Yes |
+| `wrap` | Monospace | Yes |
+| `mono` | Monospace | No |
+| `code` | Syntax-highlighted monospace | No |
+
+Put it all together, e.g. publish with a sans-serif font: `writeas new --font sans`
