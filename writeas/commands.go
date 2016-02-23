@@ -31,7 +31,7 @@ func cmdNew(c *cli.Context) {
 
 	err := handlePost(*p, c)
 	if err != nil {
-		fmt.Printf("Error posting: %s\n", err)
+		fmt.Fprintf(os.Stderr, "Error posting: %s\n", err)
 		fmt.Println(messageRetryCompose(fname))
 		os.Exit(1)
 	}

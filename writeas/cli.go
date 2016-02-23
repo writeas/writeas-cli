@@ -243,7 +243,7 @@ func readStdIn() []byte {
 
 func check(err error) {
 	if err != nil {
-		fmt.Printf("%s\n", err)
+		fmt.Fprintf(os.Stderr, "writeas: %s\n", err)
 		os.Exit(1)
 	}
 }
@@ -343,7 +343,7 @@ func DoPost(post []byte, font string, encrypt, tor, code bool) error {
 		// Copy URL to clipboard
 		err = clipboard.WriteAll(string(url))
 		if err != nil {
-			fmt.Printf("Didn't copy to clipboard: %s\n", err)
+			fmt.Fprintf(os.Stderr, "writeas: Didn't copy to clipboard: %s\n", err)
 		} else {
 			fmt.Println("Copied to clipboard.")
 		}
