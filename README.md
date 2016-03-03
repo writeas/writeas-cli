@@ -69,7 +69,7 @@ Windows: `type writeas/cli.go | writeas.exe --code`
 
 If you simply have a penchant for never leaving your keyboard, `writeas` is great for composing new posts from the command-line. Just use the `new` subcommand.
 
-`writeas new` will open your favorite command-line editor, as specified by your `EDITOR` environment variable, falling back to `vim` on OS X / *nix.
+`writeas new` will open your favorite command-line editor, as specified by your `WRITEAS_EDITOR` or `EDITOR` environment variables (in that order), falling back to `vim` on OS X / *nix.
 
 Customize your post's appearance with the `--font` flag:
 

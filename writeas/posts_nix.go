@@ -5,7 +5,6 @@ package main
 import (
 	"fmt"
 	"github.com/mitchellh/go-homedir"
-	"os"
 	"os/exec"
 )
 
@@ -24,7 +23,7 @@ func parentDataDir() string {
 }
 
 func editPostCmd(fname string) *exec.Cmd {
-	editor := os.Getenv("EDITOR")
+	editor := getConfiguredEditor()
 	if editor == "" {
 		// Fall back to default editor
 		path, err := exec.LookPath("vim")
