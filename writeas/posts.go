@@ -14,6 +14,7 @@ const (
 	separator = `|`
 )
 
+// Post holds the basic authentication information for a Write.as post.
 type Post struct {
 	ID        string
 	EditToken string

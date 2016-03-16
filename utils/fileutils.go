@@ -15,6 +15,7 @@ func Exists(p string) bool {
 	return false
 }
 
+// WriteData writes data to the given path, creating the file if necessary.
 func WriteData(path string, data []byte) {
 	f, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0600)
 	if err != nil {
@@ -30,6 +31,7 @@ func WriteData(path string, data []byte) {
 	}
 }
 
+// ReadData returns file data as an array of lines from the file.
 func ReadData(p string) *[]string {
 	f, err := os.Open(p)
 	if err != nil {
@@ -51,6 +53,8 @@ func ReadData(p string) *[]string {
 	return &lines
 }
 
+// RemoveLine searches for the line that starts with the given value and,
+// if found, removes it and saves the updated file.
 func RemoveLine(p, startsWith string) {
 	f, err := os.Open(p)
 	if err != nil {
@@ -79,6 +83,8 @@ func RemoveLine(p, startsWith string) {
 	}
 }
 
+// FindLine searches the given file for a line that begins with the given
+// string.
 func FindLine(p, startsWith string) string {
 	f, err := os.Open(p)
 	if err != nil {

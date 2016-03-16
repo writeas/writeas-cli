@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"bytes"
-	"errors"
 	"fmt"
 	"github.com/atotto/clipboard"
 	"github.com/codegangsta/cli"
@@ -19,9 +18,9 @@ import (
 
 // API constants for communicating with Write.as.
 const (
-	apiUrl       = "https://write.as"
-	hiddenApiUrl = "http://writeas7pm7rcdqg.onion"
-	readApiUrl   = "https://write.as"
+	apiURL       = "https://write.as"
+	hiddenAPIURL = "http://writeas7pm7rcdqg.onion"
+	readAPIURL   = "https://write.as"
 )
 
 // Application constants.
@@ -266,11 +265,11 @@ func client(read, tor bool, path, query string) (string, *http.Client) {
 	var u *url.URL
 	var client *http.Client
 	if tor {
-		u, _ = url.ParseRequestURI(hiddenApiUrl)
+		u, _ = url.ParseRequestURI(hiddenAPIURL)
 		u.Path = "/api/" + path
 		client = torClient()
 	} else {
-		u, _ = url.ParseRequestURI(apiUrl)
+		u, _ = url.ParseRequestURI(apiURL)
 		u.Path = "/api/" + path
 		client = &http.Client{}
 	}
@@ -282,8 +281,10 @@ func client(read, tor bool, path, query string) (string, *http.Client) {
 	return urlStr, client
 }
 
-func DoFetch(friendlyId string, tor bool) {
-	path := friendlyId
+// DoFetch retrieves the Write.as post with the given friendlyID,
+// optionally via the Tor hidden service.
+func DoFetch(friendlyID string, tor bool) {
+	path := friendlyID
 
 	urlStr, client := client(true, tor, path, "")
 
@@ -305,6 +306,8 @@ func DoFetch(friendlyId string, tor bool) {
 	}
 }
 
+// DoPost creates a Write.as post, returning an error if it was
+// unsuccessful.
 func DoPost(post []byte, font string, encrypt, tor, code bool) error {
 	data := url.Values{}
 	data.Set("w", string(post))
@@ -351,14 +354,15 @@ func DoPost(post []byte, font string, encrypt, tor, code bool) error {
 		// Output URL
 		fmt.Printf("%s\n", url)
 	} else {
-		return errors.New(fmt.Sprintf("Unable to post: %s", resp.Status))
+		return fmt.Errorf("Unable to post: %s", resp.Status)
 	}
 
 	return nil
 }
 
-func DoUpdate(post []byte, friendlyId, token, font string, tor, code bool) {
-	urlStr, client := client(false, tor, friendlyId, fmt.Sprintf("t=%s", token))
+// DoUpdate updates the given post on Write.as.
+func DoUpdate(post []byte, friendlyID, token, font string, tor, code bool) {
+	urlStr, client := client(false, tor, friendlyID, fmt.Sprintf("t=%s", token))
 
 	data := url.Values{}
 	data.Set("w", string(post))
@@ -392,8 +396,9 @@ func DoUpdate(post []byte, friendlyId, token, font string, tor, code bool) {
 	}
 }
 
-func DoDelete(friendlyId, token string, tor bool) {
-	urlStr, client := client(false, tor, friendlyId, fmt.Sprintf("t=%s", token))
+// DoDelete deletes the given post on Write.as.
+func DoDelete(friendlyID, token string, tor bool) {
+	urlStr, client := client(false, tor, friendlyID, fmt.Sprintf("t=%s", token))
 
 	r, _ := http.NewRequest("DELETE", urlStr, nil)
 	r.Header.Add("User-Agent", "writeas-cli v"+version)
@@ -409,7 +414,7 @@ func DoDelete(friendlyId, token string, tor bool) {
 		} else {
 			fmt.Println("Post deleted.")
 		}
-		removePost(friendlyId)
+		removePost(friendlyID)
 	} else {
 		if debug {
 			fmt.Printf("Problem deleting: %s\n", resp.Status)

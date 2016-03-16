@@ -34,13 +34,13 @@ func getFont(code bool, font string) string {
 			fmt.Printf("A non-default font '%s' and --code flag given. 'code' type takes precedence.\n", font)
 		}
 		return "code"
-	} else {
-		// Validate font value
-		if f, ok := postFontMap[font]; ok {
-			return string(f)
-		} else {
-			fmt.Printf("Font '%s' invalid. Using default '%s'\n", font, defaultFont)
-			return string(defaultFont)
-		}
 	}
+
+	// Validate font value
+	if f, ok := postFontMap[font]; ok {
+		return string(f)
+	}
+
+	fmt.Printf("Font '%s' invalid. Using default '%s'\n", font, defaultFont)
+	return string(defaultFont)
 }
