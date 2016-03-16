@@ -1,6 +1,6 @@
 writeas-cli
 ===========
-![MIT license](https://img.shields.io/github/license/writeas/writeas-cli.svg) [![Public Slack discussion](http://slack.write.as/badge.svg)](http://slack.write.as/)
+![MIT license](https://img.shields.io/github/license/writeas/writeas-cli.svg) [![Go Report Card](https://goreportcard.com/badge/github.com/writeas/writeas-cli)](https://goreportcard.com/report/github.com/writeas/writeas-cli) [![Public Slack discussion](http://slack.write.as/badge.svg)](http://slack.write.as/)
 
 Command line interface for [Write.as](https://write.as) and [Write.as on Tor](http://writeas7pm7rcdqg.onion/). Works on Windows, OS X, and Linux.
 
