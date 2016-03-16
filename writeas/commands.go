@@ -43,19 +43,19 @@ func cmdNew(c *cli.Context) {
 }
 
 func cmdDelete(c *cli.Context) {
-	friendlyId := c.Args().Get(0)
+	friendlyID := c.Args().Get(0)
 	token := c.Args().Get(1)
-	if friendlyId == "" {
+	if friendlyID == "" {
 		fmt.Println("usage: writeas delete <postId> [<token>]")
 		os.Exit(1)
 	}
 
 	if token == "" {
 		// Search for the token locally
-		token = tokenFromID(friendlyId)
+		token = tokenFromID(friendlyID)
 		if token == "" {
 			fmt.Println("Couldn't find an edit token locally. Did you create this post here?")
-			fmt.Printf("If you have an edit token, use: writeas delete %s <token>\n", friendlyId)
+			fmt.Printf("If you have an edit token, use: writeas delete %s <token>\n", friendlyID)
 			os.Exit(1)
 		}
 	}
@@ -70,23 +70,23 @@ func cmdDelete(c *cli.Context) {
 		fmt.Println("Deleting...")
 	}
 
-	DoDelete(friendlyId, token, tor)
+	DoDelete(friendlyID, token, tor)
 }
 
 func cmdUpdate(c *cli.Context) {
-	friendlyId := c.Args().Get(0)
+	friendlyID := c.Args().Get(0)
 	token := c.Args().Get(1)
-	if friendlyId == "" {
+	if friendlyID == "" {
 		fmt.Println("usage: writeas update <postId> [<token>]")
 		os.Exit(1)
 	}
 
 	if token == "" {
 		// Search for the token locally
-		token = tokenFromID(friendlyId)
+		token = tokenFromID(friendlyID)
 		if token == "" {
 			fmt.Println("Couldn't find an edit token locally. Did you create this post here?")
-			fmt.Printf("If you have an edit token, use: writeas update %s <token>\n", friendlyId)
+			fmt.Printf("If you have an edit token, use: writeas update %s <token>\n", friendlyID)
 			os.Exit(1)
 		}
 	}
@@ -104,12 +104,12 @@ func cmdUpdate(c *cli.Context) {
 		fmt.Println("Updating...")
 	}
 
-	DoUpdate(fullPost, friendlyId, token, c.String("font"), tor, c.Bool("code"))
+	DoUpdate(fullPost, friendlyID, token, c.String("font"), tor, c.Bool("code"))
 }
 
 func cmdGet(c *cli.Context) {
-	friendlyId := c.Args().Get(0)
-	if friendlyId == "" {
+	friendlyID := c.Args().Get(0)
+	if friendlyID == "" {
 		fmt.Println("usage: writeas get <postId>")
 		os.Exit(1)
 	}
@@ -124,18 +124,18 @@ func cmdGet(c *cli.Context) {
 		fmt.Println("Getting...")
 	}
 
-	DoFetch(friendlyId, tor)
+	DoFetch(friendlyID, tor)
 }
 
 func cmdAdd(c *cli.Context) {
-	friendlyId := c.Args().Get(0)
+	friendlyID := c.Args().Get(0)
 	token := c.Args().Get(1)
-	if friendlyId == "" || token == "" {
+	if friendlyID == "" || token == "" {
 		fmt.Println("usage: writeas add <postId> <token>")
 		os.Exit(1)
 	}
 
-	addPost(friendlyId, token)
+	addPost(friendlyID, token)
 }
 
 func cmdList(c *cli.Context) {
