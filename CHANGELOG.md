@@ -1,7 +1,7 @@
 Change log
 ==========
 
-## [0.4](https://github.com/writeas/writeas-cli/compare/v0.3...v0.4) - 2015-04-11
+## [0.4](https://github.com/writeas/writeas-cli/compare/v0.3...v0.4) - 2015-12-10
 
 ### Added
 
@@ -15,7 +15,7 @@ Change log
 
 * `--code` flag not working on `writeas --code` command
 
-## [0.3](https://github.com/writeas/writeas-cli/compare/v0.2...v0.3) - 2015-04-11
+## [0.3](https://github.com/writeas/writeas-cli/compare/v0.2...v0.3) - 2015-09-08
 
 ### Added
 
