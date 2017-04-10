@@ -65,7 +65,46 @@ OS X / *nix: `cat writeas/cli.go | writeas --code`
 
 Windows: `type writeas/cli.go | writeas.exe --code`
 
-#### Composing posts
+#### Output a post
+
+This outputs any Write.as post with the given ID.
+
+```bash
+$ writeas get aaaaaaaaaaaa
+Getting...
+Hello world!
+```
+
+#### List all published posts
+
+This lists all posts you've published from your device. Pass the `--url` flag to show the list with full URLs.
+
+```bash
+$ writeas list
+aaaaaaaaaaaa
+```
+
+#### Delete a post
+
+This permanently deletes a post you own.
+
+```bash
+$ writeas delete aaaaaaaaaaaa
+Deleting...
+Post deleted.
+```
+
+#### Update a post
+
+This completely overwrites an existing post you own.
+
+```bash
+$ echo "See you later!" | writeas update aaaaaaaaaaaa
+Updating...
+Post updated.
+```
+
+### Composing posts
 
 If you simply have a penchant for never leaving your keyboard, `writeas` is great for composing new posts from the command-line. Just use the `new` subcommand.
 
