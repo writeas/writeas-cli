@@ -40,28 +40,20 @@ func createDataDir() {
 	}
 }
 
-func addPost(id, token string) {
+func addPost(id, token string) error {
 	f, err := os.OpenFile(filepath.Join(userDataDir(), postsFile), os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0600)
 	if err != nil {
-		if debug {
-			panic(err)
-		} else {
-			fmt.Printf("Error creating local posts list: %s\n", err)
-			return
-		}
+		return fmt.Errorf("Error creating local posts list: %s\n", err)
 	}
 	defer f.Close()
 
 	l := fmt.Sprintf("%s%s%s\n", id, separator, token)
 
 	if _, err = f.WriteString(l); err != nil {
-		if debug {
-			panic(err)
-		} else {
-			fmt.Printf("Error writing to local posts list: %s\n", err)
-			return
-		}
+		return fmt.Errorf("Error writing to local posts list: %s\n", err)
 	}
+
+	return nil
 }
 
 func tokenFromID(id string) string {

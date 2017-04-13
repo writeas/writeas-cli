@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/atotto/clipboard"
-	"github.com/codegangsta/cli"
+	"gopkg.in/urfave/cli.v1"
 	"io"
 	"io/ioutil"
 	"log"
@@ -283,7 +283,7 @@ func client(read, tor bool, path, query string) (string, *http.Client) {
 
 // DoFetch retrieves the Write.as post with the given friendlyID,
 // optionally via the Tor hidden service.
-func DoFetch(friendlyID string, tor bool) {
+func DoFetch(friendlyID string, tor bool) error {
 	path := friendlyID
 
 	urlStr, client := client(true, tor, path, "")
@@ -292,18 +292,23 @@ func DoFetch(friendlyID string, tor bool) {
 	r.Header.Add("User-Agent", "writeas-cli v"+version)
 
 	resp, err := client.Do(r)
-	check(err)
+	if err != nil {
+		return err
+	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusOK {
 		content, err := ioutil.ReadAll(resp.Body)
-		check(err)
+		if err != nil {
+			return err
+		}
 		fmt.Printf("%s\n", string(content))
 	} else if resp.StatusCode == http.StatusNotFound {
-		fmt.Printf("Post not found.\n")
+		return ErrPostNotFound
 	} else {
-		fmt.Printf("Problem getting post: %s\n", resp.Status)
+		return fmt.Errorf("Unable to get post: %s\n", resp.Status)
 	}
+	return nil
 }
 
 // DoPost creates a Write.as post, returning an error if it was
@@ -361,7 +366,7 @@ func DoPost(post []byte, font string, encrypt, tor, code bool) error {
 }
 
 // DoUpdate updates the given post on Write.as.
-func DoUpdate(post []byte, friendlyID, token, font string, tor, code bool) {
+func DoUpdate(post []byte, friendlyID, token, font string, tor, code bool) error {
 	urlStr, client := client(false, tor, friendlyID, fmt.Sprintf("t=%s", token))
 
 	data := url.Values{}
@@ -378,7 +383,9 @@ func DoUpdate(post []byte, friendlyID, token, font string, tor, code bool) {
 	r.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
 
 	resp, err := client.Do(r)
-	check(err)
+	if err != nil {
+		return err
+	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusOK {
@@ -391,13 +398,14 @@ func DoUpdate(post []byte, friendlyID, token, font string, tor, code bool) {
 		if debug {
 			fmt.Printf("Problem updating: %s\n", resp.Status)
 		} else {
-			fmt.Printf("Post doesn't exist, or bad edit token given.\n")
+			return fmt.Errorf("Post doesn't exist, or bad edit token given.\n")
 		}
 	}
+	return nil
 }
 
 // DoDelete deletes the given post on Write.as.
-func DoDelete(friendlyID, token string, tor bool) {
+func DoDelete(friendlyID, token string, tor bool) error {
 	urlStr, client := client(false, tor, friendlyID, fmt.Sprintf("t=%s", token))
 
 	r, _ := http.NewRequest("DELETE", urlStr, nil)
@@ -405,7 +413,9 @@ func DoDelete(friendlyID, token string, tor bool) {
 	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 	resp, err := client.Do(r)
-	check(err)
+	if err != nil {
+		return err
+	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusOK {
@@ -419,7 +429,9 @@ func DoDelete(friendlyID, token string, tor bool) {
 		if debug {
 			fmt.Printf("Problem deleting: %s\n", resp.Status)
 		} else {
-			fmt.Printf("Post doesn't exist, or bad edit token given.\n")
+			return fmt.Errorf("Post doesn't exist, or bad edit token given.\n")
 		}
 	}
+
+	return nil
 }

@@ -2,16 +2,16 @@ package main
 
 import (
 	"fmt"
-	"github.com/codegangsta/cli"
+	"gopkg.in/urfave/cli.v1"
 	"os"
 )
 
-func cmdPost(c *cli.Context) {
+func cmdPost(c *cli.Context) error {
 	err := handlePost(readStdIn(), c)
-	check(err)
+	return err
 }
 
-func cmdNew(c *cli.Context) {
+func cmdNew(c *cli.Context) error {
 	fname, p := composeNewPost()
 	if p == nil {
 		// Assume composeNewPost already told us what the error was. Abort now.
@@ -32,22 +32,23 @@ func cmdNew(c *cli.Context) {
 	err := handlePost(*p, c)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error posting: %s\n", err)
-		fmt.Println(messageRetryCompose(fname))
-		os.Exit(1)
+		fmt.Fprintf(os.Stderr, messageRetryCompose(fname))
+		return cli.NewExitError("", 1)
 	}
 
 	// Clean up temporary post
 	if fname != "" {
 		os.Remove(fname)
 	}
+
+	return nil
 }
 
-func cmdDelete(c *cli.Context) {
+func cmdDelete(c *cli.Context) error {
 	friendlyID := c.Args().Get(0)
 	token := c.Args().Get(1)
 	if friendlyID == "" {
-		fmt.Println("usage: writeas delete <postId> [<token>]")
-		os.Exit(1)
+		return cli.NewExitError("usage: writeas delete <postId> [<token>]", 1)
 	}
 
 	if token == "" {
@@ -70,15 +71,14 @@ func cmdDelete(c *cli.Context) {
 		fmt.Println("Deleting...")
 	}
 
-	DoDelete(friendlyID, token, tor)
+	return DoDelete(friendlyID, token, tor)
 }
 
-func cmdUpdate(c *cli.Context) {
+func cmdUpdate(c *cli.Context) error {
 	friendlyID := c.Args().Get(0)
 	token := c.Args().Get(1)
 	if friendlyID == "" {
-		fmt.Println("usage: writeas update <postId> [<token>]")
-		os.Exit(1)
+		return cli.NewExitError("usage: writeas update <postId> [<token>]", 1)
 	}
 
 	if token == "" {
@@ -104,14 +104,13 @@ func cmdUpdate(c *cli.Context) {
 		fmt.Println("Updating...")
 	}
 
-	DoUpdate(fullPost, friendlyID, token, c.String("font"), tor, c.Bool("code"))
+	return DoUpdate(fullPost, friendlyID, token, c.String("font"), tor, c.Bool("code"))
 }
 
-func cmdGet(c *cli.Context) {
+func cmdGet(c *cli.Context) error {
 	friendlyID := c.Args().Get(0)
 	if friendlyID == "" {
-		fmt.Println("usage: writeas get <postId>")
-		os.Exit(1)
+		return cli.NewExitError("usage: writeas get <postId>", 1)
 	}
 
 	tor := c.Bool("tor") || c.Bool("t")
@@ -124,21 +123,21 @@ func cmdGet(c *cli.Context) {
 		fmt.Println("Getting...")
 	}
 
-	DoFetch(friendlyID, tor)
+	return DoFetch(friendlyID, tor)
 }
 
-func cmdAdd(c *cli.Context) {
+func cmdAdd(c *cli.Context) error {
 	friendlyID := c.Args().Get(0)
 	token := c.Args().Get(1)
 	if friendlyID == "" || token == "" {
-		fmt.Println("usage: writeas add <postId> <token>")
-		os.Exit(1)
+		return cli.NewExitError("usage: writeas add <postId> <token>", 1)
 	}
 
-	addPost(friendlyID, token)
+	err := addPost(friendlyID, token)
+	return err
 }
 
-func cmdList(c *cli.Context) {
+func cmdList(c *cli.Context) error {
 	urls := c.Bool("url")
 	ids := c.Bool("id")
 
@@ -154,4 +153,5 @@ func cmdList(c *cli.Context) {
 		}
 		fmt.Print("\n")
 	}
+	return nil
 }
