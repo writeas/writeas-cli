@@ -58,6 +58,11 @@ var postFlags = []cli.Flag{
 func main() {
 	initialize()
 
+	cli.VersionFlag = cli.BoolFlag{
+		Name:  "version, V",
+		Usage: "print the version",
+	}
+
 	// Run the app
 	app := cli.NewApp()
 	app.Name = "writeas"
