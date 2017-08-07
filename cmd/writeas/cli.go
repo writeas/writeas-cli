@@ -245,13 +245,6 @@ func readStdIn() []byte {
 	return fullPost
 }
 
-func check(err error) {
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "writeas: %s\n", err)
-		os.Exit(1)
-	}
-}
-
 func handlePost(fullPost []byte, c *cli.Context) error {
 	tor := c.Bool("tor") || c.Bool("t")
 	if c.Int("tor-port") != 0 {
