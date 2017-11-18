@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/writeas/writeas-cli/utils"
+	"github.com/writeas/writeas-cli/fileutils"
 	"io/ioutil"
 	"os"
 	"path/filepath"
