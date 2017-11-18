@@ -6,21 +6,39 @@ Command line interface for [Write.as](https://write.as) and [Write.as on Tor](ht
 
 Like the [Android app](https://play.google.com/store/apps/details?id=com.abunchtell.writeas), the command line client keeps track of the posts you make, so future editing / deleting is easier than [doing it with cURL](http://cmd.write.as/). The goal is for this to serve as the backend for any future GUI app we build for the desktop.
 
-It is currently **alpha**, so a) functionality is basic and b) everything is subject to change — i.e., watch the [changelog](https://write.as/changelog-cli.html).
+## Installing
+The easiest way to get the CLI is to download a pre-built executable for your OS.
 
-## Download
+### Download
 [![Latest release](https://img.shields.io/github/release/writeas/writeas-cli.svg)](https://github.com/writeas/writeas-cli/releases/latest) ![Total downloads](https://img.shields.io/github/downloads/writeas/writeas-cli/total.svg) 
 
 Get the latest version for your operating system as a standalone executable.
 
-**Windows**: [64-bit](https://github.com/writeas/writeas-cli/releases/download/v0.4/writeas_0.4_windows_amd64.zip) – [32-bit](https://github.com/writeas/writeas-cli/releases/download/v0.4/writeas_0.4_windows_386.zip)
+**Windows**<br />
+Download the [64-bit](https://github.com/writeas/writeas-cli/releases/download/v1.0/writeas_1.0_windows_amd64.zip) or [32-bit](https://github.com/writeas/writeas-cli/releases/download/v1.0/writeas_1.0_windows_386.zip) executable and put it somewhere in your `%PATH%`.
 
-**OS X**: [64-bit](https://github.com/writeas/writeas-cli/releases/download/v0.4/writeas_0.4_darwin_amd64.zip) – [32-bit](https://github.com/writeas/writeas-cli/releases/download/v0.4/writeas_0.4_darwin_386.zip)
+**OS X**<br />
+Download the [64-bit](https://github.com/writeas/writeas-cli/releases/download/v1.0/writeas_1.0_darwin_amd64.zip) executable and put it somewhere in your `$PATH`, like `/usr/local/bin`.
 
-**Linux**: [64-bit](https://github.com/writeas/writeas-cli/releases/download/v0.4/writeas_0.4_linux_amd64.tar.gz) – [32-bit](https://github.com/writeas/writeas-cli/releases/download/v0.4/writeas_0.4_linux_386.tar.gz)
+**Linux**<br />
+Download the [64-bit](https://github.com/writeas/writeas-cli/releases/download/v1.0/writeas_1.0_linux_amd64.tar.gz) or [32-bit](https://github.com/writeas/writeas-cli/releases/download/v1.0/writeas_1.0_linux_386.tar.gz) executable and put it somewhere in your `$PATH`, like `/usr/local/bin`.
 
 ### Go get it
-`go get github.com/writeas/writeas-cli/writeas`
+```bash
+go get github.com/writeas/writeas-cli/cmd/writeas
+```
+
+Once this finishes, you'll see `writeas` or `writeas.exe` inside `$GOPATH/bin/`.
+
+## Upgrading
+
+To upgrade the CLI, download and replace the executable you downloaded before.
+
+If you previously installed with `go get`, run it again with the `-u` option.
+
+```bash
+go get -u github.com/writeas/writeas-cli/cmd/writeas
+```
 
 ## Usage
 
@@ -42,6 +60,23 @@ COMMANDS:
 GLOBAL OPTIONS:
    --tor, -t		 Perform action on Tor hidden service
    --tor-port "9150" Use a different port to connect to Tor
+   --code            Specifies this post is code
+   --verbose, -v     Make the operation more talkative
+   --font value      Sets post font to given value (default: "mono")
    --help, -h		 show help
    --version, -v	 print the version
 ```
+
+## Contributing to the CLI
+
+For a complete guide to contributing, see the [Contribution Guide](CONTRIBUTING.md).
+
+We welcome any kind of contributions including documentation, organizational improvements, tutorials, bug reports, feature requests, new features, answering questions, etc.
+
+### Getting Support
+
+We're available on [several channels](https://write.as/contact), and prefer the #development channel [in Slack](http://slack.write.as) for project discussion. Please don't use the GitHub issue tracker to ask questions.
+
+### Reporting Issues
+
+If you believe you have found a bug in the CLI or its documentation, file an issue on this repo. If you're not sure if it's a bug or not, [reach out to us](https://write.as/contact) in one way or another. Be sure to provide the version of the CLI (with `writeas --version`) in your report.
