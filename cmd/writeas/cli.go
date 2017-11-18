@@ -67,7 +67,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "writeas"
 	app.Version = version
-	app.Usage = "Simple text pasting and publishing"
+	app.Usage = "Publish text quickly"
 	app.Authors = []cli.Author{
 		{
 			Name:  "Write.as",
