@@ -1,7 +1,7 @@
 Change log
 ==========
 
-## [1.0](https://github.com/writeas/writeas-cli/compare/v0.4...v1.0)
+## [1.0](https://github.com/writeas/writeas-cli/compare/v0.4...v1.0) - 2017-11-18
 
 ### Changed
 
