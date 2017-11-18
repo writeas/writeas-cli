@@ -25,7 +25,7 @@ const (
 
 // Application constants.
 const (
-	version = "0.4"
+	version = "1.0"
 )
 
 // Defaults for posts on Write.as.
