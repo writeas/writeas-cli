@@ -97,7 +97,8 @@ func main() {
    On Windows, this will use 'copy con' to start reading what you input from the
    prompt. Press F6 or Ctrl-Z then Enter to end input.
    On *nix, this will use the best available text editor, starting with the 
-   value set to the EDITOR environment variable, or vim, or finally nano.
+   value set to the WRITAS_EDITOR or EDITOR environment variable, or vim, or
+   finally nano.
 
    Use the --code flag to indicate that the post should use syntax 
    highlighting. Or use the --font [value] argument to set the post's 
