@@ -4,6 +4,8 @@ The Write.as Command-Line Interface (CLI) is a cross-platform tool for publishin
 
 Write.as is a text-publishing service that protects your privacy. There's no sign up required to publish, but if you do sign up, you can access posts across devices and compile collections of them in what most people would call a "blog".
 
+**Note** accounts are not supported in CLI v1.0. They'll be available in [v2.0](https://github.com/writeas/writeas-cli/milestone/4).
+
 ## Uses
 
 These are a few common uses for `writeas`. If you get stuck or want to know more, run `writeas [command] --help`. If you still have questions, [ask us](https://write.as/contact).
@@ -26,18 +28,19 @@ COMMANDS:
 GLOBAL OPTIONS:
    --tor, -t		 Perform action on Tor hidden service
    --tor-port "9150" Use a different port to connect to Tor
+   --code            Specifies this post is code
+   --verbose, -v     Make the operation more talkative
+   --font value      Sets post font to given value (default: "mono")
    --help, -h		 show help
    --version, -v	 print the version
 ```
 
 #### Share something
 
-Without any flags, `writeas` creates a post with a `monospace` typeface that doesn't word wrap (scrolls horizontally):
+By default, `writeas` creates a post with a `monospace` typeface that doesn't word wrap (scrolls horizontally). It will return a single line with a URL, and automatically copy that URL to the clipboard:
 
 ```bash
 $ echo "Hello world!" | writeas
-Posting...
-Copied to clipboard.
 https://write.as/aaaaaaaaaaaa
 ```
 
@@ -53,7 +56,6 @@ This outputs any Write.as post with the given ID.
 
 ```bash
 $ writeas get aaaaaaaaaaaa
-Getting...
 Hello world!
 ```
 
@@ -72,8 +74,6 @@ This permanently deletes a post you own.
 
 ```bash
 $ writeas delete aaaaaaaaaaaa
-Deleting...
-Post deleted.
 ```
 
 #### Update a post
@@ -82,8 +82,6 @@ This completely overwrites an existing post you own.
 
 ```bash
 $ echo "See you later!" | writeas update aaaaaaaaaaaa
-Updating...
-Post updated.
 ```
 
 ### Composing posts
