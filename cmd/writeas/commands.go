@@ -25,14 +25,13 @@ func cmdNew(c *cli.Context) error {
 			os.Remove(fname)
 		}
 
-		fmt.Println("Empty post. Bye!")
-		os.Exit(0)
+		InfolnQuit("Empty post. Bye!")
 	}
 
 	err := handlePost(*p, c)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error posting: %s\n", err)
-		fmt.Fprintf(os.Stderr, messageRetryCompose(fname))
+		Errorln("Error posting: %s", err)
+		Errorln(messageRetryCompose(fname))
 		return cli.NewExitError("", 1)
 	}
 
@@ -55,9 +54,8 @@ func cmdDelete(c *cli.Context) error {
 		// Search for the token locally
 		token = tokenFromID(friendlyID)
 		if token == "" {
-			fmt.Println("Couldn't find an edit token locally. Did you create this post here?")
-			fmt.Printf("If you have an edit token, use: writeas delete %s <token>\n", friendlyID)
-			os.Exit(1)
+			Errorln("Couldn't find an edit token locally. Did you create this post here?")
+			ErrorlnQuit("If you have an edit token, use: writeas delete %s <token>", friendlyID)
 		}
 	}
 
@@ -66,12 +64,12 @@ func cmdDelete(c *cli.Context) error {
 		torPort = c.Int("tor-port")
 	}
 	if tor {
-		fmt.Println("Deleting via hidden service...")
+		Info(c, "Deleting via hidden service...")
 	} else {
-		fmt.Println("Deleting...")
+		Info(c, "Deleting...")
 	}
 
-	return DoDelete(friendlyID, token, tor)
+	return DoDelete(c, friendlyID, token, tor)
 }
 
 func cmdUpdate(c *cli.Context) error {
@@ -85,9 +83,8 @@ func cmdUpdate(c *cli.Context) error {
 		// Search for the token locally
 		token = tokenFromID(friendlyID)
 		if token == "" {
-			fmt.Println("Couldn't find an edit token locally. Did you create this post here?")
-			fmt.Printf("If you have an edit token, use: writeas update %s <token>\n", friendlyID)
-			os.Exit(1)
+			Errorln("Couldn't find an edit token locally. Did you create this post here?")
+			ErrorlnQuit("If you have an edit token, use: writeas update %s <token>", friendlyID)
 		}
 	}
 
@@ -99,12 +96,12 @@ func cmdUpdate(c *cli.Context) error {
 		torPort = c.Int("tor-port")
 	}
 	if tor {
-		fmt.Println("Updating via hidden service...")
+		Info(c, "Updating via hidden service...")
 	} else {
-		fmt.Println("Updating...")
+		Info(c, "Updating...")
 	}
 
-	return DoUpdate(fullPost, friendlyID, token, c.String("font"), tor, c.Bool("code"))
+	return DoUpdate(c, fullPost, friendlyID, token, c.String("font"), tor, c.Bool("code"))
 }
 
 func cmdGet(c *cli.Context) error {
@@ -118,9 +115,9 @@ func cmdGet(c *cli.Context) error {
 		torPort = c.Int("tor-port")
 	}
 	if tor {
-		fmt.Println("Getting via hidden service...")
+		Info(c, "Getting via hidden service...")
 	} else {
-		fmt.Println("Getting...")
+		Info(c, "Getting...")
 	}
 
 	return DoFetch(friendlyID, tor)

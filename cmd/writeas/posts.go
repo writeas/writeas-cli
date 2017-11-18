@@ -34,7 +34,7 @@ func createDataDir() {
 		if debug {
 			panic(err)
 		} else {
-			fmt.Printf("Error creating data directory: %s\n", err)
+			Errorln("Error creating data directory: %s", err)
 			return
 		}
 	}
@@ -43,14 +43,14 @@ func createDataDir() {
 func addPost(id, token string) error {
 	f, err := os.OpenFile(filepath.Join(userDataDir(), postsFile), os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0600)
 	if err != nil {
-		return fmt.Errorf("Error creating local posts list: %s\n", err)
+		return fmt.Errorf("Error creating local posts list: %s", err)
 	}
 	defer f.Close()
 
 	l := fmt.Sprintf("%s%s%s\n", id, separator, token)
 
 	if _, err = f.WriteString(l); err != nil {
-		return fmt.Errorf("Error writing to local posts list: %s\n", err)
+		return fmt.Errorf("Error writing to local posts list: %s", err)
 	}
 
 	return nil
@@ -99,7 +99,7 @@ func composeNewPost() (string, *[]byte) {
 		if debug {
 			panic(err)
 		} else {
-			fmt.Printf("Error creating temp file: %s\n", err)
+			Errorln("Error creating temp file: %s", err)
 			return "", nil
 		}
 	}
@@ -119,7 +119,7 @@ func composeNewPost() (string, *[]byte) {
 		if debug {
 			panic(err)
 		} else {
-			fmt.Printf("Error starting editor: %s\n", err)
+			Errorln("Error starting editor: %s", err)
 			return "", nil
 		}
 	}
@@ -130,7 +130,7 @@ func composeNewPost() (string, *[]byte) {
 		if debug {
 			panic(err)
 		} else {
-			fmt.Printf("Editor finished with error: %s\n", err)
+			Errorln("Editor finished with error: %s", err)
 			return "", nil
 		}
 	}
@@ -140,7 +140,7 @@ func composeNewPost() (string, *[]byte) {
 		if debug {
 			panic(err)
 		} else {
-			fmt.Printf("Error reading post: %s\n", err)
+			Errorln("Error reading post: %s", err)
 			return "", nil
 		}
 	}

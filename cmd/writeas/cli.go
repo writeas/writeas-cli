@@ -48,6 +48,10 @@ var postFlags = []cli.Flag{
 		Name:  "code",
 		Usage: "Specifies this post is code",
 	},
+	cli.BoolFlag{
+		Name:  "verbose, v",
+		Usage: "Make the operation more talkative",
+	},
 	cli.StringFlag{
 		Name:  "font",
 		Usage: "Sets post font to given value",
@@ -252,12 +256,12 @@ func handlePost(fullPost []byte, c *cli.Context) error {
 		torPort = c.Int("tor-port")
 	}
 	if tor {
-		fmt.Println("Posting to hidden service...")
+		Info(c, "Posting to hidden service...")
 	} else {
-		fmt.Println("Posting...")
+		Info(c, "Posting...")
 	}
 
-	return DoPost(fullPost, c.String("font"), false, tor, c.Bool("code"))
+	return DoPost(c, fullPost, c.String("font"), false, tor, c.Bool("code"))
 }
 
 func client(read, tor bool, path, query string) (string, *http.Client) {
@@ -304,15 +308,16 @@ func DoFetch(friendlyID string, tor bool) error {
 		fmt.Printf("%s\n", string(content))
 	} else if resp.StatusCode == http.StatusNotFound {
 		return ErrPostNotFound
+	} else if resp.StatusCode == http.StatusGone {
 	} else {
-		return fmt.Errorf("Unable to get post: %s\n", resp.Status)
+		return fmt.Errorf("Unable to get post: %s", resp.Status)
 	}
 	return nil
 }
 
 // DoPost creates a Write.as post, returning an error if it was
 // unsuccessful.
-func DoPost(post []byte, font string, encrypt, tor, code bool) error {
+func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) error {
 	data := url.Values{}
 	data.Set("w", string(post))
 	if encrypt {
@@ -350,9 +355,9 @@ func DoPost(post []byte, font string, encrypt, tor, code bool) error {
 		// Copy URL to clipboard
 		err = clipboard.WriteAll(string(url))
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "writeas: Didn't copy to clipboard: %s\n", err)
+			Errorln("writeas: Didn't copy to clipboard: %s", err)
 		} else {
-			fmt.Println("Copied to clipboard.")
+			Info(c, "Copied to clipboard.")
 		}
 
 		// Output URL
@@ -365,7 +370,7 @@ func DoPost(post []byte, font string, encrypt, tor, code bool) error {
 }
 
 // DoUpdate updates the given post on Write.as.
-func DoUpdate(post []byte, friendlyID, token, font string, tor, code bool) error {
+func DoUpdate(c *cli.Context, post []byte, friendlyID, token, font string, tor, code bool) error {
 	urlStr, client := client(false, tor, friendlyID, fmt.Sprintf("t=%s", token))
 
 	data := url.Values{}
@@ -389,22 +394,22 @@ func DoUpdate(post []byte, friendlyID, token, font string, tor, code bool) error
 
 	if resp.StatusCode == http.StatusOK {
 		if tor {
-			fmt.Println("Post updated via hidden service.")
+			Info(c, "Post updated via hidden service.")
 		} else {
-			fmt.Println("Post updated.")
+			Info(c, "Post updated.")
 		}
 	} else {
 		if debug {
-			fmt.Printf("Problem updating: %s\n", resp.Status)
+			ErrorlnQuit("Problem updating: %s", resp.Status)
 		} else {
-			return fmt.Errorf("Post doesn't exist, or bad edit token given.\n")
+			return fmt.Errorf("Post doesn't exist, or bad edit token given.")
 		}
 	}
 	return nil
 }
 
 // DoDelete deletes the given post on Write.as.
-func DoDelete(friendlyID, token string, tor bool) error {
+func DoDelete(c *cli.Context, friendlyID, token string, tor bool) error {
 	urlStr, client := client(false, tor, friendlyID, fmt.Sprintf("t=%s", token))
 
 	r, _ := http.NewRequest("DELETE", urlStr, nil)
@@ -419,16 +424,16 @@ func DoDelete(friendlyID, token string, tor bool) error {
 
 	if resp.StatusCode == http.StatusOK {
 		if tor {
-			fmt.Println("Post deleted from hidden service.")
+			Info(c, "Post deleted from hidden service.")
 		} else {
-			fmt.Println("Post deleted.")
+			Info(c, "Post deleted.")
 		}
 		removePost(friendlyID)
 	} else {
 		if debug {
-			fmt.Printf("Problem deleting: %s\n", resp.Status)
+			ErrorlnQuit("Problem deleting: %s", resp.Status)
 		} else {
-			return fmt.Errorf("Post doesn't exist, or bad edit token given.\n")
+			return fmt.Errorf("Post doesn't exist, or bad edit token given.")
 		}
 	}
 
