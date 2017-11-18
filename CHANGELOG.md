@@ -1,6 +1,19 @@
 Change log
 ==========
 
+## [1.0](https://github.com/writeas/writeas-cli/compare/v0.4...v1.0)
+
+### Changed
+
+* All logging and errors go to stderr, not stdout (#11)
+* Verbose logging requires `-v` or `--verbose` flag
+* Executable now lives in `cmd/` directory
+
+### Fixed
+
+* All errors exit with status 1
+* `cli` library deprecation (#8)
+
 ## [0.4](https://github.com/writeas/writeas-cli/compare/v0.3...v0.4) - 2015-12-10
 
 ### Added
