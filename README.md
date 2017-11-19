@@ -69,7 +69,7 @@ GLOBAL OPTIONS:
 
 ## Contributing to the CLI
 
-For a complete guide to contributing, see the [Contribution Guide](CONTRIBUTING.md).
+For a complete guide to contributing, see the [Contribution Guide](.github/CONTRIBUTING.md).
 
 We welcome any kind of contributions including documentation, organizational improvements, tutorials, bug reports, feature requests, new features, answering questions, etc.
 
