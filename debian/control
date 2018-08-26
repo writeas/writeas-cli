@@ -1,0 +1,17 @@
+Source: writeas-cli
+Section: web
+Priority: extra
+Maintainer: Write.as <hello@write.as>
+Build-Depends: debhelper (>= 8.0.0),
+               dh-golang,
+               golang-pq-dev,
+               golang-go,
+               golang-godebiancontrol-dev,
+               golang-codesearch-dev
+Standards-Version: 3.9.3
+
+Package: writeas-cli
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}, dpkg-dev
+Built-Using: ${misc:Built-Using}
+Description: A distraction free and private writing tool, with builtin publishing.
