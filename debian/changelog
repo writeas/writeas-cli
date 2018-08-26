@@ -1,0 +1,9 @@
+writeas-cli (1.0+git20171119.dc1ab5b-1) xenial; urgency=medium
+
+  * All logging and errors go to stderr, not stdout (Closes: #11)
+  * Verbose logging requires `-v` or `--verbose` flag
+  * Executable now lives in `cmd/` directory
+  * All errors exit with status 1
+  * Fixed `cli` library deprecation (Closes: #8)
+
+ -- Write.as <hello@write.as>  Sun, 19 Nov 2017 09:36:28 -0500

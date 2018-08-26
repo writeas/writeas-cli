@@ -1,0 +1,29 @@
+Source: writeas-cli
+Section: utils
+Priority: optional
+Maintainer: Matt Baer <hello@write.as>
+Uploaders: Matt Baer <hello@write.as>
+Build-Depends: debhelper (>= 9),
+               dh-golang,
+               golang-any,
+               golang-github-mitchellh-go-homedir-dev
+Standards-Version: 4.1.1
+Homepage: https://write.as/apps/cli
+Vcs-Browser: https://github.com/writeas/writeas-cli
+Vcs-Git: https://github.com/writeas/writeas-cli
+XS-Go-Import-Path: github.com/writeas/writeas-cli
+Testsuite: autopkgtest-pkg-go
+
+Package: writeas-cli
+Architecture: any
+Built-Using: ${misc:Built-Using}
+Depends: ${shlibs:Depends},
+         ${misc:Depends}
+Description: Text publishing utility
+ The Write.as CLI enables you to publish text to Write.as directly from the
+ command-line.
+ .
+ Write.as is a simple writing and publishing tool that lets you share text on
+ the web and keep your privacy in the process. There's no sign up required to
+ use it, and whether you're on the web, a mobile device, or the command-line,
+ you can start publishing instantly.
