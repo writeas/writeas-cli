@@ -26,7 +26,7 @@ Get the latest version for your operating system as a standalone executable.
 Download the [64-bit](https://github.com/writeas/writeas-cli/releases/download/v1.1/writeas_1.1_windows_amd64.zip) or [32-bit](https://github.com/writeas/writeas-cli/releases/download/v1.1/writeas_1.1_windows_386.zip) executable and put it somewhere in your `%PATH%`.
 
 **macOS**<br />
-Download the [64-bit](https://github.com/writeas/writeas-cli/releases/download/v1.1/writeas_1.1_darwin_amd64.zip) executable and put it somewhere in your `$PATH`, like `/usr/local/bin`.
+Download the [64-bit](https://github.com/writeas/writeas-cli/releases/download/v1.1/writeas_1.1_darwin_amd64.tar.gz) executable and put it somewhere in your `$PATH`, like `/usr/local/bin`.
 
 **Linux**<br />
 Download the [64-bit](https://github.com/writeas/writeas-cli/releases/download/v1.1/writeas_1.1_linux_amd64.tar.gz) or [32-bit](https://github.com/writeas/writeas-cli/releases/download/v1.1/writeas_1.1_linux_386.tar.gz) executable and put it somewhere in your `$PATH`, like `/usr/local/bin`.
