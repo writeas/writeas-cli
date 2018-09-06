@@ -120,7 +120,7 @@ func cmdGet(c *cli.Context) error {
 		Info(c, "Getting...")
 	}
 
-	return DoFetch(friendlyID, tor)
+	return DoFetch(friendlyID, userAgent(c), tor)
 }
 
 func cmdAdd(c *cli.Context) error {

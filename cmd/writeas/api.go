@@ -12,6 +12,18 @@ import (
 	"strings"
 )
 
+const (
+	defaultUserAgent = "writeas-cli v" + version
+)
+
+func userAgent(c *cli.Context) string {
+	ua := c.String("user-agent")
+	if ua == "" {
+		return defaultUserAgent
+	}
+	return ua + " (" + defaultUserAgent + ")"
+}
+
 func client(read, tor bool, path, query string) (string, *http.Client) {
 	var u *url.URL
 	var client *http.Client
@@ -34,13 +46,13 @@ func client(read, tor bool, path, query string) (string, *http.Client) {
 
 // DoFetch retrieves the Write.as post with the given friendlyID,
 // optionally via the Tor hidden service.
-func DoFetch(friendlyID string, tor bool) error {
+func DoFetch(friendlyID, ua string, tor bool) error {
 	path := friendlyID
 
 	urlStr, client := client(true, tor, path, "")
 
 	r, _ := http.NewRequest("GET", urlStr, nil)
-	r.Header.Add("User-Agent", "writeas-cli v"+version)
+	r.Header.Add("User-Agent", ua)
 
 	resp, err := client.Do(r)
 	if err != nil {
@@ -76,7 +88,7 @@ func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) e
 	urlStr, client := client(false, tor, "", "")
 
 	r, _ := http.NewRequest("POST", urlStr, bytes.NewBufferString(data.Encode()))
-	r.Header.Add("User-Agent", "writeas-cli v"+version)
+	r.Header.Add("User-Agent", userAgent(c))
 	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	r.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
 
@@ -130,7 +142,7 @@ func DoUpdate(c *cli.Context, post []byte, friendlyID, token, font string, tor, 
 	}
 
 	r, _ := http.NewRequest("POST", urlStr, bytes.NewBufferString(data.Encode()))
-	r.Header.Add("User-Agent", "writeas-cli v"+version)
+	r.Header.Add("User-Agent", userAgent(c))
 	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	r.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
 
@@ -161,7 +173,7 @@ func DoDelete(c *cli.Context, friendlyID, token string, tor bool) error {
 	urlStr, client := client(false, tor, friendlyID, fmt.Sprintf("t=%s", token))
 
 	r, _ := http.NewRequest("DELETE", urlStr, nil)
-	r.Header.Add("User-Agent", "writeas-cli v"+version)
+	r.Header.Add("User-Agent", userAgent(c))
 	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 	resp, err := client.Do(r)

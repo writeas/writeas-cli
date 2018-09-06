@@ -49,6 +49,11 @@ var postFlags = []cli.Flag{
 		Usage: "Sets post font to given value",
 		Value: defaultFont,
 	},
+	cli.StringFlag{
+		Name:  "user-agent",
+		Usage: "Sets the User-Agent for API requests",
+		Value: "",
+	},
 }
 
 func main() {
