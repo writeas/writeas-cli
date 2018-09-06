@@ -12,7 +12,6 @@ import (
 const (
 	apiURL       = "https://write.as"
 	hiddenAPIURL = "http://writeas7pm7rcdqg.onion"
-	readAPIURL   = "https://write.as"
 )
 
 // Application constants.
