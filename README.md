@@ -2,9 +2,17 @@ writeas-cli
 ===========
 ![MIT license](https://img.shields.io/github/license/writeas/writeas-cli.svg) [![Go Report Card](https://goreportcard.com/badge/github.com/writeas/writeas-cli)](https://goreportcard.com/report/github.com/writeas/writeas-cli) [![#writeas on freenode](https://img.shields.io/badge/freenode-%23writeas-blue.svg)](http://webchat.freenode.net/?channels=writeas) [![Public Slack discussion](http://slack.write.as/badge.svg)](http://slack.write.as/)
 
-Command line interface for [Write.as](https://write.as) and [Write.as on Tor](http://writeas7pm7rcdqg.onion/). Works on Windows, OS X, and Linux.
+Command line interface for [Write.as](https://write.as). Works on Windows, macOS, and Linux.
 
-Like the [Android app](https://play.google.com/store/apps/details?id=com.abunchtell.writeas), the command line client keeps track of the posts you make, so future editing / deleting is easier than [doing it with cURL](http://cmd.write.as/). The goal is for this to serve as the backend for any future GUI app we build for the desktop.
+## Features
+
+* Publish anonymously to Write.as
+* A stable, easy back-end for your GUI app or desktop-based workflow
+* Compatible with our [Tor hidden service](http://writeas7pm7rcdqg.onion/)
+* Locally keeps track of any posts you make
+* Update and delete anonymous posts
+* Fetch any post by ID
+* Add anonymous post credentials (like for one published with the [Android app](https://play.google.com/store/apps/details?id=com.abunchtell.writeas)) for editing
 
 ## Installing
 The easiest way to get the CLI is to download a pre-built executable for your OS.
