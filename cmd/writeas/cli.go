@@ -10,8 +10,8 @@ import (
 
 // API constants for communicating with Write.as.
 const (
-	apiURL       = "https://write.as"
-	hiddenAPIURL = "http://writeas7pm7rcdqg.onion"
+	writeasBaseURL = "https://write.as"
+	torBaseURL     = "http://writeas7pm7rcdqg.onion"
 )
 
 // Application constants.

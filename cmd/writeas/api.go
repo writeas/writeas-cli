@@ -1,15 +1,10 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"github.com/atotto/clipboard"
+	"github.com/writeas/go-writeas"
 	"gopkg.in/urfave/cli.v1"
-	"io/ioutil"
-	"net/http"
-	"net/url"
-	"strconv"
-	"strings"
 )
 
 const (
@@ -24,178 +19,120 @@ func userAgent(c *cli.Context) string {
 	return ua + " (" + defaultUserAgent + ")"
 }
 
-func client(read, tor bool, path, query string) (string, *http.Client) {
-	var u *url.URL
-	var client *http.Client
+func client(userAgent string, tor bool) *writeas.Client {
+	var client *writeas.Client
 	if tor {
-		u, _ = url.ParseRequestURI(hiddenAPIURL)
-		u.Path = "/api/" + path
-		client = torClient()
+		client = writeas.NewTorClient(torPort)
 	} else {
-		u, _ = url.ParseRequestURI(apiURL)
-		u.Path = "/api/" + path
-		client = &http.Client{}
+		client = writeas.NewClient()
 	}
-	if query != "" {
-		u.RawQuery = query
-	}
-	urlStr := fmt.Sprintf("%v", u)
+	client.UserAgent = userAgent
 
-	return urlStr, client
+	return client
 }
 
 // DoFetch retrieves the Write.as post with the given friendlyID,
 // optionally via the Tor hidden service.
 func DoFetch(friendlyID, ua string, tor bool) error {
-	path := friendlyID
+	cl := client(ua, tor)
 
-	urlStr, client := client(true, tor, path, "")
-
-	r, _ := http.NewRequest("GET", urlStr, nil)
-	r.Header.Add("User-Agent", ua)
-
-	resp, err := client.Do(r)
+	p, err := cl.GetPost(friendlyID)
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
 
-	if resp.StatusCode == http.StatusOK {
-		content, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return err
-		}
-		fmt.Printf("%s\n", string(content))
-	} else if resp.StatusCode == http.StatusNotFound {
-		return ErrPostNotFound
-	} else if resp.StatusCode == http.StatusGone {
-	} else {
-		return fmt.Errorf("Unable to get post: %s", resp.Status)
-	}
+	fmt.Printf("%s\n", string(p.Content))
 	return nil
 }
 
 // DoPost creates a Write.as post, returning an error if it was
 // unsuccessful.
 func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) error {
-	data := url.Values{}
-	data.Set("w", string(post))
-	if encrypt {
-		data.Add("e", "")
-	}
-	data.Add("font", getFont(code, font))
+	cl := client(userAgent(c), tor)
 
-	urlStr, client := client(false, tor, "", "")
-
-	r, _ := http.NewRequest("POST", urlStr, bytes.NewBufferString(data.Encode()))
-	r.Header.Add("User-Agent", userAgent(c))
-	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	r.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
-
-	resp, err := client.Do(r)
+	p, err := cl.CreatePost(&writeas.PostParams{
+		// TODO: extract title
+		Content: string(post),
+		Font:    getFont(code, font),
+	})
 	if err != nil {
-		return err
+		return fmt.Errorf("Unable to post: %v", err)
 	}
-	defer resp.Body.Close()
 
-	if resp.StatusCode == http.StatusOK {
-		content, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return err
-		}
+	url := writeasBaseURL
+	if tor {
+		url = torBaseURL
+	}
+	url += "/" + p.ID
 
-		nlPos := strings.Index(string(content), "\n")
-		url := content[:nlPos]
-		idPos := strings.LastIndex(string(url), "/") + 1
-		id := string(url[idPos:])
-		token := string(content[nlPos+1 : len(content)-1])
+	// Store post locally
+	addPost(p.ID, p.Token)
 
-		addPost(id, token)
-
-		// Copy URL to clipboard
-		err = clipboard.WriteAll(string(url))
-		if err != nil {
-			Errorln("writeas: Didn't copy to clipboard: %s", err)
-		} else {
-			Info(c, "Copied to clipboard.")
-		}
-
-		// Output URL
-		fmt.Printf("%s\n", url)
+	// Copy URL to clipboard
+	err = clipboard.WriteAll(string(url))
+	if err != nil {
+		Errorln("writeas: Didn't copy to clipboard: %s", err)
 	} else {
-		return fmt.Errorf("Unable to post: %s", resp.Status)
+		Info(c, "Copied to clipboard.")
 	}
+
+	// Output URL
+	fmt.Printf("%s\n", url)
 
 	return nil
 }
 
 // DoUpdate updates the given post on Write.as.
 func DoUpdate(c *cli.Context, post []byte, friendlyID, token, font string, tor, code bool) error {
-	urlStr, client := client(false, tor, friendlyID, fmt.Sprintf("t=%s", token))
+	cl := client(userAgent(c), tor)
 
-	data := url.Values{}
-	data.Set("w", string(post))
-
+	params := writeas.PostParams{
+		ID:      friendlyID,
+		Token:   token,
+		Content: string(post),
+		// TODO: extract title
+	}
 	if code || font != "" {
-		// Only update font if explicitly changed
-		data.Add("font", getFont(code, font))
+		params.Font = getFont(code, font)
 	}
 
-	r, _ := http.NewRequest("POST", urlStr, bytes.NewBufferString(data.Encode()))
-	r.Header.Add("User-Agent", userAgent(c))
-	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	r.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
-
-	resp, err := client.Do(r)
+	_, err := cl.UpdatePost(&params)
 	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode == http.StatusOK {
-		if tor {
-			Info(c, "Post updated via hidden service.")
-		} else {
-			Info(c, "Post updated.")
-		}
-	} else {
 		if debug {
-			ErrorlnQuit("Problem updating: %s", resp.Status)
-		} else {
-			return fmt.Errorf("Post doesn't exist, or bad edit token given.")
+			ErrorlnQuit("Problem updating: %v", err)
 		}
+		return fmt.Errorf("Post doesn't exist, or bad edit token given.")
+	}
+
+	if tor {
+		Info(c, "Post updated via hidden service.")
+	} else {
+		Info(c, "Post updated.")
 	}
 	return nil
 }
 
 // DoDelete deletes the given post on Write.as.
 func DoDelete(c *cli.Context, friendlyID, token string, tor bool) error {
-	urlStr, client := client(false, tor, friendlyID, fmt.Sprintf("t=%s", token))
+	cl := client(userAgent(c), tor)
 
-	r, _ := http.NewRequest("DELETE", urlStr, nil)
-	r.Header.Add("User-Agent", userAgent(c))
-	r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-
-	resp, err := client.Do(r)
+	err := cl.DeletePost(&writeas.PostParams{
+		ID:    friendlyID,
+		Token: token,
+	})
 	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode == http.StatusOK {
-		if tor {
-			Info(c, "Post deleted from hidden service.")
-		} else {
-			Info(c, "Post deleted.")
-		}
-		removePost(friendlyID)
-	} else {
 		if debug {
-			ErrorlnQuit("Problem deleting: %s", resp.Status)
-		} else {
-			return fmt.Errorf("Post doesn't exist, or bad edit token given.")
+			ErrorlnQuit("Problem deleting: %v", err)
 		}
+		return fmt.Errorf("Post doesn't exist, or bad edit token given.")
 	}
+
+	if tor {
+		Info(c, "Post deleted from hidden service.")
+	} else {
+		Info(c, "Post deleted.")
+	}
+	removePost(friendlyID)
 
 	return nil
 }
