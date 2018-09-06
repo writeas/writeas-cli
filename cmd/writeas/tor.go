@@ -1,8 +1,8 @@
 package main
 
 import (
+	"code.as/core/socks"
 	"fmt"
-	"h12.me/socks"
 	"net/http"
 )
 
