@@ -11,14 +11,6 @@ const (
 	defaultUserAgent = "writeas-cli v" + version
 )
 
-func userAgent(c *cli.Context) string {
-	ua := c.String("user-agent")
-	if ua == "" {
-		return defaultUserAgent
-	}
-	return ua + " (" + defaultUserAgent + ")"
-}
-
 func client(userAgent string, tor bool) *writeas.Client {
 	var client *writeas.Client
 	if tor {
