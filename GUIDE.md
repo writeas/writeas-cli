@@ -23,16 +23,18 @@ COMMANDS:
    get      Read a raw post
    add      Add an existing post locally
    list     List local posts
+   auth     Authenticate with Write.as
    help, h  Shows a list of commands or help for one command
-   
+
 GLOBAL OPTIONS:
-   --tor, -t		 Perform action on Tor hidden service
-   --tor-port "9150" Use a different port to connect to Tor
-   --code            Specifies this post is code
-   --verbose, -v     Make the operation more talkative
-   --font value      Sets post font to given value (default: "mono")
-   --help, -h		 show help
-   --version, -v	 print the version
+   --tor, -t           Perform action on Tor hidden service
+   --tor-port value    Use a different port to connect to Tor (default: 9150)
+   --code              Specifies this post is code
+   --verbose, -v       Make the operation more talkative
+   --font value        Sets post font to given value (default: "mono")
+   --user-agent value  Sets the User-Agent for API requests
+   --help, -h          show help
+   --version, -V       print the version
 ```
 
 #### Share something
