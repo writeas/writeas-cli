@@ -128,3 +128,24 @@ func DoDelete(c *cli.Context, friendlyID, token string, tor bool) error {
 
 	return nil
 }
+
+func DoLogIn(c *cli.Context, username, password string) error {
+	cl := client(userAgent(c), isTor(c))
+
+	uc, err := loadConfig()
+	if err != nil {
+		return cli.NewExitError(fmt.Sprintf("couldn't load config: %v", err), 1)
+	}
+
+	u, err := cl.LogIn(username, password)
+	if err != nil {
+		if debug {
+			ErrorlnQuit("Problem logging in: %v", err)
+		}
+		return err
+	}
+
+	uc.API.Token = u.AccessToken
+	Info(c, "Success.")
+	return saveConfig(uc)
+}

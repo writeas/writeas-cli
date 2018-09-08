@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/howeyc/gopass"
 	"gopkg.in/urfave/cli.v1"
 	"os"
 )
@@ -151,4 +152,22 @@ func cmdList(c *cli.Context) error {
 		fmt.Print("\n")
 	}
 	return nil
+}
+
+func cmdAuth(c *cli.Context) error {
+	username := c.String("u")
+	if username == "" {
+		return cli.NewExitError("usage: writeas auth -u <username>", 1)
+	}
+
+	fmt.Print("Password: ")
+	pass, err := gopass.GetPasswdMasked()
+	if err != nil {
+		return cli.NewExitError(fmt.Sprintf("error reading password: %v", err), 1)
+	}
+	// Validate password
+	if len(pass) == 0 {
+		return cli.NewExitError("Please enter your password.", 1)
+	}
+	return DoLogIn(c, username, string(pass))
 }

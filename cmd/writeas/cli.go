@@ -191,6 +191,27 @@ func main() {
 				},
 			},
 		},
+		{
+			Name:   "auth",
+			Usage:  "Authenticate with Write.as",
+			Action: cmdAuth,
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "tor, t",
+					Usage: "Authenticate via Tor hidden service",
+				},
+				cli.IntFlag{
+					Name:  "tor-port",
+					Usage: "Use a different port to connect to Tor",
+					Value: 9150,
+				},
+				cli.StringFlag{
+					Name:  "u",
+					Usage: "Username for authentication",
+					Value: "",
+				},
+			},
+		},
 	}
 
 	cli.CommandHelpTemplate = `NAME:
