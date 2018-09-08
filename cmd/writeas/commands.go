@@ -155,6 +155,16 @@ func cmdList(c *cli.Context) error {
 }
 
 func cmdAuth(c *cli.Context) error {
+	// Check configuration
+	uc, err := loadConfig()
+	if err != nil {
+		return cli.NewExitError(fmt.Sprintf("couldn't load config: %v", err), 1)
+	}
+	if uc != nil && uc.API.Token != "" {
+		return cli.NewExitError("You're already authenticated.", 1)
+	}
+
+	// Validate arguments and get password
 	username := c.String("u")
 	if username == "" {
 		return cli.NewExitError("usage: writeas auth -u <username>", 1)
@@ -165,9 +175,10 @@ func cmdAuth(c *cli.Context) error {
 	if err != nil {
 		return cli.NewExitError(fmt.Sprintf("error reading password: %v", err), 1)
 	}
+
 	// Validate password
 	if len(pass) == 0 {
 		return cli.NewExitError("Please enter your password.", 1)
 	}
-	return DoLogIn(c, username, string(pass))
+	return DoLogIn(c, uc, username, string(pass))
 }
