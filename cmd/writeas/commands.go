@@ -59,7 +59,7 @@ func cmdDelete(c *cli.Context) error {
 		}
 	}
 
-	tor := c.Bool("tor") || c.Bool("t")
+	tor := isTor(c)
 	if c.Int("tor-port") != 0 {
 		torPort = c.Int("tor-port")
 	}
@@ -91,7 +91,7 @@ func cmdUpdate(c *cli.Context) error {
 	// Read post body
 	fullPost := readStdIn()
 
-	tor := c.Bool("tor") || c.Bool("t")
+	tor := isTor(c)
 	if c.Int("tor-port") != 0 {
 		torPort = c.Int("tor-port")
 	}
@@ -110,7 +110,7 @@ func cmdGet(c *cli.Context) error {
 		return cli.NewExitError("usage: writeas get <postId>", 1)
 	}
 
-	tor := c.Bool("tor") || c.Bool("t")
+	tor := isTor(c)
 	if c.Int("tor-port") != 0 {
 		torPort = c.Int("tor-port")
 	}

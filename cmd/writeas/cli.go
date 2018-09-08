@@ -247,7 +247,7 @@ func readStdIn() []byte {
 }
 
 func handlePost(fullPost []byte, c *cli.Context) error {
-	tor := c.Bool("tor") || c.Bool("t")
+	tor := isTor(c)
 	if c.Int("tor-port") != 0 {
 		torPort = c.Int("tor-port")
 	}

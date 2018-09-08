@@ -11,3 +11,7 @@ func userAgent(c *cli.Context) string {
 	}
 	return ua + " (" + defaultUserAgent + ")"
 }
+
+func isTor(c *cli.Context) bool {
+	return c.Bool("tor") || c.Bool("t")
+}
