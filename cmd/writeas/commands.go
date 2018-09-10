@@ -156,11 +156,11 @@ func cmdList(c *cli.Context) error {
 
 func cmdAuth(c *cli.Context) error {
 	// Check configuration
-	uc, err := loadConfig()
+	u, err := loadUser()
 	if err != nil {
 		return cli.NewExitError(fmt.Sprintf("couldn't load config: %v", err), 1)
 	}
-	if uc != nil && uc.API.Token != "" {
+	if u != nil && u.AccessToken != "" {
 		return cli.NewExitError("You're already authenticated.", 1)
 	}
 
@@ -180,5 +180,5 @@ func cmdAuth(c *cli.Context) error {
 	if len(pass) == 0 {
 		return cli.NewExitError("Please enter your password.", 1)
 	}
-	return DoLogIn(c, uc, username, string(pass))
+	return DoLogIn(c, username, string(pass))
 }

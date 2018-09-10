@@ -129,7 +129,7 @@ func DoDelete(c *cli.Context, friendlyID, token string, tor bool) error {
 	return nil
 }
 
-func DoLogIn(c *cli.Context, uc *UserConfig, username, password string) error {
+func DoLogIn(c *cli.Context, username, password string) error {
 	cl := client(userAgent(c), isTor(c))
 
 	u, err := cl.LogIn(username, password)
@@ -140,7 +140,10 @@ func DoLogIn(c *cli.Context, uc *UserConfig, username, password string) error {
 		return err
 	}
 
-	uc.API.Token = u.AccessToken
-	Info(c, "Success.")
-	return saveConfig(uc)
+	err = saveUser(u)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Logged in as %s.\n", u.User.Username)
+	return nil
 }
