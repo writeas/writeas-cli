@@ -23,6 +23,22 @@ func client(userAgent string, tor bool) *writeas.Client {
 	return client
 }
 
+func newClient(c *cli.Context) *writeas.Client {
+	var client *writeas.Client
+	if isTor(c) {
+		client = writeas.NewTorClient(torPort)
+	} else {
+		client = writeas.NewClient()
+	}
+	client.UserAgent = userAgent(c)
+	u, _ := loadUser()
+	if u != nil {
+		client.SetToken(u.AccessToken)
+	}
+
+	return client
+}
+
 // DoFetch retrieves the Write.as post with the given friendlyID,
 // optionally via the Tor hidden service.
 func DoFetch(friendlyID, ua string, tor bool) error {
@@ -40,7 +56,7 @@ func DoFetch(friendlyID, ua string, tor bool) error {
 // DoPost creates a Write.as post, returning an error if it was
 // unsuccessful.
 func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) error {
-	cl := client(userAgent(c), tor)
+	cl := newClient(c)
 
 	p, err := cl.CreatePost(&writeas.PostParams{
 		// TODO: extract title
@@ -57,8 +73,10 @@ func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) e
 	}
 	url += "/" + p.ID
 
-	// Store post locally
-	addPost(p.ID, p.Token)
+	if cl.Token() == "" {
+		// Store post locally, since we're not authenticated
+		addPost(p.ID, p.Token)
+	}
 
 	// Copy URL to clipboard
 	err = clipboard.WriteAll(string(url))
@@ -76,7 +94,7 @@ func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) e
 
 // DoUpdate updates the given post on Write.as.
 func DoUpdate(c *cli.Context, post []byte, friendlyID, token, font string, tor, code bool) error {
-	cl := client(userAgent(c), tor)
+	cl := newClient(c)
 
 	params := writeas.PostParams{
 		ID:      friendlyID,
@@ -106,7 +124,7 @@ func DoUpdate(c *cli.Context, post []byte, friendlyID, token, font string, tor, 
 
 // DoDelete deletes the given post on Write.as.
 func DoDelete(c *cli.Context, friendlyID, token string, tor bool) error {
-	cl := client(userAgent(c), tor)
+	cl := newClient(c)
 
 	err := cl.DeletePost(&writeas.PostParams{
 		ID:    friendlyID,
