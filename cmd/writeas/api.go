@@ -58,20 +58,28 @@ func DoFetch(friendlyID, ua string, tor bool) error {
 func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) error {
 	cl := newClient(c)
 
-	p, err := cl.CreatePost(&writeas.PostParams{
+	pp := &writeas.PostParams{
 		// TODO: extract title
-		Content: string(post),
-		Font:    getFont(code, font),
-	})
+		Content:    string(post),
+		Font:       getFont(code, font),
+		Collection: collection(c),
+	}
+	p, err := cl.CreatePost(pp)
 	if err != nil {
 		return fmt.Errorf("Unable to post: %v", err)
 	}
 
-	url := writeasBaseURL
-	if tor {
-		url = torBaseURL
+	var url string
+	if p.Collection != nil {
+		url = p.Collection.URL + p.Slug
+	} else {
+		if tor {
+			url = torBaseURL
+		} else {
+			url = writeasBaseURL
+		}
+		url += "/" + p.ID
 	}
-	url += "/" + p.ID
 
 	if cl.Token() == "" {
 		// Store post locally, since we're not authenticated

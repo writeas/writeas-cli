@@ -15,3 +15,13 @@ func userAgent(c *cli.Context) string {
 func isTor(c *cli.Context) bool {
 	return c.Bool("tor") || c.Bool("t")
 }
+
+func collection(c *cli.Context) string {
+	if coll := c.String("c"); coll != "" {
+		return coll
+	}
+	if coll := c.String("b"); coll != "" {
+		return coll
+	}
+	return ""
+}

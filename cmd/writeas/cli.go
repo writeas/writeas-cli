@@ -26,6 +26,11 @@ const (
 
 // Available flags for creating posts
 var postFlags = []cli.Flag{
+	cli.StringFlag{
+		Name:  "c, b",
+		Usage: "Optional blog to post to",
+		Value: "",
+	},
 	cli.BoolFlag{
 		Name:  "tor, t",
 		Usage: "Perform action on Tor hidden service",
