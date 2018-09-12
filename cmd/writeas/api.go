@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"github.com/atotto/clipboard"
 	"github.com/writeas/go-writeas"
+	"github.com/writeas/writeas-cli/fileutils"
 	"gopkg.in/urfave/cli.v1"
+	"path/filepath"
 )
 
 const (
@@ -171,5 +173,28 @@ func DoLogIn(c *cli.Context, username, password string) error {
 		return err
 	}
 	fmt.Printf("Logged in as %s.\n", u.User.Username)
+	return nil
+}
+
+func DoLogOut(c *cli.Context) error {
+	cl := newClient(c)
+	if cl.Token() == "" {
+		return fmt.Errorf("Not currently logged in. Authenticate with: writeas auth -u <username>")
+	}
+
+	err := cl.LogOut()
+	if err != nil {
+		if debug {
+			ErrorlnQuit("Problem logging out: %v", err)
+		}
+		return err
+	}
+
+	// Delete local user data
+	err = fileutils.DeleteFile(filepath.Join(userDataDir(), userFile))
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

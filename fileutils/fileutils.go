@@ -105,3 +105,7 @@ func FindLine(p, startsWith string) string {
 
 	return ""
 }
+
+func DeleteFile(p string) error {
+	return os.Remove(p)
+}

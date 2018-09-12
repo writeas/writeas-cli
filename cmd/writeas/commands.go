@@ -182,3 +182,7 @@ func cmdAuth(c *cli.Context) error {
 	}
 	return DoLogIn(c, username, string(pass))
 }
+
+func cmdLogOut(c *cli.Context) error {
+	return DoLogOut(c)
+}
