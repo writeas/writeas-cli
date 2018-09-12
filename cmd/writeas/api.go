@@ -25,7 +25,7 @@ func client(userAgent string, tor bool) *writeas.Client {
 	return client
 }
 
-func newClient(c *cli.Context) *writeas.Client {
+func newClient(c *cli.Context, authRequired bool) (*writeas.Client, error) {
 	var client *writeas.Client
 	if isTor(c) {
 		client = writeas.NewTorClient(torPort)
@@ -36,9 +36,11 @@ func newClient(c *cli.Context) *writeas.Client {
 	u, _ := loadUser()
 	if u != nil {
 		client.SetToken(u.AccessToken)
+	} else if authRequired {
+		return nil, fmt.Errorf("Not currently logged in. Authenticate with: writeas auth -u <username>")
 	}
 
-	return client
+	return client, nil
 }
 
 // DoFetch retrieves the Write.as post with the given friendlyID,
@@ -58,7 +60,7 @@ func DoFetch(friendlyID, ua string, tor bool) error {
 // DoPost creates a Write.as post, returning an error if it was
 // unsuccessful.
 func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) error {
-	cl := newClient(c)
+	cl, _ := newClient(c, false)
 
 	pp := &writeas.PostParams{
 		// TODO: extract title
@@ -104,7 +106,7 @@ func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) e
 
 // DoUpdate updates the given post on Write.as.
 func DoUpdate(c *cli.Context, post []byte, friendlyID, token, font string, tor, code bool) error {
-	cl := newClient(c)
+	cl, _ := newClient(c, false)
 
 	params := writeas.PostParams{
 		ID:      friendlyID,
@@ -134,7 +136,7 @@ func DoUpdate(c *cli.Context, post []byte, friendlyID, token, font string, tor, 
 
 // DoDelete deletes the given post on Write.as.
 func DoDelete(c *cli.Context, friendlyID, token string, tor bool) error {
-	cl := newClient(c)
+	cl, _ := newClient(c, false)
 
 	err := cl.DeletePost(&writeas.PostParams{
 		ID:    friendlyID,
@@ -177,12 +179,12 @@ func DoLogIn(c *cli.Context, username, password string) error {
 }
 
 func DoLogOut(c *cli.Context) error {
-	cl := newClient(c)
-	if cl.Token() == "" {
-		return fmt.Errorf("Not currently logged in. Authenticate with: writeas auth -u <username>")
+	cl, err := newClient(c, true)
+	if err != nil {
+		return err
 	}
 
-	err := cl.LogOut()
+	err = cl.LogOut()
 	if err != nil {
 		if debug {
 			ErrorlnQuit("Problem logging out: %v", err)
