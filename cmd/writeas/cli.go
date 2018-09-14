@@ -197,6 +197,22 @@ func main() {
 			},
 		},
 		{
+			Name:   "fetch",
+			Usage:  "Fetch authenticated user's Write.as posts",
+			Action: cmdPull,
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "tor, t",
+					Usage: "Authenticate via Tor hidden service",
+				},
+				cli.IntFlag{
+					Name:  "tor-port",
+					Usage: "Use a different port to connect to Tor",
+					Value: 9150,
+				},
+			},
+		},
+		{
 			Name:   "auth",
 			Usage:  "Authenticate with Write.as",
 			Action: cmdAuth,

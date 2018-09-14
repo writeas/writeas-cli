@@ -18,8 +18,13 @@ type (
 	APIConfig struct {
 	}
 
+	PostsConfig struct {
+		Directory string `ini:"directory"`
+	}
+
 	UserConfig struct {
-		API APIConfig `ini:"api"`
+		API   APIConfig   `ini:"api"`
+		Posts PostsConfig `ini:"posts"`
 	}
 )
 
