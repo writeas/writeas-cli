@@ -54,7 +54,11 @@ func cmdPull(c *cli.Context) error {
 		postFilename += postFileExt
 
 		// Write file
-		err = ioutil.WriteFile(filepath.Join(cfg.Posts.Directory, collDir, postFilename), []byte(p.Content), 0644)
+		txtFile := p.Content
+		if p.Title != "" {
+			txtFile = "# " + p.Title + "\n\n" + txtFile
+		}
+		err = ioutil.WriteFile(filepath.Join(cfg.Posts.Directory, collDir, postFilename), []byte(txtFile), 0644)
 		if err != nil {
 			Errorln("Error creating file %s: %s", postFilename, err)
 		}
