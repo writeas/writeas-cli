@@ -116,6 +116,12 @@ func main() {
 			Flags:  postFlags,
 		},
 		{
+			Name:        "publish",
+			Usage:       "Publish a file to Write.as",
+			Action:      cmdPublish,
+			Flags:       postFlags,
+		},
+		{
 			Name:   "delete",
 			Usage:  "Delete a post",
 			Action: cmdDelete,

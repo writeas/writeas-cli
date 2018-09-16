@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/howeyc/gopass"
 	"gopkg.in/urfave/cli.v1"
+	"io/ioutil"
 	"os"
 )
 
@@ -42,6 +43,18 @@ func cmdNew(c *cli.Context) error {
 	}
 
 	return nil
+}
+
+func cmdPublish(c *cli.Context) error {
+	filename := c.Args().Get(0)
+	if filename == "" {
+		return cli.NewExitError("usage: writeas publish <filename>", 1)
+	}
+	content, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return err
+	}
+	return handlePost(content, c)
 }
 
 func cmdDelete(c *cli.Context) error {

@@ -58,6 +58,7 @@ writeas [global options] command [command options] [arguments...]
 COMMANDS:
    post     Alias for default action: create post from stdin
    new      Compose a new post from the command-line and publish
+   publish  Publish a file to Write.as
    delete   Delete a post
    update   Update (overwrite) a post
    get      Read a raw post
