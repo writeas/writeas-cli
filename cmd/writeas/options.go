@@ -16,6 +16,10 @@ func isTor(c *cli.Context) bool {
 	return c.Bool("tor") || c.Bool("t")
 }
 
+func language(c *cli.Context) string {
+	return c.String("lang")
+}
+
 func collection(c *cli.Context) string {
 	if coll := c.String("c"); coll != "" {
 		return coll

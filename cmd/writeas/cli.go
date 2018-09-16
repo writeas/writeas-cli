@@ -54,6 +54,11 @@ var postFlags = []cli.Flag{
 		Value: defaultFont,
 	},
 	cli.StringFlag{
+		Name:  "lang",
+		Usage: "Sets post language to given ISO 639-1 language code",
+		Value: "",
+	},
+	cli.StringFlag{
 		Name:  "user-agent",
 		Usage: "Sets the User-Agent for API requests",
 		Value: "",
