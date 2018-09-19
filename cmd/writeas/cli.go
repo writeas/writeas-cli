@@ -12,6 +12,7 @@ import (
 // API constants for communicating with Write.as.
 const (
 	writeasBaseURL = "https://write.as"
+	devBaseURL     = "https://development.write.as"
 	torBaseURL     = "http://writeas7pm7rcdqg.onion"
 )
 

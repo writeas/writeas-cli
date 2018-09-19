@@ -18,7 +18,11 @@ func client(userAgent string, tor bool) *writeas.Client {
 	if tor {
 		client = writeas.NewTorClient(torPort)
 	} else {
-		client = writeas.NewClient()
+		if isDev() {
+			client = writeas.NewDevClient()
+		} else {
+			client = writeas.NewClient()
+		}
 	}
 	client.UserAgent = userAgent
 
@@ -30,7 +34,11 @@ func newClient(c *cli.Context, authRequired bool) (*writeas.Client, error) {
 	if isTor(c) {
 		client = writeas.NewTorClient(torPort)
 	} else {
-		client = writeas.NewClient()
+		if isDev() {
+			client = writeas.NewDevClient()
+		} else {
+			client = writeas.NewClient()
+		}
 	}
 	client.UserAgent = userAgent(c)
 	// TODO: load user into var shared across the app
@@ -86,6 +94,8 @@ func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) (
 	} else {
 		if tor {
 			url = torBaseURL
+		} else if isDev() {
+			url = devBaseURL
 		} else {
 			url = writeasBaseURL
 		}

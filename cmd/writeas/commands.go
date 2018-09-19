@@ -192,7 +192,11 @@ func cmdList(c *cli.Context) error {
 			fmt.Printf("%s ", p.ID)
 		}
 		if urls {
-			fmt.Printf("https://write.as/%s ", p.ID)
+			base := writeasBaseURL
+			if isDev() {
+				base = devBaseURL
+			}
+			fmt.Printf("%s/%s ", base, p.ID)
 		}
 		fmt.Print("\n")
 	}
