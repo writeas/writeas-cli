@@ -54,6 +54,9 @@ func DoFetch(friendlyID, ua string, tor bool) error {
 		return err
 	}
 
+	if p.Title != "" {
+		fmt.Printf("# %s\n\n", string(p.Title))
+	}
 	fmt.Printf("%s\n", string(p.Content))
 	return nil
 }
