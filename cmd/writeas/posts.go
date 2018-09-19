@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/writeas/go-writeas"
 	"github.com/writeas/writeas-cli/fileutils"
 	"io/ioutil"
 	"os"
@@ -145,4 +146,20 @@ func composeNewPost() (string, *[]byte) {
 		}
 	}
 	return f.Name(), &post
+}
+
+func WritePost(postsDir string, p *writeas.Post) error {
+	postFilename := p.ID
+	collDir := ""
+	if p.Collection != nil {
+		postFilename = p.Slug
+		collDir = p.Collection.Alias
+	}
+	postFilename += postFileExt
+
+	txtFile := p.Content
+	if p.Title != "" {
+		txtFile = "# " + p.Title + "\n\n" + txtFile
+	}
+	return ioutil.WriteFile(filepath.Join(postsDir, collDir, postFilename), []byte(txtFile), 0644)
 }

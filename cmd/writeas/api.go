@@ -33,6 +33,7 @@ func newClient(c *cli.Context, authRequired bool) (*writeas.Client, error) {
 		client = writeas.NewClient()
 	}
 	client.UserAgent = userAgent(c)
+	// TODO: load user into var shared across the app
 	u, _ := loadUser()
 	if u != nil {
 		client.SetToken(u.AccessToken)
@@ -59,7 +60,7 @@ func DoFetch(friendlyID, ua string, tor bool) error {
 
 // DoPost creates a Write.as post, returning an error if it was
 // unsuccessful.
-func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) error {
+func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) (*writeas.Post, error) {
 	cl, _ := newClient(c, false)
 
 	pp := &writeas.PostParams{
@@ -73,7 +74,7 @@ func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) e
 	}
 	p, err := cl.CreatePost(pp)
 	if err != nil {
-		return fmt.Errorf("Unable to post: %v", err)
+		return nil, fmt.Errorf("Unable to post: %v", err)
 	}
 
 	var url string
@@ -104,7 +105,7 @@ func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) e
 	// Output URL
 	fmt.Printf("%s\n", url)
 
-	return nil
+	return p, nil
 }
 
 // DoUpdate updates the given post on Write.as.

@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"github.com/writeas/go-writeas"
 	"gopkg.in/urfave/cli.v1"
 	"io"
 	"log"
@@ -315,7 +316,7 @@ func readStdIn() []byte {
 	return fullPost
 }
 
-func handlePost(fullPost []byte, c *cli.Context) error {
+func handlePost(fullPost []byte, c *cli.Context) (*writeas.Post, error) {
 	tor := isTor(c)
 	if c.Int("tor-port") != 0 {
 		torPort = c.Int("tor-port")

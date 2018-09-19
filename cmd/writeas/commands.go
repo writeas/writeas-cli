@@ -9,7 +9,7 @@ import (
 )
 
 func cmdPost(c *cli.Context) error {
-	err := handlePost(readStdIn(), c)
+	_, err := handlePost(readStdIn(), c)
 	return err
 }
 
@@ -30,7 +30,7 @@ func cmdNew(c *cli.Context) error {
 		InfolnQuit("Empty post. Bye!")
 	}
 
-	err := handlePost(*p, c)
+	_, err := handlePost(*p, c)
 	if err != nil {
 		Errorln("Error posting: %s", err)
 		Errorln(messageRetryCompose(fname))
@@ -54,7 +54,20 @@ func cmdPublish(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	return handlePost(content, c)
+	p, err := handlePost(content, c)
+	if err != nil {
+		return err
+	}
+
+	// Save post to posts folder
+	cfg, err := loadConfig()
+	if cfg.Posts.Directory != "" {
+		err = WritePost(cfg.Posts.Directory, p)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func cmdDelete(c *cli.Context) error {

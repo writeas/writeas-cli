@@ -29,6 +29,7 @@ type (
 )
 
 func loadConfig() (*UserConfig, error) {
+	// TODO: load config to var shared across app
 	cfg, err := ini.LooseLoad(filepath.Join(userDataDir(), userConfigFile))
 	if err != nil {
 		return nil, err
