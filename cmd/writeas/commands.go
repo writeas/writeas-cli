@@ -3,9 +3,11 @@ package main
 import (
 	"fmt"
 	"github.com/howeyc/gopass"
+	"github.com/writeas/writeas-cli/fileutils"
 	"gopkg.in/urfave/cli.v1"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 )
 
 func cmdPost(c *cli.Context) error {
@@ -97,7 +99,22 @@ func cmdDelete(c *cli.Context) error {
 		Info(c, "Deleting...")
 	}
 
-	return DoDelete(c, friendlyID, token, tor)
+	err := DoDelete(c, friendlyID, token, tor)
+	if err != nil {
+		return err
+	}
+
+	// Delete local file, if necessary
+	cfg, err := loadConfig()
+	if cfg.Posts.Directory != "" {
+		// TODO: handle deleting blog posts
+		err = fileutils.DeleteFile(filepath.Join(cfg.Posts.Directory, friendlyID+postFileExt))
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func cmdUpdate(c *cli.Context) error {
