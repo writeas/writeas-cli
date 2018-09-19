@@ -124,10 +124,11 @@ func cmdUpdate(c *cli.Context) error {
 		return cli.NewExitError("usage: writeas update <postId> [<token>]", 1)
 	}
 
+	u, _ := loadUser()
 	if token == "" {
 		// Search for the token locally
 		token = tokenFromID(friendlyID)
-		if token == "" {
+		if token == "" && u == nil {
 			Errorln("Couldn't find an edit token locally. Did you create this post here?")
 			ErrorlnQuit("If you have an edit token, use: writeas update %s <token>", friendlyID)
 		}
