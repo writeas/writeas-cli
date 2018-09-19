@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/atotto/clipboard"
 	"github.com/writeas/go-writeas"
+	"github.com/writeas/web-core/posts"
 	"github.com/writeas/writeas-cli/fileutils"
 	"gopkg.in/urfave/cli.v1"
 	"path/filepath"
@@ -75,11 +76,10 @@ func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) (
 	cl, _ := newClient(c, false)
 
 	pp := &writeas.PostParams{
-		// TODO: extract title
-		Content:    string(post),
 		Font:       getFont(code, font),
 		Collection: collection(c),
 	}
+	pp.Title, pp.Content = posts.ExtractTitle(string(post))
 	if lang := language(c); lang != "" {
 		pp.Language = &lang
 	}
@@ -126,11 +126,10 @@ func DoUpdate(c *cli.Context, post []byte, friendlyID, token, font string, tor, 
 	cl, _ := newClient(c, false)
 
 	params := writeas.PostParams{
-		ID:      friendlyID,
-		Token:   token,
-		Content: string(post),
-		// TODO: extract title
+		ID:    friendlyID,
+		Token: token,
 	}
+	params.Title, params.Content = posts.ExtractTitle(string(post))
 	if code || font != "" {
 		params.Font = getFont(code, font)
 	}
