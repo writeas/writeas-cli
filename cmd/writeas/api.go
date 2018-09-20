@@ -130,6 +130,9 @@ func DoUpdate(c *cli.Context, post []byte, friendlyID, token, font string, tor, 
 		Token: token,
 	}
 	params.Title, params.Content = posts.ExtractTitle(string(post))
+	if lang := language(c, false); lang != "" {
+		params.Language = &lang
+	}
 	if code || font != "" {
 		params.Font = getFont(code, font)
 	}
