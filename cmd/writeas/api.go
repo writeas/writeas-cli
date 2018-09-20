@@ -80,7 +80,7 @@ func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) (
 		Collection: collection(c),
 	}
 	pp.Title, pp.Content = posts.ExtractTitle(string(post))
-	if lang := language(c); lang != "" {
+	if lang := language(c, true); lang != "" {
 		pp.Language = &lang
 	}
 	p, err := cl.CreatePost(pp)
