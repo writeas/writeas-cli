@@ -239,11 +239,6 @@ func main() {
 					Usage: "Use a different port to connect to Tor",
 					Value: 9150,
 				},
-				cli.StringFlag{
-					Name:  "u",
-					Usage: "Username for authentication",
-					Value: "",
-				},
 			},
 		},
 		{

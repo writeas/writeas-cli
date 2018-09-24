@@ -214,9 +214,9 @@ func cmdAuth(c *cli.Context) error {
 	}
 
 	// Validate arguments and get password
-	username := c.String("u")
+	username := c.Args().Get(0)
 	if username == "" {
-		return cli.NewExitError("usage: writeas auth -u <username>", 1)
+		return cli.NewExitError("usage: writeas auth <username>", 1)
 	}
 
 	fmt.Print("Password: ")
