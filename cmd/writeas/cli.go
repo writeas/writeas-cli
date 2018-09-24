@@ -2,7 +2,7 @@ package main
 
 import (
 	"bufio"
-	"github.com/writeas/go-writeas"
+	"go.code.as/writeas.v2"
 	"gopkg.in/urfave/cli.v1"
 	"io"
 	"log"

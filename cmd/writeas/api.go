@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 	"github.com/atotto/clipboard"
-	"github.com/writeas/go-writeas"
 	"github.com/writeas/web-core/posts"
 	"github.com/writeas/writeas-cli/fileutils"
+	"go.code.as/writeas.v2"
 	"gopkg.in/urfave/cli.v1"
 	"path/filepath"
 )

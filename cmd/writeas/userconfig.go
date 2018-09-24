@@ -2,8 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/writeas/go-writeas"
 	"github.com/writeas/writeas-cli/fileutils"
+	"go.code.as/writeas.v2"
 	"gopkg.in/ini.v1"
 	"io/ioutil"
 	"path/filepath"
