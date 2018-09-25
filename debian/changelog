@@ -1,3 +1,9 @@
+writeas-cli (1.1+git20171119.dc1ab5b-1ubuntu1) xenial; urgency=medium
+
+  * Add --user-agent flag
+
+ -- Write.as <hello@write.as>  Tue, 25 Sep 2018 13:02:41 -0400
+
 writeas-cli (1.0+git20171119.dc1ab5b-1) xenial; urgency=medium
 
   * All logging and errors go to stderr, not stdout (Closes: #11)
