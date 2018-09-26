@@ -142,6 +142,10 @@ func main() {
 					Usage: "Use a different port to connect to Tor",
 					Value: 9150,
 				},
+				cli.BoolFlag{
+					Name:  "verbose, v",
+					Usage: "Make the operation more talkative",
+				},
 			},
 		},
 		{
@@ -166,6 +170,10 @@ func main() {
 					Name:  "font",
 					Usage: "Sets post font to given value",
 				},
+				cli.BoolFlag{
+					Name:  "verbose, v",
+					Usage: "Make the operation more talkative",
+				},
 			},
 		},
 		{
@@ -181,6 +189,10 @@ func main() {
 					Name:  "tor-port",
 					Usage: "Use a different port to connect to Tor",
 					Value: 9150,
+				},
+				cli.BoolFlag{
+					Name:  "verbose, v",
+					Usage: "Make the operation more talkative",
 				},
 			},
 		},
@@ -223,6 +235,10 @@ func main() {
 					Usage: "Use a different port to connect to Tor",
 					Value: 9150,
 				},
+				cli.BoolFlag{
+					Name:  "verbose, v",
+					Usage: "Make the operation more talkative",
+				},
 			},
 		},
 		{
@@ -239,6 +255,10 @@ func main() {
 					Usage: "Use a different port to connect to Tor",
 					Value: 9150,
 				},
+				cli.BoolFlag{
+					Name:  "verbose, v",
+					Usage: "Make the operation more talkative",
+				},
 			},
 		},
 		{
@@ -254,6 +274,10 @@ func main() {
 					Name:  "tor-port",
 					Usage: "Use a different port to connect to Tor",
 					Value: 9150,
+				},
+				cli.BoolFlag{
+					Name:  "verbose, v",
+					Usage: "Make the operation more talkative",
 				},
 			},
 		},
