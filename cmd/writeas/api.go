@@ -47,7 +47,7 @@ func newClient(c *cli.Context, authRequired bool) (*writeas.Client, error) {
 	if u != nil {
 		client.SetToken(u.AccessToken)
 	} else if authRequired {
-		return nil, fmt.Errorf("Not currently logged in. Authenticate with: writeas auth -u <username>")
+		return nil, fmt.Errorf("Not currently logged in. Authenticate with: writeas auth <username>")
 	}
 
 	return client, nil
