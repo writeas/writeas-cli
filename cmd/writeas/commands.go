@@ -210,7 +210,7 @@ func cmdAuth(c *cli.Context) error {
 		return cli.NewExitError(fmt.Sprintf("couldn't load config: %v", err), 1)
 	}
 	if u != nil && u.AccessToken != "" {
-		return cli.NewExitError("You're already authenticated.", 1)
+		return cli.NewExitError("You're already authenticated as "+u.User.Username+". Log out with: writeas logout", 1)
 	}
 
 	// Validate arguments and get password
