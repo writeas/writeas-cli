@@ -11,7 +11,8 @@ import (
 )
 
 const (
-	postFileExt = ".txt"
+	postFileExt  = ".txt"
+	userFilename = "writeas_user"
 )
 
 func cmdPull(c *cli.Context) error {
@@ -77,6 +78,13 @@ func cmdPull(c *cli.Context) error {
 
 // TODO: move UserConfig to its own package, and this to sync package
 func syncSetUp(cfg *UserConfig) error {
+	// Get user information and fail early (before we make the user do
+	// anything), if we're going to
+	u, err := loadUser()
+	if err != nil {
+		return err
+	}
+
 	// Prompt for posts directory
 	defaultDir, err := os.Getwd()
 	if err != nil {
@@ -89,6 +97,9 @@ func syncSetUp(cfg *UserConfig) error {
 		dir = defaultDir
 	}
 
+	// FIXME: This only works on non-Windows OSes (fix: https://www.reddit.com/r/golang/comments/5t3ezd/hidden_files_directories/)
+	userFilepath := filepath.Join(dir, "."+userFilename)
+
 	// Create directory if needed
 	if !fileutils.Exists(dir) {
 		err = os.MkdirAll(dir, 0700)
@@ -98,6 +109,8 @@ func syncSetUp(cfg *UserConfig) error {
 			}
 			return err
 		}
+		// Create username file in directory
+		err = ioutil.WriteFile(userFilepath, []byte(u.User.Username), 0644)
 		fmt.Println("Created posts directory.")
 	}
 
