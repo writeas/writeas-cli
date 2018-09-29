@@ -46,7 +46,7 @@ https://write.as/aaaaaaaaaaaa
 
 This is generally more useful for posting terminal output or code, like so (the `--code` flag turns on syntax highlighting):
 
-OS X / *nix: `cat writeas/cli.go | writeas --code`
+macOS / Linux: `cat writeas/cli.go | writeas --code`
 
 Windows: `type writeas/cli.go | writeas.exe --code`
 
