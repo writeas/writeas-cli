@@ -112,6 +112,10 @@ func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) e
 
 		addPost(id, token)
 
+		// Output URL in requested format
+		if c.Bool("md") {
+			url = append(url, []byte(".md")...)
+		}
 		// Copy URL to clipboard
 		err = clipboard.WriteAll(string(url))
 		if err != nil {

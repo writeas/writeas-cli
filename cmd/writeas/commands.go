@@ -146,7 +146,12 @@ func cmdList(c *cli.Context) error {
 			fmt.Printf("%s ", p.ID)
 		}
 		if urls {
-			fmt.Printf("https://write.as/%s ", p.ID)
+			ext := ""
+			// Output URL in requested format
+			if c.Bool("md") {
+				ext = ".md"
+			}
+			fmt.Printf("https://write.as/%s%s ", p.ID, ext)
 		}
 		fmt.Print("\n")
 	}

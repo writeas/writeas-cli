@@ -41,6 +41,10 @@ var postFlags = []cli.Flag{
 		Usage: "Specifies this post is code",
 	},
 	cli.BoolFlag{
+		Name:  "md",
+		Usage: "Returns post URL with Markdown enabled",
+	},
+	cli.BoolFlag{
 		Name:  "verbose, v",
 		Usage: "Make the operation more talkative",
 	},
@@ -185,6 +189,10 @@ func main() {
 				cli.BoolFlag{
 					Name:  "id",
 					Usage: "Show list with post IDs (default)",
+				},
+				cli.BoolFlag{
+					Name:  "md",
+					Usage: "Use with --url to return URLs with Markdown enabled",
 				},
 				cli.BoolFlag{
 					Name:  "url",
