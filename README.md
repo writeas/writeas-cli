@@ -28,6 +28,13 @@ Download the [64-bit](https://github.com/writeas/writeas-cli/releases/download/v
 **macOS**<br />
 Download the [64-bit](https://github.com/writeas/writeas-cli/releases/download/v1.2/writeas_1.2_darwin_amd64.tar.gz) executable and put it somewhere in your `$PATH`, like `/usr/local/bin`.
 
+**Debian-based Linux**<br />
+```bash
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys DBE07445
+sudo add-apt-repository "deb http://updates.writeas.org xenial main"
+sudo apt-get update && sudo apt-get install writeas-cli
+```
+
 **Linux (other)**<br />
 Download the [64-bit](https://github.com/writeas/writeas-cli/releases/download/v1.2/writeas_1.2_linux_amd64.tar.gz) or [32-bit](https://github.com/writeas/writeas-cli/releases/download/v1.2/writeas_1.2_linux_386.tar.gz) executable and put it somewhere in your `$PATH`, like `/usr/local/bin`.
 
