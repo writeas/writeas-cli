@@ -49,7 +49,7 @@ https://write.as/aaaaaaaaaaaa
 
 This is generally more useful for posting terminal output or code, like so (the `--code` flag turns on syntax highlighting):
 
-OS X / *nix: `cat writeas/cli.go | writeas --code`
+macOS / Linux: `cat writeas/cli.go | writeas --code`
 
 Windows: `type writeas/cli.go | writeas.exe --code`
 
@@ -64,7 +64,9 @@ Hello world!
 
 #### List all published posts
 
-This lists all posts you've published from your device. Pass the `--url` flag to show the list with full URLs.
+This lists all posts you've published from your device.
+
+Pass the `--url` flag to show the list with full post URLs, and the `--md` flag to return URLs with Markdown enabled.
 
 ```bash
 $ writeas list
@@ -104,3 +106,5 @@ Customize your post's appearance with the `--font` flag:
 | `code` | Syntax-highlighted monospace | No |
 
 Put it all together, e.g. publish with a sans-serif font: `writeas new --font sans`
+
+If you're publishing Markdown, supply the `--md` flag to get a URL back that will render Markdown, e.g.: `writeas new --font sans --md`

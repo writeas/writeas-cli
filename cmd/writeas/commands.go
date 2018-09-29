@@ -196,7 +196,12 @@ func cmdList(c *cli.Context) error {
 			if isDev() {
 				base = devBaseURL
 			}
-			fmt.Printf("%s/%s ", base, p.ID)
+			ext := ""
+			// Output URL in requested format
+			if c.Bool("md") {
+				ext = ".md"
+			}
+			fmt.Printf("%s/%s%s ", base, p.ID, ext)
 		}
 		fmt.Print("\n")
 	}

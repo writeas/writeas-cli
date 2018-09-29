@@ -18,7 +18,7 @@ const (
 
 // Application constants.
 const (
-	version = "1.2-dev"
+	version = "2.0-dev"
 )
 
 // Defaults for posts on Write.as.
@@ -45,6 +45,10 @@ var postFlags = []cli.Flag{
 	cli.BoolFlag{
 		Name:  "code",
 		Usage: "Specifies this post is code",
+	},
+	cli.BoolFlag{
+		Name:  "md",
+		Usage: "Returns post URL with Markdown enabled",
 	},
 	cli.BoolFlag{
 		Name:  "verbose, v",
@@ -123,10 +127,10 @@ func main() {
 			Flags:  postFlags,
 		},
 		{
-			Name:        "publish",
-			Usage:       "Publish a file to Write.as",
-			Action:      cmdPublish,
-			Flags:       postFlags,
+			Name:   "publish",
+			Usage:  "Publish a file to Write.as",
+			Action: cmdPublish,
+			Flags:  postFlags,
 		},
 		{
 			Name:   "delete",
@@ -214,6 +218,10 @@ func main() {
 				cli.BoolFlag{
 					Name:  "id",
 					Usage: "Show list with post IDs (default)",
+				},
+				cli.BoolFlag{
+					Name:  "md",
+					Usage: "Use with --url to return URLs with Markdown enabled",
 				},
 				cli.BoolFlag{
 					Name:  "url",

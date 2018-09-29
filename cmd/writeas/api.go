@@ -100,6 +100,10 @@ func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) (
 			url = writeasBaseURL
 		}
 		url += "/" + p.ID
+		// Output URL in requested format
+		if c.Bool("md") {
+			url += ".md"
+		}
 	}
 
 	if cl.Token() == "" {
