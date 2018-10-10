@@ -129,10 +129,7 @@ func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) (
 func DoUpdate(c *cli.Context, post []byte, friendlyID, token, font string, tor, code bool) error {
 	cl, _ := newClient(c, false)
 
-	params := writeas.PostParams{
-		ID:    friendlyID,
-		Token: token,
-	}
+	params := writeas.PostParams{}
 	params.Title, params.Content = posts.ExtractTitle(string(post))
 	if lang := language(c, false); lang != "" {
 		params.Language = &lang
@@ -141,7 +138,7 @@ func DoUpdate(c *cli.Context, post []byte, friendlyID, token, font string, tor, 
 		params.Font = getFont(code, font)
 	}
 
-	_, err := cl.UpdatePost(&params)
+	_, err := cl.UpdatePost(friendlyID, token, &params)
 	if err != nil {
 		if debug {
 			ErrorlnQuit("Problem updating: %v", err)
@@ -161,10 +158,7 @@ func DoUpdate(c *cli.Context, post []byte, friendlyID, token, font string, tor, 
 func DoDelete(c *cli.Context, friendlyID, token string, tor bool) error {
 	cl, _ := newClient(c, false)
 
-	err := cl.DeletePost(&writeas.PostParams{
-		ID:    friendlyID,
-		Token: token,
-	})
+	err := cl.DeletePost(friendlyID, token)
 	if err != nil {
 		if debug {
 			ErrorlnQuit("Problem deleting: %v", err)
