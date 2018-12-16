@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	cli "gopkg.in/urfave/cli.v1"
 )
 
 const (
@@ -17,8 +18,11 @@ const (
 
 // Post holds the basic authentication information for a Write.as post.
 type Post struct {
-	ID        string
-	EditToken string
+	ID         string
+	EditToken  string
+	Title      string
+	Slug       string
+	Collection string
 }
 
 func userDataDir() string {
@@ -73,6 +77,32 @@ func tokenFromID(id string) string {
 
 func removePost(id string) {
 	fileutils.RemoveLine(filepath.Join(userDataDir(), postsFile), id)
+}
+
+func getUserPosts(c *cli.Context, u *writeas.AuthUser) ([]Post, error) {
+	client := client(userAgent(c), isTor(c))
+	client.SetToken(u.AccessToken)
+
+	apiPosts, err := client.GetUserPosts()
+	if err != nil {
+		return nil, err
+	}
+
+	posts := make([]Post, len(*apiPosts))
+	for i, p := range *apiPosts {
+		posts[i] = Post{
+			ID:        p.ID,
+			EditToken: p.Token,
+			Title:     p.Title,
+			Slug:      p.Slug,
+		}
+
+		if p.Collection != nil {
+			posts[i].Collection = p.Collection.Alias
+		}
+	}
+
+	return posts, nil
 }
 
 func getPosts() *[]Post {

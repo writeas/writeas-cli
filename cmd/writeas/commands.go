@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/howeyc/gopass"
 	"github.com/writeas/writeas-cli/fileutils"
@@ -184,24 +185,50 @@ func cmdList(c *cli.Context) error {
 	urls := c.Bool("url")
 	ids := c.Bool("id")
 
-	var p Post
-	posts := getPosts()
-	for i := range *posts {
-		p = (*posts)[len(*posts)-1-i]
+	user, err := loadUser()
+	if err != nil {
+		return cli.NewExitError(fmt.Sprintf("couldn't load config: %v", err), 1)
+	}
+
+	var posts []Post
+	if user == nil {
+		posts = *getPosts()
+	} else {
+		var err error
+		posts, err = getUserPosts(c, user)
+		if err != nil {
+			return cli.NewExitError(fmt.Sprintf("couldn't load posts for %q: %v", user.User.Username, err), 1)
+		}
+	}
+
+	for i := len(posts) - 1; i >= 0; i-- {
+		p := posts[i]
 		if ids || !urls {
 			fmt.Printf("%s ", p.ID)
 		}
 		if urls {
-			base := writeasBaseURL
+			var url bytes.Buffer
+
+			// Base URL
 			if isDev() {
-				base = devBaseURL
+				url.WriteString(devBaseURL)
+			} else {
+				url.WriteString(writeasBaseURL)
 			}
-			ext := ""
-			// Output URL in requested format
+
+			// Path
+			if p.Collection != "" {
+				fmt.Fprintf(&url, "/%v/%v", p.Collection, p.Slug)
+			} else {
+				fmt.Fprintf(&url, "/%v", p.ID)
+			}
+
+			// Extension
 			if c.Bool("md") {
-				ext = ".md"
+				url.WriteString(".md")
 			}
-			fmt.Printf("%s/%s%s ", base, p.ID, ext)
+
+			fmt.Print(url.String())
 		}
 		fmt.Print("\n")
 	}
