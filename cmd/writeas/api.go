@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/atotto/clipboard"
-	"github.com/writeas/go-writeas"
-	"github.com/writeas/writeas-cli/fileutils"
-	"gopkg.in/urfave/cli.v1"
 	"path/filepath"
+
+	"github.com/atotto/clipboard"
+	"github.com/writeas/writeas-cli/fileutils"
+	writeas "go.code.as/writeas.v2"
+	cli "gopkg.in/urfave/cli.v1"
 )
 
 const (
@@ -116,7 +117,7 @@ func DoUpdate(c *cli.Context, post []byte, friendlyID, token, font string, tor, 
 		params.Font = getFont(code, font)
 	}
 
-	_, err := cl.UpdatePost(&params)
+	_, err := cl.UpdatePost(params.ID, params.Token, &params)
 	if err != nil {
 		if debug {
 			ErrorlnQuit("Problem updating: %v", err)
@@ -136,10 +137,7 @@ func DoUpdate(c *cli.Context, post []byte, friendlyID, token, font string, tor, 
 func DoDelete(c *cli.Context, friendlyID, token string, tor bool) error {
 	cl := newClient(c)
 
-	err := cl.DeletePost(&writeas.PostParams{
-		ID:    friendlyID,
-		Token: token,
-	})
+	err := cl.DeletePost(friendlyID, token)
 	if err != nil {
 		if debug {
 			ErrorlnQuit("Problem deleting: %v", err)

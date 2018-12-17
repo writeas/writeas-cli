@@ -2,11 +2,12 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/writeas/go-writeas"
-	"github.com/writeas/writeas-cli/fileutils"
-	"gopkg.in/ini.v1"
 	"io/ioutil"
 	"path/filepath"
+
+	"github.com/writeas/writeas-cli/fileutils"
+	writeas "go.code.as/writeas.v2"
+	ini "gopkg.in/ini.v1"
 )
 
 const (
