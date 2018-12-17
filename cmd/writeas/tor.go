@@ -1,9 +1,10 @@
 package main
 
 import (
-	"code.as/core/socks"
 	"fmt"
 	"net/http"
+
+	"code.as/core/socks"
 )
 
 var (

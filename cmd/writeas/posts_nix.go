@@ -4,8 +4,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/mitchellh/go-homedir"
 	"os/exec"
+
+	homedir "github.com/mitchellh/go-homedir"
 )
 
 const (

@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/howeyc/gopass"
-	"github.com/writeas/writeas-cli/fileutils"
-	"gopkg.in/urfave/cli.v1"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"github.com/howeyc/gopass"
+	"github.com/writeas/writeas-cli/fileutils"
+	cli "gopkg.in/urfave/cli.v1"
 )
 
 func cmdPost(c *cli.Context) error {

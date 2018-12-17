@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/writeas/writeas-cli/fileutils"
-	"go.code.as/writeas.v2"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/writeas/writeas-cli/fileutils"
+	writeas "go.code.as/writeas.v2"
 )
 
 const (

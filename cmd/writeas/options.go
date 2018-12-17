@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/cloudfoundry/jibber_jabber"
-	"gopkg.in/urfave/cli.v1"
+	cli "gopkg.in/urfave/cli.v1"
 )
 
 func userAgent(c *cli.Context) string {

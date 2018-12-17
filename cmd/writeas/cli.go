@@ -2,11 +2,12 @@ package main
 
 import (
 	"bufio"
-	"go.code.as/writeas.v2"
-	"gopkg.in/urfave/cli.v1"
 	"io"
 	"log"
 	"os"
+
+	writeas "go.code.as/writeas.v2"
+	cli "gopkg.in/urfave/cli.v1"
 )
 
 // API constants for communicating with Write.as.
