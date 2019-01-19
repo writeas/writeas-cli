@@ -20,16 +20,34 @@ type (
 
 	PostsConfig struct {
 		Directory string `ini:"directory"`
+		Font string `ini:"font"`
+		Lang string `ini:"lang"`
+		IsRTL bool `ini:"rtl"`
+		Collection string `ini:"collection"`
 	}
 
 	UserConfig struct {
 		API   APIConfig   `ini:"api"`
 		Posts PostsConfig `ini:"posts"`
 	}
-)
 
+	ConfigSingleton struct {
+		uc *UserConfig
+		err error
+	}
+)
+var _instance *ConfigSingleton = nil
+
+// Only load config file once
 func loadConfig() (*UserConfig, error) {
-	// TODO: load config to var shared across app
+	if _instance == nil {
+		uc, err  := reloadConfig()
+		_instance = &ConfigSingleton{uc, err}
+	}
+	return _instance.uc, _instance.err
+}
+
+func reloadConfig() (*UserConfig, error) {
 	cfg, err := ini.LooseLoad(filepath.Join(userDataDir(), userConfigFile))
 	if err != nil {
 		return nil, err
@@ -43,6 +61,7 @@ func loadConfig() (*UserConfig, error) {
 	}
 	return uc, nil
 }
+
 
 func saveConfig(uc *UserConfig) error {
 	cfg := ini.Empty()

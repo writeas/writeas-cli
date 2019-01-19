@@ -83,6 +83,9 @@ func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) (
 	if lang := language(c, true); lang != "" {
 		pp.Language = &lang
 	}
+	if rtl := rtl(); rtl {
+		pp.IsRTL = &rtl
+	}
 	p, err := cl.CreatePost(pp)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to post: %v", err)

@@ -24,6 +24,13 @@ func language(c *cli.Context, auto bool) string {
 	if !auto {
 		return ""
 	}
+
+	// Lang defined in config file
+	uc, _ := loadConfig()
+	if uc != nil && uc.Posts.Lang != "" {
+		return uc.Posts.Lang
+	}
+
 	// Automatically detect language
 	l, err := jibber_jabber.DetectLanguage()
 	if err != nil {
@@ -33,12 +40,26 @@ func language(c *cli.Context, auto bool) string {
 	return l
 }
 
+func rtl() bool {
+	uc, _ := loadConfig()
+
+	if uc != nil {
+		return uc.Posts.IsRTL
+	}
+	return false
+}
+
 func collection(c *cli.Context) string {
 	if coll := c.String("c"); coll != "" {
 		return coll
 	}
 	if coll := c.String("b"); coll != "" {
 		return coll
+	}
+	uc, _ := loadConfig()
+
+	if uc != nil {
+		return uc.Posts.Collection
 	}
 	return ""
 }
