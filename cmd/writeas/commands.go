@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strconv"
 )
 
 func cmdPost(c *cli.Context) error {
@@ -239,4 +240,80 @@ func cmdAuth(c *cli.Context) error {
 
 func cmdLogOut(c *cli.Context) error {
 	return DoLogOut(c)
+}
+
+func cmdOptions(c *cli.Context) error {
+
+	// Edit config file
+	if c.Bool("e") {
+		composeConfig()
+
+	// List configs
+	} else if c.Bool("l") || c.Bool("a") {
+		uc, err := loadConfig()
+		if err != nil {
+			ErrorlnQuit(fmt.Sprintf("Error loading config: %v", err), 1)
+		}
+		printConfig(uc, "", c.Bool("a"))
+
+	// Check arguments
+	} else {
+		nargs := len(c.Args())
+
+		// No arguments nor options: display command usage
+		if nargs == 0 {
+			cli.ShowSubcommandHelp(c)
+			return nil
+		}
+		name  := c.Args().Get(0)
+		value := c.Args().Get(1)
+
+		// Load config file
+		uc, err := loadConfig()
+		if err != nil {
+			ErrorlnQuit(fmt.Sprintf("Error loading config: %v", err), 1)
+		}
+
+		// Get reflection of field
+		rval, err := getConfigField(uc, name)
+		if err != nil {
+			ErrorlnQuit(fmt.Sprintf("%v", err), 1)
+		}
+
+		// Print value
+		if nargs == 1 {
+			fmt.Printf("%s=%v\n", name, *rval)
+
+		// Set value
+		} else {
+
+			// Cast and set value
+			switch typ := rval.Kind().String(); typ {
+				case "bool":
+					b, err := strconv.ParseBool(value)
+					if err != nil {
+						ErrorlnQuit(fmt.Sprintf("error: \"%s\" is not a valid boolean", value), 1)
+					}
+					rval.SetBool(b)
+
+				case "int":
+					i, err := strconv.ParseInt(value, 0, 0)
+					if err != nil {
+						ErrorlnQuit(fmt.Sprintf("error: \"%s\" is not a valid integer", value), 1)
+					}
+					rval.SetInt(i)
+
+				case "string":
+					rval.SetString(value)
+			}
+
+			// Save config to file
+			err = saveConfig(uc)
+			if err != nil {
+				ErrorlnQuit(fmt.Sprintf("Unable to save config: %s", err), 1)
+			}
+			fmt.Println("Saved config.")
+		}
+	}
+	return nil
 }

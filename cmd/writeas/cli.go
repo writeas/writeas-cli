@@ -289,13 +289,37 @@ func main() {
 				},
 			},
 		},
+		{
+			Name:   "config",
+			Usage:  "Get and set options",
+			UsageText: "config name [value]\n   writeas config [command options]",
+			Action: cmdOptions,
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "edit, e",
+					Usage: "Opens an editor to modify the config file",
+				},
+				cli.BoolFlag{
+					Name:  "list, l",
+					Usage: "List all variables set in config file, along with their values",
+				},
+				cli.BoolFlag{
+					Name:  "list-all, a",
+					Usage: "List all config variables, along with their values",
+				},
+				cli.BoolFlag{
+					Name:  "verbose, v",
+					Usage: "Make the operation more talkative",
+				},
+			},
+		},
 	}
 
 	cli.CommandHelpTemplate = `NAME:
    {{.Name}} - {{.Usage}}
 
 USAGE:
-   writeas {{.Name}}{{if .Flags}} [command options]{{end}} [arguments...]{{if .Description}}
+   writeas {{if .UsageText}}{{.UsageText}}{{else}}{{.Name}}{{if .Flags}} [command options]{{end}} [arguments...]{{end}}{{if .Description}}
 
 DESCRIPTION:
    {{.Description}}{{end}}{{if .Flags}}
