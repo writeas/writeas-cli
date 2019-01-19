@@ -30,10 +30,20 @@ var postFontMap = map[string]postFont{
 
 func getFont(code bool, font string) string {
 	if code {
-		if font != "" && font != defaultFont {
+		if font != "" {
 			fmt.Printf("A non-default font '%s' and --code flag given. 'code' type takes precedence.\n", font)
 		}
 		return "code"
+
+	// Font defined in config file
+	} else if font == "" {
+		uc, _ := loadConfig()
+
+		if uc != nil && uc.Posts.Font != "" {
+			font = uc.Posts.Font
+		} else {
+			return string(defaultFont)
+		}
 	}
 
 	// Validate font value

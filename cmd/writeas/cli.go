@@ -57,7 +57,6 @@ var postFlags = []cli.Flag{
 	cli.StringFlag{
 		Name:  "font",
 		Usage: "Sets post font to given value",
-		Value: defaultFont,
 	},
 	cli.StringFlag{
 		Name:  "lang",
