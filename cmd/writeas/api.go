@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
+	"path/filepath"
+
 	"github.com/atotto/clipboard"
 	"github.com/writeas/web-core/posts"
 	"github.com/writeas/writeas-cli/fileutils"
 	"go.code.as/writeas.v2"
 	"gopkg.in/urfave/cli.v1"
-	"path/filepath"
 )
 
 const (
@@ -40,12 +41,17 @@ func newClient(c *cli.Context, authRequired bool) (*writeas.Client, error) {
 		} else {
 			client = writeas.NewClient()
 		}
+
+		if c.String("host") != "" {
+			client.SetBaseUrl(c.String("host") + "/api")
+		}
 	}
 	client.UserAgent = userAgent(c)
 	// TODO: load user into var shared across the app
 	u, _ := loadUser()
 	if u != nil {
 		client.SetToken(u.AccessToken)
+		client.SetBaseUrl(u.BaseURL)
 	} else if authRequired {
 		return nil, fmt.Errorf("Not currently logged in. Authenticate with: writeas auth <username>")
 	}
@@ -177,7 +183,7 @@ func DoDelete(c *cli.Context, friendlyID, token string, tor bool) error {
 }
 
 func DoLogIn(c *cli.Context, username, password string) error {
-	cl := client(userAgent(c), isTor(c))
+	cl, _ := newClient(c, false)
 
 	u, err := cl.LogIn(username, password)
 	if err != nil {

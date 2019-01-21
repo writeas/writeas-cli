@@ -2,11 +2,12 @@ package main
 
 import (
 	"bufio"
-	"go.code.as/writeas.v2"
-	"gopkg.in/urfave/cli.v1"
 	"io"
 	"log"
 	"os"
+
+	"go.code.as/writeas.v2"
+	"gopkg.in/urfave/cli.v1"
 )
 
 // API constants for communicating with Write.as.
@@ -254,6 +255,10 @@ func main() {
 			Usage:  "Authenticate with Write.as",
 			Action: cmdAuth,
 			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "host",
+					Usage: "Set host address",
+				},
 				cli.BoolFlag{
 					Name:  "tor, t",
 					Usage: "Authenticate via Tor hidden service",
