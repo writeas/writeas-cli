@@ -22,10 +22,19 @@ Please follow our coding conventions below and make sure all of your commits are
 
 We strive for consistency above all. Reading the small codebase should give you a good idea of the conventions we follow.
 
-* We use `go fmt` before committing anything
+* We use `goimports` before committing anything
 * We aim to document all exported entities
 * Go files are broken up into logical functional components
 * General functions are extracted into modules when possible
+
+### Import Groups
+
+We aim for two import groups:
+
+* Standard library imports
+* Everything else
+
+`goimports` already does this for you along with running `go fmt`.
 
 ## Design conventions
 

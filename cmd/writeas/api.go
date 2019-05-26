@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
+	"path/filepath"
+
 	"github.com/atotto/clipboard"
 	"github.com/writeas/web-core/posts"
 	"github.com/writeas/writeas-cli/fileutils"
-	"go.code.as/writeas.v2"
-	"gopkg.in/urfave/cli.v1"
-	"path/filepath"
+	writeas "go.code.as/writeas.v2"
+	cli "gopkg.in/urfave/cli.v1"
 )
 
 const (

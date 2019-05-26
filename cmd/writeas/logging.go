@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"gopkg.in/urfave/cli.v1"
 	"os"
+
+	cli "gopkg.in/urfave/cli.v1"
 )
 
 // Info logs general diagnostic messages, shown only when the -v or --verbose
