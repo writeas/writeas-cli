@@ -1,8 +1,19 @@
-package main
+package writeascli
 
 import (
 	"github.com/cloudfoundry/jibber_jabber"
 	cli "gopkg.in/urfave/cli.v1"
+)
+
+// Application constants.
+const (
+	Version          = "1.99-dev"
+	defaultUserAgent = "writeas-cli v" + Version
+	// Defaults for posts on Write.as.
+	DefaultFont    = PostFontMono
+	WriteasBaseURL = "https://write.as"
+	DevBaseURL     = "https://development.write.as"
+	TorBaseURL     = "http://writeas7pm7rcdqg.onion"
 )
 
 func userAgent(c *cli.Context) string {

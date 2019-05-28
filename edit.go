@@ -1,4 +1,4 @@
-package main
+package writeascli
 
 import (
 	"os"
@@ -6,7 +6,7 @@ import (
 
 var editors = []string{"WRITEAS_EDITOR", "EDITOR"}
 
-func getConfiguredEditor() string {
+func GetConfiguredEditor() string {
 	for _, v := range editors {
 		if e := os.Getenv(v); e != "" {
 			return e

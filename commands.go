@@ -1,4 +1,4 @@
-package main
+package writeascli
 
 import (
 	"fmt"
@@ -7,16 +7,17 @@ import (
 	"path/filepath"
 
 	"github.com/howeyc/gopass"
+	"github.com/writeas/writeas-cli/config"
 	"github.com/writeas/writeas-cli/fileutils"
 	cli "gopkg.in/urfave/cli.v1"
 )
 
-func cmdPost(c *cli.Context) error {
+func CmdPost(c *cli.Context) error {
 	_, err := handlePost(readStdIn(), c)
 	return err
 }
 
-func cmdNew(c *cli.Context) error {
+func CmdNew(c *cli.Context) error {
 	fname, p := composeNewPost()
 	if p == nil {
 		// Assume composeNewPost already told us what the error was. Abort now.
@@ -48,7 +49,7 @@ func cmdNew(c *cli.Context) error {
 	return nil
 }
 
-func cmdPublish(c *cli.Context) error {
+func CmdPublish(c *cli.Context) error {
 	filename := c.Args().Get(0)
 	if filename == "" {
 		return cli.NewExitError("usage: writeas publish <filename>", 1)
@@ -63,7 +64,7 @@ func cmdPublish(c *cli.Context) error {
 	}
 
 	// Save post to posts folder
-	cfg, err := loadConfig()
+	cfg, err := config.LoadConfig(userDataDir())
 	if cfg.Posts.Directory != "" {
 		err = WritePost(cfg.Posts.Directory, p)
 		if err != nil {
@@ -73,14 +74,14 @@ func cmdPublish(c *cli.Context) error {
 	return nil
 }
 
-func cmdDelete(c *cli.Context) error {
+func CmdDelete(c *cli.Context) error {
 	friendlyID := c.Args().Get(0)
 	token := c.Args().Get(1)
 	if friendlyID == "" {
 		return cli.NewExitError("usage: writeas delete <postId> [<token>]", 1)
 	}
 
-	u, _ := loadUser()
+	u, _ := LoadUser(userDataDir())
 	if token == "" {
 		// Search for the token locally
 		token = tokenFromID(friendlyID)
@@ -108,7 +109,7 @@ func cmdDelete(c *cli.Context) error {
 	}
 
 	// Delete local file, if necessary
-	cfg, err := loadConfig()
+	cfg, err := config.LoadConfig(userDataDir())
 	if cfg.Posts.Directory != "" {
 		// TODO: handle deleting blog posts
 		err = fileutils.DeleteFile(filepath.Join(cfg.Posts.Directory, friendlyID+postFileExt))
@@ -120,14 +121,14 @@ func cmdDelete(c *cli.Context) error {
 	return nil
 }
 
-func cmdUpdate(c *cli.Context) error {
+func CmdUpdate(c *cli.Context) error {
 	friendlyID := c.Args().Get(0)
 	token := c.Args().Get(1)
 	if friendlyID == "" {
 		return cli.NewExitError("usage: writeas update <postId> [<token>]", 1)
 	}
 
-	u, _ := loadUser()
+	u, _ := LoadUser(userDataDir())
 	if token == "" {
 		// Search for the token locally
 		token = tokenFromID(friendlyID)
@@ -155,7 +156,7 @@ func cmdUpdate(c *cli.Context) error {
 	return DoUpdate(c, fullPost, friendlyID, token, c.String("font"), tor, c.Bool("code"))
 }
 
-func cmdGet(c *cli.Context) error {
+func CmdGet(c *cli.Context) error {
 	friendlyID := c.Args().Get(0)
 	if friendlyID == "" {
 		return cli.NewExitError("usage: writeas get <postId>", 1)
@@ -176,7 +177,7 @@ func cmdGet(c *cli.Context) error {
 	return DoFetch(friendlyID, userAgent(c), tor)
 }
 
-func cmdAdd(c *cli.Context) error {
+func CmdAdd(c *cli.Context) error {
 	friendlyID := c.Args().Get(0)
 	token := c.Args().Get(1)
 	if friendlyID == "" || token == "" {
@@ -187,7 +188,7 @@ func cmdAdd(c *cli.Context) error {
 	return err
 }
 
-func cmdList(c *cli.Context) error {
+func CmdList(c *cli.Context) error {
 	urls := c.Bool("url")
 	ids := c.Bool("id")
 
@@ -199,9 +200,9 @@ func cmdList(c *cli.Context) error {
 			fmt.Printf("%s ", p.ID)
 		}
 		if urls {
-			base := writeasBaseURL
-			if isDev() {
-				base = devBaseURL
+			base := WriteasBaseURL
+			if IsDev() {
+				base = DevBaseURL
 			}
 			ext := ""
 			// Output URL in requested format
@@ -215,9 +216,9 @@ func cmdList(c *cli.Context) error {
 	return nil
 }
 
-func cmdAuth(c *cli.Context) error {
+func CmdAuth(c *cli.Context) error {
 	// Check configuration
-	u, err := loadUser()
+	u, err := LoadUser(userDataDir())
 	if err != nil {
 		return cli.NewExitError(fmt.Sprintf("couldn't load config: %v", err), 1)
 	}
@@ -249,6 +250,6 @@ func cmdAuth(c *cli.Context) error {
 	return nil
 }
 
-func cmdLogOut(c *cli.Context) error {
+func CmdLogOut(c *cli.Context) error {
 	return DoLogOut(c)
 }

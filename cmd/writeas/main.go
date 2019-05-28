@@ -1,76 +1,12 @@
 package main
 
 import (
-	"bufio"
-	"io"
-	"log"
 	"os"
 
-	writeas "go.code.as/writeas.v2"
+	writeascli "github.com/writeas/writeas-cli"
+	cmd "github.com/writeas/writeas-cli/cmd"
 	cli "gopkg.in/urfave/cli.v1"
 )
-
-// API constants for communicating with Write.as.
-const (
-	writeasBaseURL = "https://write.as"
-	devBaseURL     = "https://development.write.as"
-	torBaseURL     = "http://writeas7pm7rcdqg.onion"
-)
-
-// Application constants.
-const (
-	version = "1.99-dev"
-)
-
-// Defaults for posts on Write.as.
-const (
-	defaultFont = PostFontMono
-)
-
-// Available flags for creating posts
-var postFlags = []cli.Flag{
-	cli.StringFlag{
-		Name:  "c, b",
-		Usage: "Optional blog to post to",
-		Value: "",
-	},
-	cli.BoolFlag{
-		Name:  "tor, t",
-		Usage: "Perform action on Tor hidden service",
-	},
-	cli.IntFlag{
-		Name:  "tor-port",
-		Usage: "Use a different port to connect to Tor",
-		Value: 9150,
-	},
-	cli.BoolFlag{
-		Name:  "code",
-		Usage: "Specifies this post is code",
-	},
-	cli.BoolFlag{
-		Name:  "md",
-		Usage: "Returns post URL with Markdown enabled",
-	},
-	cli.BoolFlag{
-		Name:  "verbose, v",
-		Usage: "Make the operation more talkative",
-	},
-	cli.StringFlag{
-		Name:  "font",
-		Usage: "Sets post font to given value",
-		Value: defaultFont,
-	},
-	cli.StringFlag{
-		Name:  "lang",
-		Usage: "Sets post language to given ISO 639-1 language code",
-		Value: "",
-	},
-	cli.StringFlag{
-		Name:  "user-agent",
-		Usage: "Sets the User-Agent for API requests",
-		Value: "",
-	},
-}
 
 func main() {
 	initialize()
@@ -83,7 +19,7 @@ func main() {
 	// Run the app
 	app := cli.NewApp()
 	app.Name = "writeas"
-	app.Version = version
+	app.Version = writeascli.Version
 	app.Usage = "Publish text quickly"
 	app.Authors = []cli.Author{
 		{
@@ -91,14 +27,14 @@ func main() {
 			Email: "hello@write.as",
 		},
 	}
-	app.Action = cmdPost
-	app.Flags = postFlags
+	app.Action = writeascli.CmdPost
+	app.Flags = cmd.PostFlags
 	app.Commands = []cli.Command{
 		{
 			Name:   "post",
 			Usage:  "Alias for default action: create post from stdin",
-			Action: cmdPost,
-			Flags:  postFlags,
+			Action: writeascli.CmdPost,
+			Flags:  cmd.PostFlags,
 			Description: `Create a new post on Write.as from stdin.
 
    Use the --code flag to indicate that the post should use syntax 
@@ -124,19 +60,19 @@ func main() {
    
    If posting fails for any reason, 'writeas' will show you the temporary file
    location and how to pipe it to 'writeas' to retry.`,
-			Action: cmdNew,
-			Flags:  postFlags,
+			Action: writeascli.CmdNew,
+			Flags:  cmd.PostFlags,
 		},
 		{
 			Name:   "publish",
 			Usage:  "Publish a file to Write.as",
-			Action: cmdPublish,
-			Flags:  postFlags,
+			Action: writeascli.CmdPublish,
+			Flags:  cmd.PostFlags,
 		},
 		{
 			Name:   "delete",
 			Usage:  "Delete a post",
-			Action: cmdDelete,
+			Action: writeascli.CmdDelete,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "tor, t",
@@ -156,7 +92,7 @@ func main() {
 		{
 			Name:   "update",
 			Usage:  "Update (overwrite) a post",
-			Action: cmdUpdate,
+			Action: writeascli.CmdUpdate,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "tor, t",
@@ -184,7 +120,7 @@ func main() {
 		{
 			Name:   "get",
 			Usage:  "Read a raw post",
-			Action: cmdGet,
+			Action: writeascli.CmdGet,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "tor, t",
@@ -209,12 +145,12 @@ func main() {
    This requires a post ID (from https://write.as/[ID]) and an Edit Token
    (exported from another Write.as client, such as the Android app).
 `,
-			Action: cmdAdd,
+			Action: writeascli.CmdAdd,
 		},
 		{
 			Name:   "list",
 			Usage:  "List local posts",
-			Action: cmdList,
+			Action: writeascli.CmdList,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "id",
@@ -233,7 +169,7 @@ func main() {
 		{
 			Name:   "fetch",
 			Usage:  "Fetch authenticated user's Write.as posts",
-			Action: cmdPull,
+			Action: writeascli.CmdPull,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "tor, t",
@@ -253,7 +189,7 @@ func main() {
 		{
 			Name:   "auth",
 			Usage:  "Authenticate with Write.as",
-			Action: cmdAuth,
+			Action: writeascli.CmdAuth,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "tor, t",
@@ -273,7 +209,7 @@ func main() {
 		{
 			Name:   "logout",
 			Usage:  "Log out of Write.as",
-			Action: cmdLogOut,
+			Action: writeascli.CmdLogOut,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "tor, t",
@@ -311,50 +247,7 @@ OPTIONS:
 
 func initialize() {
 	// Ensure we have a data directory to use
-	if !dataDirExists() {
-		createDataDir()
+	if !writeascli.DataDirExists() {
+		writeascli.CreateDataDir()
 	}
-}
-
-func readStdIn() []byte {
-	numBytes, numChunks := int64(0), int64(0)
-	r := bufio.NewReader(os.Stdin)
-	fullPost := []byte{}
-	buf := make([]byte, 0, 1024)
-	for {
-		n, err := r.Read(buf[:cap(buf)])
-		buf = buf[:n]
-		if n == 0 {
-			if err == nil {
-				continue
-			}
-			if err == io.EOF {
-				break
-			}
-			log.Fatal(err)
-		}
-		numChunks++
-		numBytes += int64(len(buf))
-
-		fullPost = append(fullPost, buf...)
-		if err != nil && err != io.EOF {
-			log.Fatal(err)
-		}
-	}
-
-	return fullPost
-}
-
-func handlePost(fullPost []byte, c *cli.Context) (*writeas.Post, error) {
-	tor := isTor(c)
-	if c.Int("tor-port") != 0 {
-		torPort = c.Int("tor-port")
-	}
-	if tor {
-		Info(c, "Posting to hidden service...")
-	} else {
-		Info(c, "Posting...")
-	}
-
-	return DoPost(c, fullPost, c.String("font"), false, tor, c.Bool("code"))
 }

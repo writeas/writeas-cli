@@ -1,4 +1,4 @@
-package main
+package writeascli
 
 import (
 	"fmt"
@@ -11,16 +11,12 @@ import (
 	cli "gopkg.in/urfave/cli.v1"
 )
 
-const (
-	defaultUserAgent = "writeas-cli v" + version
-)
-
 func client(userAgent string, tor bool) *writeas.Client {
 	var client *writeas.Client
 	if tor {
 		client = writeas.NewTorClient(torPort)
 	} else {
-		if isDev() {
+		if IsDev() {
 			client = writeas.NewDevClient()
 		} else {
 			client = writeas.NewClient()
@@ -36,7 +32,7 @@ func newClient(c *cli.Context, authRequired bool) (*writeas.Client, error) {
 	if isTor(c) {
 		client = writeas.NewTorClient(torPort)
 	} else {
-		if isDev() {
+		if IsDev() {
 			client = writeas.NewDevClient()
 		} else {
 			client = writeas.NewClient()
@@ -44,7 +40,7 @@ func newClient(c *cli.Context, authRequired bool) (*writeas.Client, error) {
 	}
 	client.UserAgent = userAgent(c)
 	// TODO: load user into var shared across the app
-	u, _ := loadUser()
+	u, _ := LoadUser(userDataDir())
 	if u != nil {
 		client.SetToken(u.AccessToken)
 	} else if authRequired {
@@ -94,11 +90,11 @@ func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) (
 		url = p.Collection.URL + p.Slug
 	} else {
 		if tor {
-			url = torBaseURL
-		} else if isDev() {
-			url = devBaseURL
+			url = TorBaseURL
+		} else if IsDev() {
+			url = DevBaseURL
 		} else {
-			url = writeasBaseURL
+			url = WriteasBaseURL
 		}
 		url += "/" + p.ID
 		// Output URL in requested format
@@ -188,7 +184,7 @@ func DoLogIn(c *cli.Context, username, password string) error {
 		return err
 	}
 
-	err = saveUser(u)
+	err = SaveUser(userDataDir(), u)
 	if err != nil {
 		return err
 	}
@@ -211,7 +207,7 @@ func DoLogOut(c *cli.Context) error {
 	}
 
 	// Delete local user data
-	err = fileutils.DeleteFile(filepath.Join(userDataDir(), userFile))
+	err = fileutils.DeleteFile(filepath.Join(userDataDir(), UserFile))
 	if err != nil {
 		return err
 	}

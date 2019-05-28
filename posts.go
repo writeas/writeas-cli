@@ -1,14 +1,18 @@
-package main
+package writeascli
 
 import (
+	"bufio"
 	"fmt"
+	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/writeas/writeas-cli/fileutils"
 	writeas "go.code.as/writeas.v2"
+	cli "gopkg.in/urfave/cli.v1"
 )
 
 const (
@@ -26,11 +30,11 @@ func userDataDir() string {
 	return filepath.Join(parentDataDir(), dataDirName)
 }
 
-func dataDirExists() bool {
+func DataDirExists() bool {
 	return fileutils.Exists(userDataDir())
 }
 
-func createDataDir() {
+func CreateDataDir() {
 	err := os.Mkdir(userDataDir(), 0700)
 	if err != nil {
 		if debug {
@@ -163,4 +167,47 @@ func WritePost(postsDir string, p *writeas.Post) error {
 		txtFile = "# " + p.Title + "\n\n" + txtFile
 	}
 	return ioutil.WriteFile(filepath.Join(postsDir, collDir, postFilename), []byte(txtFile), 0644)
+}
+
+func handlePost(fullPost []byte, c *cli.Context) (*writeas.Post, error) {
+	tor := isTor(c)
+	if c.Int("tor-port") != 0 {
+		torPort = c.Int("tor-port")
+	}
+	if tor {
+		Info(c, "Posting to hidden service...")
+	} else {
+		Info(c, "Posting...")
+	}
+
+	return DoPost(c, fullPost, c.String("font"), false, tor, c.Bool("code"))
+}
+
+func readStdIn() []byte {
+	numBytes, numChunks := int64(0), int64(0)
+	r := bufio.NewReader(os.Stdin)
+	fullPost := []byte{}
+	buf := make([]byte, 0, 1024)
+	for {
+		n, err := r.Read(buf[:cap(buf)])
+		buf = buf[:n]
+		if n == 0 {
+			if err == nil {
+				continue
+			}
+			if err == io.EOF {
+				break
+			}
+			log.Fatal(err)
+		}
+		numChunks++
+		numBytes += int64(len(buf))
+
+		fullPost = append(fullPost, buf...)
+		if err != nil && err != io.EOF {
+			log.Fatal(err)
+		}
+	}
+
+	return fullPost
 }

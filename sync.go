@@ -1,4 +1,4 @@
-package main
+package writeascli
 
 import (
 	//"github.com/writeas/writeas-cli/sync"
@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/writeas/writeas-cli/config"
 	"github.com/writeas/writeas-cli/fileutils"
 	cli "gopkg.in/urfave/cli.v1"
 )
@@ -16,8 +17,8 @@ const (
 	userFilename = "writeas_user"
 )
 
-func cmdPull(c *cli.Context) error {
-	cfg, err := loadConfig()
+func CmdPull(c *cli.Context) error {
+	cfg, err := config.LoadConfig(userDataDir())
 	if err != nil {
 		return err
 	}
@@ -78,10 +79,10 @@ func cmdPull(c *cli.Context) error {
 }
 
 // TODO: move UserConfig to its own package, and this to sync package
-func syncSetUp(cfg *UserConfig) error {
+func syncSetUp(cfg *config.UserConfig) error {
 	// Get user information and fail early (before we make the user do
 	// anything), if we're going to
-	u, err := loadUser()
+	u, err := LoadUser(userDataDir())
 	if err != nil {
 		return err
 	}
@@ -117,7 +118,7 @@ func syncSetUp(cfg *UserConfig) error {
 
 	// Save preference
 	cfg.Posts.Directory = dir
-	err = saveConfig(cfg)
+	err = config.SaveConfig(userDataDir(), cfg)
 	if err != nil {
 		if debug {
 			Errorln("Unable to save config: %s", err)

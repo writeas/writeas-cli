@@ -1,9 +1,9 @@
-package main
+package writeascli
 
 import (
 	"os"
 )
 
-func isDev() bool {
+func IsDev() bool {
 	return os.Getenv("WRITEAS_DEV") == "1"
 }

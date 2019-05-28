@@ -1,6 +1,6 @@
 // +build !windows
 
-package main
+package writeascli
 
 import (
 	"fmt"
@@ -24,7 +24,7 @@ func parentDataDir() string {
 }
 
 func editPostCmd(fname string) *exec.Cmd {
-	editor := getConfiguredEditor()
+	editor := GetConfiguredEditor()
 	if editor == "" {
 		// Fall back to default editor
 		path, err := exec.LookPath("vim")
