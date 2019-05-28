@@ -1,4 +1,4 @@
-package writeascli
+package config
 
 import (
 	"encoding/json"

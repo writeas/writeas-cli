@@ -1,4 +1,4 @@
-package writeascli
+package api
 
 import (
 	//"github.com/writeas/writeas-cli/sync"
@@ -9,16 +9,17 @@ import (
 
 	"github.com/writeas/writeas-cli/config"
 	"github.com/writeas/writeas-cli/fileutils"
+	"github.com/writeas/writeas-cli/log"
 	cli "gopkg.in/urfave/cli.v1"
 )
 
 const (
-	postFileExt  = ".txt"
+	PostFileExt  = ".txt"
 	userFilename = "writeas_user"
 )
 
 func CmdPull(c *cli.Context) error {
-	cfg, err := config.LoadConfig(userDataDir())
+	cfg, err := config.LoadConfig(config.UserDataDir())
 	if err != nil {
 		return err
 	}
@@ -28,7 +29,7 @@ func CmdPull(c *cli.Context) error {
 	}
 
 	// Fetch posts
-	cl, err := newClient(c, true)
+	cl, err := NewClient(c, true)
 	if err != nil {
 		return err
 	}
@@ -46,15 +47,15 @@ func CmdPull(c *cli.Context) error {
 			// Create directory for collection
 			collDir = p.Collection.Alias
 			if !fileutils.Exists(filepath.Join(cfg.Posts.Directory, collDir)) {
-				Info(c, "Creating folder "+collDir)
+				log.Info(c, "Creating folder "+collDir)
 				err = os.Mkdir(filepath.Join(cfg.Posts.Directory, collDir), 0755)
 				if err != nil {
-					Errorln("Error creating blog directory %s: %s. Skipping post %s.", collDir, err, postFilename)
+					log.Errorln("Error creating blog directory %s: %s. Skipping post %s.", collDir, err, postFilename)
 					continue
 				}
 			}
 		}
-		postFilename += postFileExt
+		postFilename += PostFileExt
 
 		// Write file
 		txtFile := p.Content
@@ -63,26 +64,25 @@ func CmdPull(c *cli.Context) error {
 		}
 		err = ioutil.WriteFile(filepath.Join(cfg.Posts.Directory, collDir, postFilename), []byte(txtFile), 0644)
 		if err != nil {
-			Errorln("Error creating file %s: %s", postFilename, err)
+			log.Errorln("Error creating file %s: %s", postFilename, err)
 		}
-		Info(c, "Saved post "+postFilename)
+		log.Info(c, "Saved post "+postFilename)
 
 		// Update mtime and atime on files
 		modTime := p.Updated.Local()
 		err = os.Chtimes(filepath.Join(cfg.Posts.Directory, collDir, postFilename), modTime, modTime)
 		if err != nil {
-			Errorln("Error setting time on %s: %s", postFilename, err)
+			log.Errorln("Error setting time on %s: %s", postFilename, err)
 		}
 	}
 
 	return nil
 }
 
-// TODO: move UserConfig to its own package, and this to sync package
 func syncSetUp(cfg *config.UserConfig) error {
 	// Get user information and fail early (before we make the user do
 	// anything), if we're going to
-	u, err := LoadUser(userDataDir())
+	u, err := config.LoadUser(config.UserDataDir())
 	if err != nil {
 		return err
 	}
@@ -106,8 +106,8 @@ func syncSetUp(cfg *config.UserConfig) error {
 	if !fileutils.Exists(dir) {
 		err = os.MkdirAll(dir, 0700)
 		if err != nil {
-			if debug {
-				Errorln("Error creating data directory: %s", err)
+			if config.Debug() {
+				log.Errorln("Error creating data directory: %s", err)
 			}
 			return err
 		}
@@ -118,10 +118,10 @@ func syncSetUp(cfg *config.UserConfig) error {
 
 	// Save preference
 	cfg.Posts.Directory = dir
-	err = config.SaveConfig(userDataDir(), cfg)
+	err = config.SaveConfig(config.UserDataDir(), cfg)
 	if err != nil {
-		if debug {
-			Errorln("Unable to save config: %s", err)
+		if config.Debug() {
+			log.Errorln("Unable to save config: %s", err)
 		}
 		return err
 	}

@@ -3,8 +3,10 @@ package main
 import (
 	"os"
 
-	writeascli "github.com/writeas/writeas-cli"
-	cmd "github.com/writeas/writeas-cli/cmd"
+	"github.com/writeas/writeas-cli/api"
+	"github.com/writeas/writeas-cli/commands"
+	"github.com/writeas/writeas-cli/config"
+	"github.com/writeas/writeas-cli/log"
 	cli "gopkg.in/urfave/cli.v1"
 )
 
@@ -19,7 +21,7 @@ func main() {
 	// Run the app
 	app := cli.NewApp()
 	app.Name = "writeas"
-	app.Version = writeascli.Version
+	app.Version = config.Version
 	app.Usage = "Publish text quickly"
 	app.Authors = []cli.Author{
 		{
@@ -27,14 +29,14 @@ func main() {
 			Email: "hello@write.as",
 		},
 	}
-	app.Action = writeascli.CmdPost
-	app.Flags = cmd.PostFlags
+	app.Action = commands.CmdPost
+	app.Flags = config.PostFlags
 	app.Commands = []cli.Command{
 		{
 			Name:   "post",
 			Usage:  "Alias for default action: create post from stdin",
-			Action: writeascli.CmdPost,
-			Flags:  cmd.PostFlags,
+			Action: commands.CmdPost,
+			Flags:  config.PostFlags,
 			Description: `Create a new post on Write.as from stdin.
 
    Use the --code flag to indicate that the post should use syntax 
@@ -60,19 +62,19 @@ func main() {
    
    If posting fails for any reason, 'writeas' will show you the temporary file
    location and how to pipe it to 'writeas' to retry.`,
-			Action: writeascli.CmdNew,
-			Flags:  cmd.PostFlags,
+			Action: commands.CmdNew,
+			Flags:  config.PostFlags,
 		},
 		{
 			Name:   "publish",
 			Usage:  "Publish a file to Write.as",
-			Action: writeascli.CmdPublish,
-			Flags:  cmd.PostFlags,
+			Action: commands.CmdPublish,
+			Flags:  config.PostFlags,
 		},
 		{
 			Name:   "delete",
 			Usage:  "Delete a post",
-			Action: writeascli.CmdDelete,
+			Action: commands.CmdDelete,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "tor, t",
@@ -92,7 +94,7 @@ func main() {
 		{
 			Name:   "update",
 			Usage:  "Update (overwrite) a post",
-			Action: writeascli.CmdUpdate,
+			Action: commands.CmdUpdate,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "tor, t",
@@ -120,7 +122,7 @@ func main() {
 		{
 			Name:   "get",
 			Usage:  "Read a raw post",
-			Action: writeascli.CmdGet,
+			Action: commands.CmdGet,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "tor, t",
@@ -145,12 +147,12 @@ func main() {
    This requires a post ID (from https://write.as/[ID]) and an Edit Token
    (exported from another Write.as client, such as the Android app).
 `,
-			Action: writeascli.CmdAdd,
+			Action: commands.CmdAdd,
 		},
 		{
 			Name:   "list",
 			Usage:  "List local posts",
-			Action: writeascli.CmdList,
+			Action: commands.CmdList,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "id",
@@ -169,7 +171,7 @@ func main() {
 		{
 			Name:   "fetch",
 			Usage:  "Fetch authenticated user's Write.as posts",
-			Action: writeascli.CmdPull,
+			Action: api.CmdPull,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "tor, t",
@@ -189,7 +191,7 @@ func main() {
 		{
 			Name:   "auth",
 			Usage:  "Authenticate with Write.as",
-			Action: writeascli.CmdAuth,
+			Action: commands.CmdAuth,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "tor, t",
@@ -209,7 +211,7 @@ func main() {
 		{
 			Name:   "logout",
 			Usage:  "Log out of Write.as",
-			Action: writeascli.CmdLogOut,
+			Action: commands.CmdLogOut,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "tor, t",
@@ -247,7 +249,15 @@ OPTIONS:
 
 func initialize() {
 	// Ensure we have a data directory to use
-	if !writeascli.DataDirExists() {
-		writeascli.CreateDataDir()
+	if !config.DataDirExists() {
+		err := config.CreateDataDir()
+		if err != nil {
+			if config.Debug() {
+				panic(err)
+			} else {
+				log.Errorln("Error creating data directory: %s", err)
+				return
+			}
+		}
 	}
 }

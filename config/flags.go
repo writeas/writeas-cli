@@ -1,7 +1,6 @@
-package cmd
+package config
 
 import (
-	writeascli "github.com/writeas/writeas-cli"
 	"gopkg.in/urfave/cli.v1"
 )
 
@@ -36,7 +35,7 @@ var PostFlags = []cli.Flag{
 	cli.StringFlag{
 		Name:  "font",
 		Usage: "Sets post font to given value",
-		Value: writeascli.DefaultFont,
+		Value: DefaultFont,
 	},
 	cli.StringFlag{
 		Name:  "lang",

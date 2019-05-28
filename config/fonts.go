@@ -1,4 +1,4 @@
-package writeascli
+package config
 
 import (
 	"fmt"
@@ -28,7 +28,7 @@ var postFontMap = map[string]postFont{
 	"code":      PostFontCode,
 }
 
-func getFont(code bool, font string) string {
+func GetFont(code bool, font string) string {
 	if code {
 		if font != "" && font != DefaultFont {
 			fmt.Printf("A non-default font '%s' and --code flag given. 'code' type takes precedence.\n", font)

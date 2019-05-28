@@ -1,4 +1,4 @@
-package writeascli
+package commands
 
 import (
 	"fmt"
@@ -7,18 +7,20 @@ import (
 	"path/filepath"
 
 	"github.com/howeyc/gopass"
+	"github.com/writeas/writeas-cli/api"
 	"github.com/writeas/writeas-cli/config"
 	"github.com/writeas/writeas-cli/fileutils"
+	"github.com/writeas/writeas-cli/log"
 	cli "gopkg.in/urfave/cli.v1"
 )
 
 func CmdPost(c *cli.Context) error {
-	_, err := handlePost(readStdIn(), c)
+	_, err := api.HandlePost(api.ReadStdIn(), c)
 	return err
 }
 
 func CmdNew(c *cli.Context) error {
-	fname, p := composeNewPost()
+	fname, p := api.ComposeNewPost()
 	if p == nil {
 		// Assume composeNewPost already told us what the error was. Abort now.
 		os.Exit(1)
@@ -31,13 +33,12 @@ func CmdNew(c *cli.Context) error {
 			os.Remove(fname)
 		}
 
-		InfolnQuit("Empty post. Bye!")
+		log.InfolnQuit("Empty post. Bye!")
 	}
 
-	_, err := handlePost(*p, c)
+	_, err := api.HandlePost(*p, c)
 	if err != nil {
-		Errorln("Error posting: %s", err)
-		Errorln(messageRetryCompose(fname))
+		log.Errorln("Error posting: %s\n%s", err, config.MessageRetryCompose(fname))
 		return cli.NewExitError("", 1)
 	}
 
@@ -58,15 +59,15 @@ func CmdPublish(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	p, err := handlePost(content, c)
+	p, err := api.HandlePost(content, c)
 	if err != nil {
 		return err
 	}
 
 	// Save post to posts folder
-	cfg, err := config.LoadConfig(userDataDir())
+	cfg, err := config.LoadConfig(config.UserDataDir())
 	if cfg.Posts.Directory != "" {
-		err = WritePost(cfg.Posts.Directory, p)
+		err = api.WritePost(cfg.Posts.Directory, p)
 		if err != nil {
 			return err
 		}
@@ -81,38 +82,36 @@ func CmdDelete(c *cli.Context) error {
 		return cli.NewExitError("usage: writeas delete <postId> [<token>]", 1)
 	}
 
-	u, _ := LoadUser(userDataDir())
+	u, _ := config.LoadUser(config.UserDataDir())
 	if token == "" {
 		// Search for the token locally
-		token = tokenFromID(friendlyID)
+		token = api.TokenFromID(friendlyID)
 		if token == "" && u == nil {
-			Errorln("Couldn't find an edit token locally. Did you create this post here?")
-			ErrorlnQuit("If you have an edit token, use: writeas delete %s <token>", friendlyID)
+			log.Errorln("Couldn't find an edit token locally. Did you create this post here?")
+			log.ErrorlnQuit("If you have an edit token, use: writeas delete %s <token>", friendlyID)
 		}
 	}
 
-	tor := isTor(c)
+	tor := config.IsTor(c)
 	if c.Int("tor-port") != 0 {
-		torPort = c.Int("tor-port")
+		api.TorPort = c.Int("tor-port")
 	}
 	if tor {
-		Info(c, "Deleting via hidden service...")
-	} else if isDev() {
-		Info(c, "Deleting via dev environment...")
+		log.Info(c, "Deleting via hidden service...")
 	} else {
-		Info(c, "Deleting...")
+		log.Info(c, "Deleting...")
 	}
 
-	err := DoDelete(c, friendlyID, token, tor)
+	err := api.DoDelete(c, friendlyID, token, tor)
 	if err != nil {
 		return err
 	}
 
 	// Delete local file, if necessary
-	cfg, err := config.LoadConfig(userDataDir())
+	cfg, err := config.LoadConfig(config.UserDataDir())
 	if cfg.Posts.Directory != "" {
 		// TODO: handle deleting blog posts
-		err = fileutils.DeleteFile(filepath.Join(cfg.Posts.Directory, friendlyID+postFileExt))
+		err = fileutils.DeleteFile(filepath.Join(cfg.Posts.Directory, friendlyID+api.PostFileExt))
 		if err != nil {
 			return err
 		}
@@ -128,32 +127,30 @@ func CmdUpdate(c *cli.Context) error {
 		return cli.NewExitError("usage: writeas update <postId> [<token>]", 1)
 	}
 
-	u, _ := LoadUser(userDataDir())
+	u, _ := config.LoadUser(config.UserDataDir())
 	if token == "" {
 		// Search for the token locally
-		token = tokenFromID(friendlyID)
+		token = api.TokenFromID(friendlyID)
 		if token == "" && u == nil {
-			Errorln("Couldn't find an edit token locally. Did you create this post here?")
-			ErrorlnQuit("If you have an edit token, use: writeas update %s <token>", friendlyID)
+			log.Errorln("Couldn't find an edit token locally. Did you create this post here?")
+			log.ErrorlnQuit("If you have an edit token, use: writeas update %s <token>", friendlyID)
 		}
 	}
 
 	// Read post body
-	fullPost := readStdIn()
+	fullPost := api.ReadStdIn()
 
-	tor := isTor(c)
+	tor := config.IsTor(c)
 	if c.Int("tor-port") != 0 {
-		torPort = c.Int("tor-port")
+		api.TorPort = c.Int("tor-port")
 	}
 	if tor {
-		Info(c, "Updating via hidden service...")
-	} else if isDev() {
-		Info(c, "Updating via dev environment...")
+		log.Info(c, "Updating via hidden service...")
 	} else {
-		Info(c, "Updating...")
+		log.Info(c, "Updating...")
 	}
 
-	return DoUpdate(c, fullPost, friendlyID, token, c.String("font"), tor, c.Bool("code"))
+	return api.DoUpdate(c, fullPost, friendlyID, token, c.String("font"), tor, c.Bool("code"))
 }
 
 func CmdGet(c *cli.Context) error {
@@ -162,19 +159,17 @@ func CmdGet(c *cli.Context) error {
 		return cli.NewExitError("usage: writeas get <postId>", 1)
 	}
 
-	tor := isTor(c)
+	tor := config.IsTor(c)
 	if c.Int("tor-port") != 0 {
-		torPort = c.Int("tor-port")
+		api.TorPort = c.Int("tor-port")
 	}
 	if tor {
-		Info(c, "Getting via hidden service...")
-	} else if isDev() {
-		Info(c, "Getting via dev environment...")
+		log.Info(c, "Getting via hidden service...")
 	} else {
-		Info(c, "Getting...")
+		log.Info(c, "Getting...")
 	}
 
-	return DoFetch(friendlyID, userAgent(c), tor)
+	return api.DoFetch(friendlyID, config.UserAgent(c), tor)
 }
 
 func CmdAdd(c *cli.Context) error {
@@ -184,7 +179,7 @@ func CmdAdd(c *cli.Context) error {
 		return cli.NewExitError("usage: writeas add <postId> <token>", 1)
 	}
 
-	err := addPost(friendlyID, token)
+	err := api.AddPost(friendlyID, token)
 	return err
 }
 
@@ -192,17 +187,17 @@ func CmdList(c *cli.Context) error {
 	urls := c.Bool("url")
 	ids := c.Bool("id")
 
-	var p Post
-	posts := getPosts()
+	var p api.Post
+	posts := api.GetPosts()
 	for i := range *posts {
 		p = (*posts)[len(*posts)-1-i]
 		if ids || !urls {
 			fmt.Printf("%s ", p.ID)
 		}
 		if urls {
-			base := WriteasBaseURL
-			if IsDev() {
-				base = DevBaseURL
+			base := config.WriteasBaseURL
+			if config.IsDev() {
+				base = config.DevBaseURL
 			}
 			ext := ""
 			// Output URL in requested format
@@ -218,7 +213,7 @@ func CmdList(c *cli.Context) error {
 
 func CmdAuth(c *cli.Context) error {
 	// Check configuration
-	u, err := LoadUser(userDataDir())
+	u, err := config.LoadUser(config.UserDataDir())
 	if err != nil {
 		return cli.NewExitError(fmt.Sprintf("couldn't load config: %v", err), 1)
 	}
@@ -242,7 +237,7 @@ func CmdAuth(c *cli.Context) error {
 	if len(pass) == 0 {
 		return cli.NewExitError("Please enter your password.", 1)
 	}
-	err = DoLogIn(c, username, string(pass))
+	err = api.DoLogIn(c, username, string(pass))
 	if err != nil {
 		return cli.NewExitError(fmt.Sprintf("error logging in: %v", err), 1)
 	}
@@ -251,5 +246,5 @@ func CmdAuth(c *cli.Context) error {
 }
 
 func CmdLogOut(c *cli.Context) error {
-	return DoLogOut(c)
+	return api.DoLogOut(c)
 }

@@ -1,4 +1,4 @@
-package writeascli
+package log
 
 import (
 	"fmt"
@@ -21,7 +21,7 @@ func InfolnQuit(s string, p ...interface{}) {
 	os.Exit(0)
 }
 
-// Error
+// Errorln logs the message to stderr
 func Errorln(s string, p ...interface{}) {
 	fmt.Fprintf(os.Stderr, s+"\n", p...)
 }

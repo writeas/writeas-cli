@@ -1,6 +1,7 @@
 package config
 
 import (
+	"os"
 	"path/filepath"
 
 	ini "gopkg.in/ini.v1"
@@ -48,4 +49,15 @@ func SaveConfig(dataDir string, uc *UserConfig) error {
 	}
 
 	return cfg.SaveTo(filepath.Join(dataDir, UserConfigFile))
+}
+
+var editors = []string{"WRITEAS_EDITOR", "EDITOR"}
+
+func GetConfiguredEditor() string {
+	for _, v := range editors {
+		if e := os.Getenv(v); e != "" {
+			return e
+		}
+	}
+	return ""
 }

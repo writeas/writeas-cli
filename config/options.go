@@ -1,7 +1,8 @@
-package writeascli
+package config
 
 import (
 	"github.com/cloudfoundry/jibber_jabber"
+	"github.com/writeas/writeas-cli/log"
 	cli "gopkg.in/urfave/cli.v1"
 )
 
@@ -16,7 +17,7 @@ const (
 	TorBaseURL     = "http://writeas7pm7rcdqg.onion"
 )
 
-func userAgent(c *cli.Context) string {
+func UserAgent(c *cli.Context) string {
 	ua := c.String("user-agent")
 	if ua == "" {
 		return defaultUserAgent
@@ -24,11 +25,11 @@ func userAgent(c *cli.Context) string {
 	return ua + " (" + defaultUserAgent + ")"
 }
 
-func isTor(c *cli.Context) bool {
+func IsTor(c *cli.Context) bool {
 	return c.Bool("tor") || c.Bool("t")
 }
 
-func language(c *cli.Context, auto bool) string {
+func Language(c *cli.Context, auto bool) string {
 	if l := c.String("lang"); l != "" {
 		return l
 	}
@@ -38,13 +39,13 @@ func language(c *cli.Context, auto bool) string {
 	// Automatically detect language
 	l, err := jibber_jabber.DetectLanguage()
 	if err != nil {
-		Info(c, "Language detection failed: %s", err)
+		log.Info(c, "Language detection failed: %s", err)
 		return ""
 	}
 	return l
 }
 
-func collection(c *cli.Context) string {
+func Collection(c *cli.Context) string {
 	if coll := c.String("c"); coll != "" {
 		return coll
 	}
