@@ -65,7 +65,7 @@ func CmdPublish(c *cli.Context) error {
 	}
 
 	// Save post to posts folder
-	cfg, err := config.LoadConfig(config.UserDataDir())
+	cfg, err := config.LoadConfig(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
 	if cfg.Posts.Directory != "" {
 		err = api.WritePost(cfg.Posts.Directory, p)
 		if err != nil {
@@ -82,10 +82,10 @@ func CmdDelete(c *cli.Context) error {
 		return cli.NewExitError("usage: writeas delete <postId> [<token>]", 1)
 	}
 
-	u, _ := config.LoadUser(config.UserDataDir())
+	u, _ := config.LoadUser(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
 	if token == "" {
 		// Search for the token locally
-		token = api.TokenFromID(friendlyID)
+		token = api.TokenFromID(c, friendlyID)
 		if token == "" && u == nil {
 			log.Errorln("Couldn't find an edit token locally. Did you create this post here?")
 			log.ErrorlnQuit("If you have an edit token, use: writeas delete %s <token>", friendlyID)
@@ -108,7 +108,7 @@ func CmdDelete(c *cli.Context) error {
 	}
 
 	// Delete local file, if necessary
-	cfg, err := config.LoadConfig(config.UserDataDir())
+	cfg, err := config.LoadConfig(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
 	if cfg.Posts.Directory != "" {
 		// TODO: handle deleting blog posts
 		err = fileutils.DeleteFile(filepath.Join(cfg.Posts.Directory, friendlyID+api.PostFileExt))
@@ -127,10 +127,10 @@ func CmdUpdate(c *cli.Context) error {
 		return cli.NewExitError("usage: writeas update <postId> [<token>]", 1)
 	}
 
-	u, _ := config.LoadUser(config.UserDataDir())
+	u, _ := config.LoadUser(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
 	if token == "" {
 		// Search for the token locally
-		token = api.TokenFromID(friendlyID)
+		token = api.TokenFromID(c, friendlyID)
 		if token == "" && u == nil {
 			log.Errorln("Couldn't find an edit token locally. Did you create this post here?")
 			log.ErrorlnQuit("If you have an edit token, use: writeas update %s <token>", friendlyID)
@@ -179,7 +179,7 @@ func CmdAdd(c *cli.Context) error {
 		return cli.NewExitError("usage: writeas add <postId> <token>", 1)
 	}
 
-	err := api.AddPost(friendlyID, token)
+	err := api.AddPost(c, friendlyID, token)
 	return err
 }
 
@@ -188,7 +188,7 @@ func CmdList(c *cli.Context) error {
 	ids := c.Bool("id")
 
 	var p api.Post
-	posts := api.GetPosts()
+	posts := api.GetPosts(c)
 	for i := range *posts {
 		p = (*posts)[len(*posts)-1-i]
 		if ids || !urls {
@@ -213,7 +213,7 @@ func CmdList(c *cli.Context) error {
 
 func CmdAuth(c *cli.Context) error {
 	// Check configuration
-	u, err := config.LoadUser(config.UserDataDir())
+	u, err := config.LoadUser(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
 	if err != nil {
 		return cli.NewExitError(fmt.Sprintf("couldn't load config: %v", err), 1)
 	}

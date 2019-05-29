@@ -10,7 +10,6 @@ import (
 )
 
 const (
-	dataDirName = ".writeas"
 	NoEditorErr = "Couldn't find default editor. Try setting $EDITOR environment variable in ~/.profile"
 )
 

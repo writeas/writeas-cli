@@ -9,7 +9,6 @@ import (
 )
 
 const (
-	dataDirName = "Write.as"
 	NoEditorErr = "Error getting default editor. You shouldn't see this, so let us know you did: hello@write.as"
 )
 

@@ -19,13 +19,13 @@ const (
 )
 
 func CmdPull(c *cli.Context) error {
-	cfg, err := config.LoadConfig(config.UserDataDir())
+	cfg, err := config.LoadConfig(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
 	if err != nil {
 		return err
 	}
 	// Create posts directory if needed
 	if cfg.Posts.Directory == "" {
-		syncSetUp(cfg)
+		syncSetUp(c.App.ExtraInfo()["configDir"], cfg)
 	}
 
 	// Fetch posts
@@ -79,10 +79,10 @@ func CmdPull(c *cli.Context) error {
 	return nil
 }
 
-func syncSetUp(cfg *config.UserConfig) error {
+func syncSetUp(path string, cfg *config.UserConfig) error {
 	// Get user information and fail early (before we make the user do
 	// anything), if we're going to
-	u, err := config.LoadUser(config.UserDataDir())
+	u, err := config.LoadUser(config.UserDataDir(path))
 	if err != nil {
 		return err
 	}
@@ -118,7 +118,7 @@ func syncSetUp(cfg *config.UserConfig) error {
 
 	// Save preference
 	cfg.Posts.Directory = dir
-	err = config.SaveConfig(config.UserDataDir(), cfg)
+	err = config.SaveConfig(config.UserDataDir(path), cfg)
 	if err != nil {
 		if config.Debug() {
 			log.Errorln("Unable to save config: %s", err)

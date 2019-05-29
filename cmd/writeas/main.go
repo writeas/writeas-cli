@@ -11,8 +11,7 @@ import (
 )
 
 func main() {
-	initialize()
-
+	initialize(appInfo["configDir"])
 	cli.VersionFlag = cli.BoolFlag{
 		Name:  "version, V",
 		Usage: "print the version",
@@ -28,6 +27,9 @@ func main() {
 			Name:  "Write.as",
 			Email: "hello@write.as",
 		},
+	}
+	app.ExtraInfo = func() map[string]string {
+		return appInfo
 	}
 	app.Action = commands.CmdPost
 	app.Flags = config.PostFlags
@@ -243,14 +245,13 @@ OPTIONS:
    {{range .Flags}}{{.}}
    {{end}}{{ end }}
 `
-
 	app.Run(os.Args)
 }
 
-func initialize() {
+func initialize(dataDirName string) {
 	// Ensure we have a data directory to use
-	if !config.DataDirExists() {
-		err := config.CreateDataDir()
+	if !config.DataDirExists(dataDirName) {
+		err := config.CreateDataDir(dataDirName)
 		if err != nil {
 			if config.Debug() {
 				panic(err)

@@ -42,7 +42,7 @@ func NewClient(c *cli.Context, authRequired bool) (*writeas.Client, error) {
 	}
 	client.UserAgent = config.UserAgent(c)
 	// TODO: load user into var shared across the app
-	u, _ := config.LoadUser(config.UserDataDir())
+	u, _ := config.LoadUser(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
 	if u != nil {
 		client.SetToken(u.AccessToken)
 	} else if authRequired {
@@ -107,7 +107,7 @@ func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) (
 
 	if cl.Token() == "" {
 		// Store post locally, since we're not authenticated
-		AddPost(p.ID, p.Token)
+		AddPost(c, p.ID, p.Token)
 	}
 
 	// Copy URL to clipboard
@@ -170,7 +170,7 @@ func DoDelete(c *cli.Context, friendlyID, token string, tor bool) error {
 	} else {
 		log.Info(c, "Post deleted.")
 	}
-	removePost(friendlyID)
+	removePost(c.App.ExtraInfo()["configDir"], friendlyID)
 
 	return nil
 }
@@ -186,11 +186,11 @@ func DoLogIn(c *cli.Context, username, password string) error {
 		return err
 	}
 
-	err = config.SaveUser(config.UserDataDir(), u)
+	err = config.SaveUser(config.UserDataDir(c.App.ExtraInfo()["configDir"]), u)
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Logged in as %s.\n", u.User.Username)
+	log.Info(c, "Logged in as %s.\n", u.User.Username)
 	return nil
 }
 
@@ -209,7 +209,7 @@ func DoLogOut(c *cli.Context) error {
 	}
 
 	// Delete local user data
-	err = fileutils.DeleteFile(filepath.Join(config.UserDataDir(), config.UserFile))
+	err = fileutils.DeleteFile(filepath.Join(config.UserDataDir(c.App.ExtraInfo()["configDir"]), config.UserFile))
 	if err != nil {
 		return err
 	}
