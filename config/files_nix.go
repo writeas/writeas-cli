@@ -1,6 +1,6 @@
 // +build !windows
 
-package main
+package config
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 
 const (
 	dataDirName = ".writeas"
-	noEditorErr = "Couldn't find default editor. Try setting $EDITOR environment variable in ~/.profile"
+	NoEditorErr = "Couldn't find default editor. Try setting $EDITOR environment variable in ~/.profile"
 )
 
 func parentDataDir() string {
@@ -23,8 +23,8 @@ func parentDataDir() string {
 	return dir
 }
 
-func editPostCmd(fname string) *exec.Cmd {
-	editor := getConfiguredEditor()
+func EditPostCmd(fname string) *exec.Cmd {
+	editor := GetConfiguredEditor()
 	if editor == "" {
 		// Fall back to default editor
 		path, err := exec.LookPath("vim")
@@ -39,6 +39,6 @@ func editPostCmd(fname string) *exec.Cmd {
 	return exec.Command(editor, fname)
 }
 
-func messageRetryCompose(fname string) string {
+func MessageRetryCompose(fname string) string {
 	return fmt.Sprintf("To retry this post, run:\n  cat %s | writeas", fname)
 }

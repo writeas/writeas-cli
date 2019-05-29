@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"fmt"
@@ -6,21 +6,19 @@ import (
 
 	"github.com/atotto/clipboard"
 	"github.com/writeas/web-core/posts"
+	"github.com/writeas/writeas-cli/config"
 	"github.com/writeas/writeas-cli/fileutils"
+	"github.com/writeas/writeas-cli/log"
 	writeas "go.code.as/writeas.v2"
 	cli "gopkg.in/urfave/cli.v1"
-)
-
-const (
-	defaultUserAgent = "writeas-cli v" + version
 )
 
 func client(userAgent string, tor bool) *writeas.Client {
 	var client *writeas.Client
 	if tor {
-		client = writeas.NewTorClient(torPort)
+		client = writeas.NewTorClient(TorPort)
 	} else {
-		if isDev() {
+		if config.IsDev() {
 			client = writeas.NewDevClient()
 		} else {
 			client = writeas.NewClient()
@@ -31,20 +29,20 @@ func client(userAgent string, tor bool) *writeas.Client {
 	return client
 }
 
-func newClient(c *cli.Context, authRequired bool) (*writeas.Client, error) {
+func NewClient(c *cli.Context, authRequired bool) (*writeas.Client, error) {
 	var client *writeas.Client
-	if isTor(c) {
-		client = writeas.NewTorClient(torPort)
+	if config.IsTor(c) {
+		client = writeas.NewTorClient(TorPort)
 	} else {
-		if isDev() {
+		if config.IsDev() {
 			client = writeas.NewDevClient()
 		} else {
 			client = writeas.NewClient()
 		}
 	}
-	client.UserAgent = userAgent(c)
+	client.UserAgent = config.UserAgent(c)
 	// TODO: load user into var shared across the app
-	u, _ := loadUser()
+	u, _ := config.LoadUser(config.UserDataDir())
 	if u != nil {
 		client.SetToken(u.AccessToken)
 	} else if authRequired {
@@ -74,14 +72,14 @@ func DoFetch(friendlyID, ua string, tor bool) error {
 // DoPost creates a Write.as post, returning an error if it was
 // unsuccessful.
 func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) (*writeas.Post, error) {
-	cl, _ := newClient(c, false)
+	cl, _ := NewClient(c, false)
 
 	pp := &writeas.PostParams{
-		Font:       getFont(code, font),
-		Collection: collection(c),
+		Font:       config.GetFont(code, font),
+		Collection: config.Collection(c),
 	}
 	pp.Title, pp.Content = posts.ExtractTitle(string(post))
-	if lang := language(c, true); lang != "" {
+	if lang := config.Language(c, true); lang != "" {
 		pp.Language = &lang
 	}
 	p, err := cl.CreatePost(pp)
@@ -94,11 +92,11 @@ func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) (
 		url = p.Collection.URL + p.Slug
 	} else {
 		if tor {
-			url = torBaseURL
-		} else if isDev() {
-			url = devBaseURL
+			url = config.TorBaseURL
+		} else if config.IsDev() {
+			url = config.DevBaseURL
 		} else {
-			url = writeasBaseURL
+			url = config.WriteasBaseURL
 		}
 		url += "/" + p.ID
 		// Output URL in requested format
@@ -109,15 +107,15 @@ func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) (
 
 	if cl.Token() == "" {
 		// Store post locally, since we're not authenticated
-		addPost(p.ID, p.Token)
+		AddPost(p.ID, p.Token)
 	}
 
 	// Copy URL to clipboard
 	err = clipboard.WriteAll(string(url))
 	if err != nil {
-		Errorln("writeas: Didn't copy to clipboard: %s", err)
+		log.Errorln("writeas: Didn't copy to clipboard: %s", err)
 	} else {
-		Info(c, "Copied to clipboard.")
+		log.Info(c, "Copied to clipboard.")
 	}
 
 	// Output URL
@@ -128,49 +126,49 @@ func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) (
 
 // DoUpdate updates the given post on Write.as.
 func DoUpdate(c *cli.Context, post []byte, friendlyID, token, font string, tor, code bool) error {
-	cl, _ := newClient(c, false)
+	cl, _ := NewClient(c, false)
 
 	params := writeas.PostParams{}
 	params.Title, params.Content = posts.ExtractTitle(string(post))
-	if lang := language(c, false); lang != "" {
+	if lang := config.Language(c, false); lang != "" {
 		params.Language = &lang
 	}
 	if code || font != "" {
-		params.Font = getFont(code, font)
+		params.Font = config.GetFont(code, font)
 	}
 
 	_, err := cl.UpdatePost(friendlyID, token, &params)
 	if err != nil {
-		if debug {
-			ErrorlnQuit("Problem updating: %v", err)
+		if config.Debug() {
+			log.ErrorlnQuit("Problem updating: %v", err)
 		}
 		return fmt.Errorf("Post doesn't exist, or bad edit token given.")
 	}
 
 	if tor {
-		Info(c, "Post updated via hidden service.")
+		log.Info(c, "Post updated via hidden service.")
 	} else {
-		Info(c, "Post updated.")
+		log.Info(c, "Post updated.")
 	}
 	return nil
 }
 
 // DoDelete deletes the given post on Write.as.
 func DoDelete(c *cli.Context, friendlyID, token string, tor bool) error {
-	cl, _ := newClient(c, false)
+	cl, _ := NewClient(c, false)
 
 	err := cl.DeletePost(friendlyID, token)
 	if err != nil {
-		if debug {
-			ErrorlnQuit("Problem deleting: %v", err)
+		if config.Debug() {
+			log.ErrorlnQuit("Problem deleting: %v", err)
 		}
 		return fmt.Errorf("Post doesn't exist, or bad edit token given.")
 	}
 
 	if tor {
-		Info(c, "Post deleted from hidden service.")
+		log.Info(c, "Post deleted from hidden service.")
 	} else {
-		Info(c, "Post deleted.")
+		log.Info(c, "Post deleted.")
 	}
 	removePost(friendlyID)
 
@@ -178,17 +176,17 @@ func DoDelete(c *cli.Context, friendlyID, token string, tor bool) error {
 }
 
 func DoLogIn(c *cli.Context, username, password string) error {
-	cl := client(userAgent(c), isTor(c))
+	cl := client(config.UserAgent(c), config.IsTor(c))
 
 	u, err := cl.LogIn(username, password)
 	if err != nil {
-		if debug {
-			ErrorlnQuit("Problem logging in: %v", err)
+		if config.Debug() {
+			log.ErrorlnQuit("Problem logging in: %v", err)
 		}
 		return err
 	}
 
-	err = saveUser(u)
+	err = config.SaveUser(config.UserDataDir(), u)
 	if err != nil {
 		return err
 	}
@@ -197,21 +195,21 @@ func DoLogIn(c *cli.Context, username, password string) error {
 }
 
 func DoLogOut(c *cli.Context) error {
-	cl, err := newClient(c, true)
+	cl, err := NewClient(c, true)
 	if err != nil {
 		return err
 	}
 
 	err = cl.LogOut()
 	if err != nil {
-		if debug {
-			ErrorlnQuit("Problem logging out: %v", err)
+		if config.Debug() {
+			log.ErrorlnQuit("Problem logging out: %v", err)
 		}
 		return err
 	}
 
 	// Delete local user data
-	err = fileutils.DeleteFile(filepath.Join(userDataDir(), userFile))
+	err = fileutils.DeleteFile(filepath.Join(config.UserDataDir(), config.UserFile))
 	if err != nil {
 		return err
 	}
