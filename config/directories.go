@@ -7,14 +7,14 @@ import (
 	"github.com/writeas/writeas-cli/fileutils"
 )
 
-func UserDataDir() string {
+func UserDataDir(dataDirName string) string {
 	return filepath.Join(parentDataDir(), dataDirName)
 }
 
-func DataDirExists() bool {
-	return fileutils.Exists(UserDataDir())
+func DataDirExists(dataDirName string) bool {
+	return fileutils.Exists(UserDataDir(dataDirName))
 }
 
-func CreateDataDir() error {
-	return os.Mkdir(UserDataDir(), 0700)
+func CreateDataDir(dataDirName string) error {
+	return os.Mkdir(UserDataDir(dataDirName), 0700)
 }

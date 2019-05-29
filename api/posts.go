@@ -27,8 +27,8 @@ type Post struct {
 	EditToken string
 }
 
-func AddPost(id, token string) error {
-	f, err := os.OpenFile(filepath.Join(config.UserDataDir(), postsFile), os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0600)
+func AddPost(c *cli.Context, id, token string) error {
+	f, err := os.OpenFile(filepath.Join(config.UserDataDir(c.App.ExtraInfo()["configDir"]), postsFile), os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0600)
 	if err != nil {
 		return fmt.Errorf("Error creating local posts list: %s", err)
 	}
@@ -43,8 +43,8 @@ func AddPost(id, token string) error {
 	return nil
 }
 
-func TokenFromID(id string) string {
-	post := fileutils.FindLine(filepath.Join(config.UserDataDir(), postsFile), id)
+func TokenFromID(c *cli.Context, id string) string {
+	post := fileutils.FindLine(filepath.Join(config.UserDataDir(c.App.ExtraInfo()["configDir"]), postsFile), id)
 	if post == "" {
 		return ""
 	}
@@ -57,12 +57,12 @@ func TokenFromID(id string) string {
 	return parts[1]
 }
 
-func removePost(id string) {
-	fileutils.RemoveLine(filepath.Join(config.UserDataDir(), postsFile), id)
+func removePost(path, id string) {
+	fileutils.RemoveLine(filepath.Join(config.UserDataDir(path), postsFile), id)
 }
 
-func GetPosts() *[]Post {
-	lines := fileutils.ReadData(filepath.Join(config.UserDataDir(), postsFile))
+func GetPosts(c *cli.Context) *[]Post {
+	lines := fileutils.ReadData(filepath.Join(config.UserDataDir(c.App.ExtraInfo()["configDir"]), postsFile))
 
 	posts := []Post{}
 
