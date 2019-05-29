@@ -96,6 +96,8 @@ func cmdDelete(c *cli.Context) error {
 	}
 	if tor {
 		Info(c, "Deleting via hidden service...")
+	} else if isDev() {
+		Info(c, "Deleting via dev environment...")
 	} else {
 		Info(c, "Deleting...")
 	}
@@ -144,6 +146,8 @@ func cmdUpdate(c *cli.Context) error {
 	}
 	if tor {
 		Info(c, "Updating via hidden service...")
+	} else if isDev() {
+		Info(c, "Updating via dev environment...")
 	} else {
 		Info(c, "Updating...")
 	}
@@ -163,6 +167,8 @@ func cmdGet(c *cli.Context) error {
 	}
 	if tor {
 		Info(c, "Getting via hidden service...")
+	} else if isDev() {
+		Info(c, "Getting via dev environment...")
 	} else {
 		Info(c, "Getting...")
 	}
