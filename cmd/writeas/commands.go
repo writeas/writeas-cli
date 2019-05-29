@@ -241,7 +241,12 @@ func cmdAuth(c *cli.Context) error {
 	if len(pass) == 0 {
 		return cli.NewExitError("Please enter your password.", 1)
 	}
-	return DoLogIn(c, username, string(pass))
+	err = DoLogIn(c, username, string(pass))
+	if err != nil {
+		return cli.NewExitError(fmt.Sprintf("error logging in: %v", err), 1)
+	}
+
+	return nil
 }
 
 func cmdLogOut(c *cli.Context) error {
