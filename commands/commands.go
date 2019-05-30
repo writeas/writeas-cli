@@ -191,14 +191,16 @@ func CmdListPosts(c *cli.Context) error {
 	var p api.Post
 	posts := api.GetPosts(c)
 	tw := tabwriter.NewWriter(os.Stderr, 10, 0, 2, ' ', tabwriter.TabIndent)
-	// TODO add no posts found text
-	if ids || !urls {
+	numPosts := len(*posts)
+	if ids || !urls && numPosts != 0 {
 		fmt.Fprintf(tw, "Location\t%s\t%s\t\n", "ID", "Token")
-	} else {
+	} else if numPosts != 0 {
 		fmt.Fprintf(tw, "Location\t%s\t%s\t\n", "URL", "Token")
+	} else {
+		fmt.Fprintf(tw, "No local posts found\n")
 	}
 	for i := range *posts {
-		p = (*posts)[len(*posts)-1-i]
+		p = (*posts)[numPosts-1-i]
 		if ids || !urls {
 			fmt.Fprintf(tw, "local\t%s\t%s\t\n", p.ID, p.EditToken)
 		} else {
