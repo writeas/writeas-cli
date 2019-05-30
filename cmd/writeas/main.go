@@ -152,10 +152,12 @@ func main() {
 			Action: commands.CmdAdd,
 		},
 		{
-			Name:        "posts",
-			Usage:       "List posts",
-			Description: `List all local posts.`,
-			Action:      commands.CmdList,
+			Name:  "posts",
+			Usage: "List posts",
+			Description: `List all of your posts.
+			
+			This will be only local posts when not currently authenticated. To see remote posts as well run 'writeas auth [username]' first, and authenticate with your password.`,
+			Action: commands.CmdListPosts,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "id",
