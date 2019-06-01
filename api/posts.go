@@ -132,7 +132,7 @@ func getExcerpt(input string) string {
 
 	if length <= 80 {
 		return input
-	} else if length <= 160 {
+	} else if length < 160 {
 		ln1, idx := trimToLength(input, 80)
 		if idx == -1 {
 			idx = 80
@@ -140,7 +140,7 @@ func getExcerpt(input string) string {
 		ln2, _ := trimToLength(input[idx:], 80)
 		return ln1 + "\n" + ln2
 	} else {
-		excerpt := input[:157]
+		excerpt := input[:158]
 		ln1, idx := trimToLength(excerpt, 80)
 		if idx == -1 {
 			idx = 80
