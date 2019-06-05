@@ -153,7 +153,7 @@ func DoUpdate(c *cli.Context, post []byte, friendlyID, token, font string, tor, 
 	return nil
 }
 
-// DoDelete deletes the given post on Write.as.
+// DoDelete deletes the given post on Write.as, and removes any local references
 func DoDelete(c *cli.Context, friendlyID, token string, tor bool) error {
 	cl, _ := NewClient(c, false)
 

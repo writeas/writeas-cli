@@ -104,7 +104,7 @@ func CmdDelete(c *cli.Context) error {
 
 	err := api.DoDelete(c, friendlyID, token, tor)
 	if err != nil {
-		return err
+		return cli.NewExitError(fmt.Sprintf("Couldn't delete remote copy: %v", err), 1)
 	}
 
 	// Delete local file, if necessary
@@ -113,7 +113,7 @@ func CmdDelete(c *cli.Context) error {
 		// TODO: handle deleting blog posts
 		err = fileutils.DeleteFile(filepath.Join(cfg.Posts.Directory, friendlyID+api.PostFileExt))
 		if err != nil {
-			return err
+			return cli.NewExitError(fmt.Sprintf("Couldn't delete local copy: %v", err), 1)
 		}
 	}
 
