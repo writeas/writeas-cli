@@ -193,18 +193,18 @@ func CmdListPosts(c *cli.Context) error {
 	tw := tabwriter.NewWriter(os.Stderr, 10, 0, 2, ' ', tabwriter.TabIndent)
 	numPosts := len(*posts)
 	if ids || !urls && numPosts != 0 {
-		fmt.Fprintf(tw, "Location\t%s\t%s\t\n", "ID", "Token")
+		fmt.Fprintf(tw, "Local\t%s\t%s\t\n", "ID", "Token")
 	} else if numPosts != 0 {
-		fmt.Fprintf(tw, "Location\t%s\t%s\t\n", "URL", "Token")
+		fmt.Fprintf(tw, "Local\t%s\t%s\t\n", "URL", "Token")
 	} else {
 		fmt.Fprintf(tw, "No local posts found\n")
 	}
 	for i := range *posts {
 		p = (*posts)[numPosts-1-i]
 		if ids || !urls {
-			fmt.Fprintf(tw, "local\t%s\t%s\t\n", p.ID, p.EditToken)
+			fmt.Fprintf(tw, "unsynced\t%s\t%s\t\n", p.ID, p.EditToken)
 		} else {
-			fmt.Fprintf(tw, "local\t%s\t%s\t\n", getPostURL(c, p.ID), p.EditToken)
+			fmt.Fprintf(tw, "unsynced\t%s\t%s\t\n", getPostURL(c, p.ID), p.EditToken)
 		}
 	}
 	u, _ := config.LoadUser(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
@@ -219,15 +219,18 @@ func CmdListPosts(c *cli.Context) error {
 			if ids || !urls {
 				identifier = "ID"
 			}
-			fmt.Fprintf(tw, "\nLocation\t%s\t%s\t\n", identifier, "Title")
+			fmt.Fprintf(tw, "\nAccount\t%s\t%s\t\n", identifier, "Title")
 		}
 		for _, p := range remotePosts {
 			identifier := getPostURL(c, p.ID)
 			if ids || !urls {
 				identifier = p.ID
 			}
-
-			fmt.Fprintf(tw, "remote\t%s\t%s\t\n", identifier, p.Title)
+			synced := "unsynced"
+			if p.Synced {
+				synced = "synced"
+			}
+			fmt.Fprintf(tw, "%s\t%s\t%s\t\n", synced, identifier, p.Title)
 		}
 	}
 	return tw.Flush()
