@@ -140,6 +140,33 @@ func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) (
 	return p, nil
 }
 
+// DoFetchCollections retrieves a list of the currently logged in users
+// collections.
+func DoFetchCollections(c *cli.Context) ([]RemoteColl, error) {
+	cl, err := NewClient(c, true)
+	if err != nil {
+		//
+	}
+
+	colls, err := cl.GetUserCollections()
+	if err != nil {
+		//
+	}
+
+	out := make([]RemoteColl, len(*colls))
+
+	for i, c := range *colls {
+		coll := RemoteColl{
+			Alias: c.Alias,
+			Title: c.Title,
+			URL:   c.URL,
+		}
+		out[i] = coll
+	}
+
+	return out, nil
+}
+
 // DoUpdate updates the given post on Write.as.
 func DoUpdate(c *cli.Context, post []byte, friendlyID, token, font string, tor, code bool) error {
 	cl, _ := NewClient(c, false)

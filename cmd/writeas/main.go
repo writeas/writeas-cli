@@ -170,6 +170,16 @@ func main() {
 					Usage: "Show list with URLs",
 				},
 			},
+		}, {
+			Name:   "colls",
+			Usage:  "List collections",
+			Action: commands.CmdCollections,
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "url",
+					Usage: "Show list with URLs",
+				},
+			},
 		},
 		{
 			Name:   "fetch",
