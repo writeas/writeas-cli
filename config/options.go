@@ -1,6 +1,8 @@
 package config
 
 import (
+	"net/url"
+
 	"github.com/cloudfoundry/jibber_jabber"
 	"github.com/writeas/writeas-cli/log"
 	cli "gopkg.in/urfave/cli.v1"
@@ -53,4 +55,17 @@ func Collection(c *cli.Context) string {
 		return coll
 	}
 	return ""
+}
+
+// HostDirectory returns the sub directory string for the host flag if set
+func HostDirectory(c *cli.Context) (string, error) {
+	if host := c.GlobalString("host"); host != "" {
+		u, err := url.Parse(host)
+		if err != nil {
+			return "", err // TODO
+		}
+		return u.Hostname(), nil
+	}
+
+	return "", nil
 }
