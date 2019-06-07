@@ -7,10 +7,11 @@ Command line interface for [Write.as](https://write.as). Works on Windows, macOS
 ## Features
 
 * Publish anonymously to Write.as
+* Authenticate with a Write.as account
 * A stable, easy back-end for your GUI app or desktop-based workflow
 * Compatible with our [Tor hidden service](http://writeas7pm7rcdqg.onion/)
 * Locally keeps track of any posts you make
-* Update and delete anonymous posts
+* Update and delete posts, anonymous and authenticated
 * Fetch any post by ID
 * Add anonymous post credentials (like for one published with the [Android app](https://play.google.com/store/apps/details?id=com.abunchtell.writeas)) for editing
 
@@ -53,26 +54,31 @@ go get -u github.com/writeas/writeas-cli/cmd/writeas
 See full usage documentation on our [User Guide](GUIDE.md).
 
 ```
-writeas [global options] command [command options] [arguments...]
+   writeas [global options] command [command options] [arguments...]
 
 COMMANDS:
-   post     Alias for default action: create post from stdin
-   new      Compose a new post from the command-line and publish
-   publish  Publish a file to Write.as
-   delete   Delete a post
-   update   Update (overwrite) a post
-   get      Read a raw post
-   add      Add an existing post locally
-   list     List local posts
-   auth     Authenticate with Write.as
-   help, h  Shows a list of commands or help for one command
+     post     Alias for default action: create post from stdin
+     new      Compose a new post from the command-line and publish
+     publish  Publish a file to Write.as
+     delete   Delete a post
+     update   Update (overwrite) a post
+     get      Read a raw post
+     add      Add an existing post locally
+     posts    List all of your posts
+     fetch    Fetch authenticated user's Write.as posts
+     auth     Authenticate with Write.as
+     logout   Log out of Write.as
+     help, h  Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
+   -c value, -b value  Optional blog to post to
    --tor, -t           Perform action on Tor hidden service
    --tor-port value    Use a different port to connect to Tor (default: 9150)
    --code              Specifies this post is code
+   --md                Returns post URL with Markdown enabled
    --verbose, -v       Make the operation more talkative
    --font value        Sets post font to given value (default: "mono")
+   --lang value        Sets post language to given ISO 639-1 language code
    --user-agent value  Sets the User-Agent for API requests
    --help, -h          show help
    --version, -V       print the version
@@ -86,7 +92,7 @@ We welcome any kind of contributions including documentation, organizational imp
 
 ### Getting Support
 
-We're available on [several channels](https://write.as/contact), and prefer the #development channel [in Slack](http://slack.write.as) for project discussion. Please don't use the GitHub issue tracker to ask questions.
+We're available on [several channels](https://write.as/contact), and prefer our [discuss instance](https://discuss.write.as) for project discussion. Please don't use the GitHub issue tracker to ask questions.
 
 ### Reporting Issues
 
