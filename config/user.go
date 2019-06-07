@@ -36,6 +36,15 @@ func LoadUser(c *cli.Context) (*writeas.AuthUser, error) {
 	return u, nil
 }
 
+func DeleteUser(c *cli.Context) error {
+	dir, err := userHostDir(c)
+	if err != nil {
+		return err
+	}
+
+	return fileutils.DeleteFile(filepath.Join(dir, UserFile))
+}
+
 func SaveUser(c *cli.Context, u *writeas.AuthUser) error {
 	// Marshal struct into pretty-printed JSON
 	userJSON, err := json.MarshalIndent(u, "", "  ")
@@ -56,6 +65,8 @@ func SaveUser(c *cli.Context, u *writeas.AuthUser) error {
 	return nil
 }
 
+// userHostDir returns the path to the user data directory with the host based
+// subpath if the host flag is set
 func userHostDir(c *cli.Context) (string, error) {
 	dataDir := UserDataDir(c.App.ExtraInfo()["configDir"])
 	hostDir, err := HostDirectory(c)

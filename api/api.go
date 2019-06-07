@@ -2,13 +2,11 @@ package api
 
 import (
 	"fmt"
-	"path/filepath"
 
 	"github.com/atotto/clipboard"
 	writeas "github.com/writeas/go-writeas/v2"
 	"github.com/writeas/web-core/posts"
 	"github.com/writeas/writeas-cli/config"
-	"github.com/writeas/writeas-cli/fileutils"
 	"github.com/writeas/writeas-cli/log"
 	cli "gopkg.in/urfave/cli.v1"
 )
@@ -257,11 +255,6 @@ func DoLogOut(c *cli.Context) error {
 		return err
 	}
 
-	// Delete local user data
-	err = fileutils.DeleteFile(filepath.Join(config.UserDataDir(c.App.ExtraInfo()["configDir"]), config.UserFile))
-	if err != nil {
-		return err
-	}
-
-	return nil
+	// delete local user file
+	return config.DeleteUser(c)
 }

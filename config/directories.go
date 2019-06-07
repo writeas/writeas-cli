@@ -8,6 +8,8 @@ import (
 	"github.com/writeas/writeas-cli/log"
 )
 
+// UserDataDir returns a platform specific directory under the user's home
+// directory
 func UserDataDir(dataDirName string) string {
 	return filepath.Join(parentDataDir(), dataDirName)
 }
