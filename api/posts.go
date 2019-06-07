@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/writeas/writeas-cli/config"
 	"github.com/writeas/writeas-cli/fileutils"
@@ -25,6 +26,19 @@ const (
 type Post struct {
 	ID        string
 	EditToken string
+}
+
+// RemotePost holds addition information about published
+// posts
+type RemotePost struct {
+	Post
+	Title,
+	Excerpt,
+	Slug,
+	Collection,
+	EditToken string
+	Synced  bool
+	Updated time.Time
 }
 
 func AddPost(c *cli.Context, id, token string) error {
@@ -78,6 +92,84 @@ func GetPosts(c *cli.Context) *[]Post {
 	}
 
 	return &posts
+}
+
+func GetUserPosts(c *cli.Context) ([]RemotePost, error) {
+	waposts, err := DoFetchPosts(c)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(waposts) == 0 {
+		return nil, nil
+	}
+
+	posts := []RemotePost{}
+	for _, p := range waposts {
+		post := RemotePost{
+			Post: Post{
+				ID:        p.ID,
+				EditToken: p.Token,
+			},
+			Title:   p.Title,
+			Excerpt: getExcerpt(p.Content),
+			Slug:    p.Slug,
+			Synced:  p.Slug != "",
+			Updated: p.Updated,
+		}
+		if p.Collection != nil {
+			post.Collection = p.Collection.Alias
+		}
+		posts = append(posts, post)
+	}
+
+	return posts, nil
+}
+
+// getExcerpt takes in a content string and returns
+// a concatenated version. limited to no more than
+// two lines of 80 chars each. delimited by '...'
+func getExcerpt(input string) string {
+	length := len(input)
+
+	if length <= 80 {
+		return input
+	} else if length < 160 {
+		ln1, idx := trimToLength(input, 80)
+		if idx == -1 {
+			idx = 80
+		}
+		ln2, _ := trimToLength(input[idx:], 80)
+		return ln1 + "\n" + ln2
+	} else {
+		excerpt := input[:158]
+		ln1, idx := trimToLength(excerpt, 80)
+		if idx == -1 {
+			idx = 80
+		}
+		ln2, _ := trimToLength(excerpt[idx:], 80)
+		return ln1 + "\n" + ln2 + "..."
+	}
+}
+
+func trimToLength(in string, l int) (string, int) {
+	c := []rune(in)
+	spaceIdx := -1
+	length := len(c)
+	if length <= l {
+		return in, spaceIdx
+	}
+
+	for i := l; i > 0; i-- {
+		if c[i] == ' ' {
+			spaceIdx = i
+			break
+		}
+	}
+	if spaceIdx > -1 {
+		c = c[:spaceIdx]
+	}
+	return string(c), spaceIdx
 }
 
 func ComposeNewPost() (string, *[]byte) {

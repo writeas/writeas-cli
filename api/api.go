@@ -69,6 +69,22 @@ func DoFetch(friendlyID, ua string, tor bool) error {
 	return nil
 }
 
+// DoFetchPosts retrieves all remote posts for the
+// authenticated user
+func DoFetchPosts(c *cli.Context) ([]writeas.Post, error) {
+	cl, err := NewClient(c, true)
+	if err != nil {
+		return nil, err
+	}
+
+	posts, err := cl.GetUserPosts()
+	if err != nil {
+		return nil, err
+	}
+
+	return *posts, nil
+}
+
 // DoPost creates a Write.as post, returning an error if it was
 // unsuccessful.
 func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) (*writeas.Post, error) {
