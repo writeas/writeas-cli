@@ -190,7 +190,7 @@ func CmdListPosts(c *cli.Context) error {
 
 	var p api.Post
 	posts := api.GetPosts(c)
-	tw := tabwriter.NewWriter(os.Stderr, 10, 0, 2, ' ', tabwriter.TabIndent)
+	tw := tabwriter.NewWriter(os.Stdout, 10, 0, 2, ' ', tabwriter.TabIndent)
 	numPosts := len(*posts)
 	if ids || !urls && numPosts != 0 {
 		fmt.Fprintf(tw, "Local\t%s\t%s\t\n", "ID", "Token")
