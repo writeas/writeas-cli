@@ -31,7 +31,7 @@ func main() {
 		return appInfo
 	}
 	app.Action = commands.CmdPost
-	app.Flags = config.PostFlags
+	app.Flags = globalFlags
 	app.Commands = []cli.Command{
 		{
 			Name:   "post",
