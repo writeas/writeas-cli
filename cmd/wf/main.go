@@ -6,12 +6,11 @@ import (
 	"github.com/writeas/writeas-cli/api"
 	"github.com/writeas/writeas-cli/commands"
 	"github.com/writeas/writeas-cli/config"
-	"github.com/writeas/writeas-cli/log"
 	cli "gopkg.in/urfave/cli.v1"
 )
 
 func main() {
-	initialize(appInfo["configDir"])
+	config.DirMustExist(appInfo["configDir"])
 	cli.VersionFlag = cli.BoolFlag{
 		Name:  "version, V",
 		Usage: "print the version",
@@ -248,19 +247,4 @@ OPTIONS:
    {{end}}{{ end }}
 `
 	app.Run(os.Args)
-}
-
-func initialize(dataDirName string) {
-	// Ensure we have a data directory to use
-	if !config.DataDirExists(dataDirName) {
-		err := config.CreateDataDir(dataDirName)
-		if err != nil {
-			if config.Debug() {
-				panic(err)
-			} else {
-				log.Errorln("Error creating data directory: %s", err)
-				return
-			}
-		}
-	}
 }

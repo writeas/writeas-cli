@@ -42,7 +42,7 @@ func NewClient(c *cli.Context, authRequired bool) (*writeas.Client, error) {
 	}
 	client.UserAgent = config.UserAgent(c)
 	// TODO: load user into var shared across the app
-	u, _ := config.LoadUser(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
+	u, _ := config.LoadUser(c)
 	if u != nil {
 		client.SetToken(u.AccessToken)
 	} else if authRequired {
@@ -235,7 +235,7 @@ func DoLogIn(c *cli.Context, username, password string) error {
 		return err
 	}
 
-	err = config.SaveUser(config.UserDataDir(c.App.ExtraInfo()["configDir"]), u)
+	err = config.SaveUser(c, u)
 	if err != nil {
 		return err
 	}
