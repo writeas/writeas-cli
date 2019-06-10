@@ -145,12 +145,18 @@ func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) (
 func DoFetchCollections(c *cli.Context) ([]RemoteColl, error) {
 	cl, err := NewClient(c, true)
 	if err != nil {
-		//
+		if config.Debug() {
+			log.ErrorlnQuit("could not create new client: %v", err)
+		}
+		return nil, fmt.Errorf("Couldn't create new client")
 	}
 
 	colls, err := cl.GetUserCollections()
 	if err != nil {
-		//
+		if config.Debug() {
+			log.ErrorlnQuit("failed fetching user collections: %v", err)
+		}
+		return nil, fmt.Errorf("Couldn't get user collections")
 	}
 
 	out := make([]RemoteColl, len(*colls))
