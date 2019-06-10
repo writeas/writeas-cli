@@ -249,6 +249,36 @@ func getPostURL(c *cli.Context, slug string) string {
 	return fmt.Sprintf("%s/%s%s", base, slug, ext)
 }
 
+func CmdCollections(c *cli.Context) error {
+	u, err := config.LoadUser(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
+	if err != nil {
+		return cli.NewExitError(fmt.Sprintf("couldn't load config: %v", err), 1)
+	}
+	if u == nil {
+		return cli.NewExitError("You must be authenticated to view collections.\nLog in first with: writeas auth <username>", 1)
+	}
+	colls, err := api.DoFetchCollections(c)
+	if err != nil {
+		return cli.NewExitError(fmt.Sprintf("Couldn't get collections for user %s: %v", u.User.Username, err), 1)
+	}
+	urls := c.Bool("url")
+	tw := tabwriter.NewWriter(os.Stdout, 8, 0, 2, ' ', tabwriter.TabIndent)
+	detail := "Title"
+	if urls {
+		detail = "URL"
+	}
+	fmt.Fprintf(tw, "%s\t%s\t\n", "Alias", detail)
+	for _, c := range colls {
+		dData := c.Title
+		if urls {
+			dData = c.URL
+		}
+		fmt.Fprintf(tw, "%s\t%s\t\n", c.Alias, dData)
+	}
+	tw.Flush()
+	return nil
+}
+
 func CmdAuth(c *cli.Context) error {
 	// Check configuration
 	u, err := config.LoadUser(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
