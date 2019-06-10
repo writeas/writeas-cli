@@ -57,6 +57,24 @@ func AddPost(c *cli.Context, id, token string) error {
 	return nil
 }
 
+// ClaimPost adds a local post to the authenticated user's account and deletes
+// the local reference
+func ClaimPosts(c *cli.Context, localPosts *[]Post) (*[]writeas.ClaimPostResult, error) {
+	cl, err := NewClient(c, true)
+	if err != nil {
+		return nil, err
+	}
+	postsToClaim := make([]writeas.OwnedPostParams, len(*localPosts))
+	for i, post := range *localPosts {
+		postsToClaim[i] = writeas.OwnedPostParams{
+			ID:    post.ID,
+			Token: post.EditToken,
+		}
+	}
+
+	return cl.ClaimPosts(&postsToClaim)
+}
+
 func TokenFromID(c *cli.Context, id string) string {
 	post := fileutils.FindLine(filepath.Join(config.UserDataDir(c.App.ExtraInfo()["configDir"]), postsFile), id)
 	if post == "" {
@@ -71,7 +89,7 @@ func TokenFromID(c *cli.Context, id string) string {
 	return parts[1]
 }
 
-func removePost(path, id string) {
+func RemovePost(path, id string) {
 	fileutils.RemoveLine(filepath.Join(config.UserDataDir(path), postsFile), id)
 }
 

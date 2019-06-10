@@ -219,7 +219,7 @@ func DoDelete(c *cli.Context, friendlyID, token string, tor bool) error {
 	} else {
 		log.Info(c, "Post deleted.")
 	}
-	removePost(c.App.ExtraInfo()["configDir"], friendlyID)
+	RemovePost(c.App.ExtraInfo()["configDir"], friendlyID)
 
 	return nil
 }
