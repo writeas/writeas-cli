@@ -1,6 +1,6 @@
 writeas-cli
 ===========
-![GPL](https://img.shields.io/github/license/writeas/writeas-cli.svg) [![Go Report Card](https://goreportcard.com/badge/github.com/writeas/writeas-cli)](https://goreportcard.com/report/github.com/writeas/writeas-cli) [![#writeas on freenode](https://img.shields.io/badge/freenode-%23writeas-blue.svg)](http://webchat.freenode.net/?channels=writeas) [![Public Slack discussion](http://slack.write.as/badge.svg)](http://slack.write.as/)
+![GPL](https://img.shields.io/github/license/writeas/writeas-cli.svg) [![Go Report Card](https://goreportcard.com/badge/github.com/writeas/writeas-cli)](https://goreportcard.com/report/github.com/writeas/writeas-cli) [![#writeas on freenode](https://img.shields.io/badge/freenode-%23writeas-blue.svg)](http://webchat.freenode.net/?channels=writeas) [![Discuss on our forum](https://img.shields.io/discourse/https/discuss.write.as/users.svg?label=forum)](https://discuss.write.as/c/development)
 
 Command line interface for [Write.as](https://write.as). Works on Windows, macOS, and Linux.
 
@@ -92,7 +92,7 @@ We welcome any kind of contributions including documentation, organizational imp
 
 ### Getting Support
 
-We're available on [several channels](https://write.as/contact), and prefer our [discuss instance](https://discuss.write.as) for project discussion. Please don't use the GitHub issue tracker to ask questions.
+We're available on [several channels](https://write.as/contact), and prefer our [forum](https://discuss.write.as) for project discussion. Please don't use the GitHub issue tracker to ask questions.
 
 ### Reporting Issues
 
