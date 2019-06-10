@@ -279,6 +279,41 @@ func CmdCollections(c *cli.Context) error {
 	return nil
 }
 
+func CmdClaim(c *cli.Context) error {
+	u, err := config.LoadUser(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
+	if err != nil {
+		return cli.NewExitError(fmt.Sprintf("couldn't load config: %v", err), 1)
+	}
+	if u == nil {
+		return cli.NewExitError("You must be authenticated to claim local posts.\nLog in first with: writeas auth <username>", 1)
+	}
+
+	localPosts := api.GetPosts(c)
+	if len(*localPosts) == 0 {
+		return nil
+	}
+
+	results, err := api.ClaimPosts(c, localPosts)
+	if err != nil {
+		return cli.NewExitError(fmt.Sprintf("Failed to claim posts: %v", err), 1)
+	}
+
+	for _, r := range *results {
+		fmt.Printf("Adding %s to user %s..", r.Post.ID, u.User.Username)
+		if r.ErrorMessage != "" {
+			fmt.Printf(" Failed\n")
+			if config.Debug() {
+				log.Errorln("Failed claiming post %s: %v", r.ID, r.ErrorMessage)
+			}
+		} else {
+			fmt.Printf(" OK\n")
+			// only delete local if successful
+			api.RemovePost(c.App.ExtraInfo()["configDir"], r.Post.ID)
+		}
+	}
+	return nil
+}
+
 func CmdAuth(c *cli.Context) error {
 	// Check configuration
 	u, err := config.LoadUser(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
