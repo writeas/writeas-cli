@@ -5,8 +5,8 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
+	writeas "github.com/writeas/go-writeas/v2"
 	"github.com/writeas/writeas-cli/fileutils"
-	"go.code.as/writeas.v2"
 )
 
 const UserFile = "user.json"
