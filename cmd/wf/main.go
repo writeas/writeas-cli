@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	config.DirMustExist(appInfo["configDir"])
+	config.DirMustExist(config.UserDataDir(appInfo["configDir"]))
 	cli.VersionFlag = cli.BoolFlag{
 		Name:  "version, V",
 		Usage: "print the version",
