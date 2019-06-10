@@ -65,6 +65,7 @@ COMMANDS:
      get      Read a raw post
      add      Add an existing post locally
      posts    List all of your posts
+     blogs    List blogs
      auth     Authenticate with Write.as
      logout   Log out of Write.as
      help, h  Shows a list of commands or help for one command
