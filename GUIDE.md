@@ -24,7 +24,6 @@ COMMANDS:
      get      Read a raw post
      add      Add an existing post locally
      posts    List all of your posts
-     fetch    Fetch authenticated user's Write.as posts
      auth     Authenticate with Write.as
      logout   Log out of Write.as
      help, h  Shows a list of commands or help for one command
@@ -117,18 +116,3 @@ Customize your post's appearance with the `--font` flag:
 Put it all together, e.g. publish with a sans-serif font: `writeas new --font sans`
 
 If you're publishing Markdown, supply the `--md` flag to get a URL back that will render Markdown, e.g.: `writeas new --font sans --md`
-
-### Fetch posts
-
-This pulls down local copies of the authenticated user's posts.
-
-You will be prompted for a storage location the first time, if you have not already configured one.
-
-```bash
-$ writeas fetch
-Posts directory? [/home/username/present/directory]: /home/username/posts
-Created posts directory.
-Saved config.
-$ ls /home/username/posts
-blog/  aaaazzzzzzzza.txt
-```
