@@ -18,4 +18,8 @@ var globalFlags = []cli.Flag{
 		Name:  "host, H",
 		Usage: "Operate against a custom hostname",
 	},
+	cli.StringFlag{
+		Name:  "user, u",
+		Usage: "Use authenticated user, other than default",
+	},
 }

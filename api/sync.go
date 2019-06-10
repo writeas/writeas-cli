@@ -82,7 +82,7 @@ func CmdPull(c *cli.Context) error {
 func syncSetUp(c *cli.Context, cfg *config.UserConfig) error {
 	// Get user information and fail early (before we make the user do
 	// anything), if we're going to
-	u, err := config.LoadUser(c)
+	u, err := config.LoadUser(c, c.GlobalString("user"))
 	if err != nil {
 		return err
 	}

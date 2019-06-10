@@ -40,7 +40,7 @@ func NewClient(c *cli.Context, authRequired bool) (*writeas.Client, error) {
 	}
 	client.UserAgent = config.UserAgent(c)
 	// TODO: load user into var shared across the app
-	u, _ := config.LoadUser(c)
+	u, _ := config.LoadUser(c, c.GlobalString("user"))
 	if u != nil {
 		client.SetToken(u.AccessToken)
 	} else if authRequired {
@@ -256,5 +256,5 @@ func DoLogOut(c *cli.Context) error {
 	}
 
 	// delete local user file
-	return config.DeleteUser(c)
+	return config.DeleteUser(c, c.GlobalString("user"))
 }

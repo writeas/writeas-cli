@@ -15,7 +15,8 @@ var globalFlags = []cli.Flag{
 		Value: 9150,
 	},
 	cli.StringFlag{
-		Name:  "host, H",
-		Usage: "Operate against a custom hostname",
+		Name:   "user, u",
+		Hidden: true,
+		Value:  "user",
 	},
 }

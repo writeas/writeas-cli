@@ -10,14 +10,12 @@ import (
 	"gopkg.in/urfave/cli.v1"
 )
 
-const UserFile = "user.json"
-
-func LoadUser(c *cli.Context) (*writeas.AuthUser, error) {
+func LoadUser(c *cli.Context, username string) (*writeas.AuthUser, error) {
 	dir, err := userHostDir(c)
 	if err != nil {
 		return nil, err
 	}
-	fname := filepath.Join(dir, UserFile)
+	fname := filepath.Join(dir, username+".json")
 	userJSON, err := ioutil.ReadFile(fname)
 	if err != nil {
 		if !fileutils.Exists(fname) {
@@ -36,13 +34,13 @@ func LoadUser(c *cli.Context) (*writeas.AuthUser, error) {
 	return u, nil
 }
 
-func DeleteUser(c *cli.Context) error {
+func DeleteUser(c *cli.Context, username string) error {
 	dir, err := userHostDir(c)
 	if err != nil {
 		return err
 	}
 
-	return fileutils.DeleteFile(filepath.Join(dir, UserFile))
+	return fileutils.DeleteFile(filepath.Join(dir, username+".json"))
 }
 
 func SaveUser(c *cli.Context, u *writeas.AuthUser) error {
@@ -58,7 +56,7 @@ func SaveUser(c *cli.Context, u *writeas.AuthUser) error {
 	}
 	DirMustExist(dir)
 	// Save file
-	err = ioutil.WriteFile(filepath.Join(dir, UserFile), userJSON, 0600)
+	err = ioutil.WriteFile(filepath.Join(dir, u.User.Username+".json"), userJSON, 0600)
 	if err != nil {
 		return err
 	}

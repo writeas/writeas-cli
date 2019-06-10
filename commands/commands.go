@@ -71,7 +71,7 @@ func CmdDelete(c *cli.Context) error {
 		return cli.NewExitError("usage: writeas delete <postId> [<token>]", 1)
 	}
 
-	u, _ := config.LoadUser(c)
+	u, _ := config.LoadUser(c, c.GlobalString("user"))
 	if token == "" {
 		// Search for the token locally
 		token = api.TokenFromID(c, friendlyID)
@@ -107,7 +107,7 @@ func CmdUpdate(c *cli.Context) error {
 		return cli.NewExitError("usage: writeas update <postId> [<token>]", 1)
 	}
 
-	u, _ := config.LoadUser(c)
+	u, _ := config.LoadUser(c, c.GlobalString("user"))
 	if token == "" {
 		// Search for the token locally
 		token = api.TokenFromID(c, friendlyID)
@@ -186,7 +186,7 @@ func CmdListPosts(c *cli.Context) error {
 			fmt.Fprintf(tw, "unsynced\t%s\t%s\t\n", getPostURL(c, p.ID), p.EditToken)
 		}
 	}
-	u, _ := config.LoadUser(c)
+	u, _ := config.LoadUser(c, c.GlobalString("user"))
 	if u != nil {
 		remotePosts, err := api.GetUserPosts(c)
 		if err != nil {
@@ -229,7 +229,7 @@ func getPostURL(c *cli.Context, slug string) string {
 }
 
 func CmdCollections(c *cli.Context) error {
-	u, err := config.LoadUser(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
+	u, err := config.LoadUser(c, c.GlobalString("user"))
 	if err != nil {
 		return cli.NewExitError(fmt.Sprintf("couldn't load config: %v", err), 1)
 	}
@@ -302,7 +302,7 @@ func CmdClaim(c *cli.Context) error {
 
 func CmdAuth(c *cli.Context) error {
 	// Check configuration
-	u, err := config.LoadUser(c)
+	u, err := config.LoadUser(c, c.GlobalString("user"))
 	if err != nil {
 		return cli.NewExitError(fmt.Sprintf("couldn't load config: %v", err), 1)
 	}
