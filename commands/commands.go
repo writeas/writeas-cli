@@ -299,16 +299,21 @@ func CmdClaim(c *cli.Context) error {
 	}
 
 	for _, r := range *results {
-		fmt.Printf("Adding %s to user %s..", r.Post.ID, u.User.Username)
+		id := r.ID
+		if id == "" {
+			// No top-level ID, so the claim was successful
+			id = r.Post.ID
+		}
+		fmt.Printf("Adding %s to user %s..", id, u.User.Username)
 		if r.ErrorMessage != "" {
 			fmt.Printf(" Failed\n")
 			if config.Debug() {
-				log.Errorln("Failed claiming post %s: %v", r.ID, r.ErrorMessage)
+				log.Errorln("Failed claiming post %s: %v", id, r.ErrorMessage)
 			}
 		} else {
 			fmt.Printf(" OK\n")
 			// only delete local if successful
-			api.RemovePost(c.App.ExtraInfo()["configDir"], r.Post.ID)
+			api.RemovePost(c.App.ExtraInfo()["configDir"], id)
 		}
 	}
 	return nil
