@@ -3,7 +3,6 @@ package main
 import (
 	"os"
 
-	"github.com/writeas/writeas-cli/api"
 	"github.com/writeas/writeas-cli/commands"
 	"github.com/writeas/writeas-cli/config"
 	cli "gopkg.in/urfave/cli.v1"
@@ -170,28 +169,17 @@ func main() {
 					Usage: "Show list with URLs",
 				},
 			},
-		},
-		{
-			Name:   "fetch",
-			Usage:  "Fetch authenticated user's Write.as posts",
-			Action: api.CmdPull,
+		}, {
+			Name:   "blogs",
+			Usage:  "List blogs",
+			Action: commands.CmdCollections,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
-					Name:  "tor, t",
-					Usage: "Authenticate via Tor hidden service",
-				},
-				cli.IntFlag{
-					Name:  "tor-port",
-					Usage: "Use a different port to connect to Tor",
-					Value: 9150,
-				},
-				cli.BoolFlag{
-					Name:  "verbose, v",
-					Usage: "Make the operation more talkative",
+					Name:  "url",
+					Usage: "Show list with URLs",
 				},
 			},
-		},
-		{
+		}, {
 			Name:   "auth",
 			Usage:  "Authenticate with Write.as",
 			Action: commands.CmdAuth,
