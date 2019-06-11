@@ -19,7 +19,10 @@ func LoadUser(c *cli.Context) (*writeas.AuthUser, error) {
 	if err != nil {
 		return nil, err
 	}
-	fname := filepath.Join(dir, username+".json")
+	if username == "user" {
+		username = ""
+	}
+	fname := filepath.Join(dir, username, "user.json")
 	userJSON, err := ioutil.ReadFile(fname)
 	if err != nil {
 		if !fileutils.Exists(fname) {
@@ -49,7 +52,11 @@ func DeleteUser(c *cli.Context) error {
 		return err
 	}
 
-	return fileutils.DeleteFile(filepath.Join(dir, username+".json"))
+	if username == "user" {
+		username = ""
+	}
+
+	return fileutils.DeleteFile(filepath.Join(dir, username, "user.json"))
 }
 
 func SaveUser(c *cli.Context, u *writeas.AuthUser) error {
@@ -63,16 +70,16 @@ func SaveUser(c *cli.Context, u *writeas.AuthUser) error {
 	if err != nil {
 		return err
 	}
-	DirMustExist(dir)
 	// Save file
 	username, err := currentUser(c)
 	if err != nil {
 		return err
 	}
 	if username != "user" {
-		username = u.User.Username
+		dir = filepath.Join(dir, u.User.Username)
 	}
-	err = ioutil.WriteFile(filepath.Join(dir, username+".json"), userJSON, 0600)
+	DirMustExist(dir)
+	err = ioutil.WriteFile(filepath.Join(dir, "user.json"), userJSON, 0600)
 	if err != nil {
 		return err
 	}
@@ -91,7 +98,11 @@ func userHostDir(c *cli.Context) (string, error) {
 }
 
 func currentUser(c *cli.Context) (string, error) {
-	cfg, err := LoadConfig(UserDataDir(c.App.ExtraInfo()["configDir"]))
+	hostDir, err := userHostDir(c)
+	if err != nil {
+		return "", err
+	}
+	cfg, err := LoadConfig(hostDir)
 	if err != nil {
 		return "", err
 	}
