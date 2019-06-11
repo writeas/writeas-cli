@@ -2,6 +2,4 @@
 
 package main
 
-var appInfo = map[string]string{
-	"configDir": "WriteFreely",
-}
+const configDir = "WriteFreely"

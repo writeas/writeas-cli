@@ -2,6 +2,4 @@
 
 package main
 
-var appInfo = map[string]string{
-	"configDir": ".writeas",
-}
+const configDir = ".writeas"

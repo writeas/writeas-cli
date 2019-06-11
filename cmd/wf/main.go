@@ -9,6 +9,10 @@ import (
 )
 
 func main() {
+	appInfo := map[string]string{
+		"configDir": configDir,
+		"version":   "1.0",
+	}
 	config.DirMustExist(config.UserDataDir(appInfo["configDir"]))
 	cli.VersionFlag = cli.BoolFlag{
 		Name:  "version, V",
@@ -18,7 +22,7 @@ func main() {
 	// Run the app
 	app := cli.NewApp()
 	app.Name = "wf"
-	app.Version = config.Version
+	app.Version = appInfo["version"]
 	app.Usage = "Publish text quickly"
 	// TODO: who is the author? the contributors? link to GH?
 	app.Authors = []cli.Author{
@@ -31,7 +35,7 @@ func main() {
 		return appInfo
 	}
 	app.Action = commands.CmdPost
-	app.Flags = globalFlags
+	app.Flags = append(config.PostFlags, flags...)
 	app.Commands = []cli.Command{
 		{
 			Name:   "post",
