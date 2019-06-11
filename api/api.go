@@ -11,33 +11,55 @@ import (
 	cli "gopkg.in/urfave/cli.v1"
 )
 
-func client(userAgent string, tor bool) *writeas.Client {
+func client(c *cli.Context, userAgent string, tor bool) (*writeas.Client, error) {
 	var client *writeas.Client
-	if tor {
-		client = writeas.NewTorClient(TorPort)
-	} else {
-		if config.IsDev() {
-			client = writeas.NewDevClient()
-		} else {
-			client = writeas.NewClient()
-		}
+	var clientConfig writeas.Config
+	cfg, err := config.LoadConfig(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
+	if err != nil {
+		return nil, fmt.Errorf("Failed to load configuration file: %v", err)
 	}
+	if c.GlobalString("host") != "" {
+		clientConfig.URL = c.GlobalString("host") + "/api"
+	} else if cfg.Default.Host != "" {
+		clientConfig.URL = cfg.Default.Host + "/api"
+	} else if config.IsDev() {
+		clientConfig.URL = config.DevBaseURL + "/api"
+	} else {
+		clientConfig.URL = config.WriteasBaseURL + "/api"
+	}
+	if tor {
+		clientConfig.URL = config.TorBaseURL
+		clientConfig.TorPort = TorPort
+	}
+
+	client = writeas.NewClientWith(clientConfig)
 	client.UserAgent = userAgent
 
-	return client
+	return client, nil
 }
 
 func NewClient(c *cli.Context, authRequired bool) (*writeas.Client, error) {
 	var client *writeas.Client
-	if config.IsTor(c) {
-		client = writeas.NewTorClient(TorPort)
-	} else {
-		if config.IsDev() {
-			client = writeas.NewDevClient()
-		} else {
-			client = writeas.NewClient()
-		}
+	var clientConfig writeas.Config
+	cfg, err := config.LoadConfig(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
+	if err != nil {
+		return nil, fmt.Errorf("Failed to load configuration file: %v", err)
 	}
+	if c.GlobalString("host") != "" {
+		clientConfig.URL = c.GlobalString("host") + "/api"
+	} else if cfg.Default.Host != "" {
+		clientConfig.URL = cfg.Default.Host + "/api"
+	} else if config.IsDev() {
+		clientConfig.URL = config.DevBaseURL + "/api"
+	} else {
+		clientConfig.URL = config.WriteasBaseURL + "/api"
+	}
+	if config.IsTor(c) {
+		clientConfig.URL = config.TorBaseURL
+		clientConfig.TorPort = TorPort
+	}
+
+	client = writeas.NewClientWith(clientConfig)
 	client.UserAgent = config.UserAgent(c)
 	// TODO: load user into var shared across the app
 	u, _ := config.LoadUser(c)
@@ -52,8 +74,11 @@ func NewClient(c *cli.Context, authRequired bool) (*writeas.Client, error) {
 
 // DoFetch retrieves the Write.as post with the given friendlyID,
 // optionally via the Tor hidden service.
-func DoFetch(friendlyID, ua string, tor bool) error {
-	cl := client(ua, tor)
+func DoFetch(c *cli.Context, friendlyID, ua string, tor bool) error {
+	cl, err := client(c, ua, tor)
+	if err != nil {
+		return err
+	}
 
 	p, err := cl.GetPost(friendlyID)
 	if err != nil {
@@ -223,7 +248,10 @@ func DoDelete(c *cli.Context, friendlyID, token string, tor bool) error {
 }
 
 func DoLogIn(c *cli.Context, username, password string) error {
-	cl := client(config.UserAgent(c), config.IsTor(c))
+	cl, err := client(c, config.UserAgent(c), config.IsTor(c))
+	if err != nil {
+		return err
+	}
 
 	u, err := cl.LogIn(username, password)
 	if err != nil {

@@ -65,7 +65,14 @@ func SaveUser(c *cli.Context, u *writeas.AuthUser) error {
 	}
 	DirMustExist(dir)
 	// Save file
-	err = ioutil.WriteFile(filepath.Join(dir, u.User.Username+".json"), userJSON, 0600)
+	username, err := currentUser(c)
+	if err != nil {
+		return err
+	}
+	if username != "user" {
+		username = u.User.Username
+	}
+	err = ioutil.WriteFile(filepath.Join(dir, username+".json"), userJSON, 0600)
 	if err != nil {
 		return err
 	}

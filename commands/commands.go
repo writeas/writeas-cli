@@ -149,7 +149,7 @@ func CmdGet(c *cli.Context) error {
 		log.Info(c, "Getting...")
 	}
 
-	return api.DoFetch(friendlyID, config.UserAgent(c), tor)
+	return api.DoFetch(c, friendlyID, config.UserAgent(c), tor)
 }
 
 func CmdAdd(c *cli.Context) error {
