@@ -259,7 +259,7 @@ func CmdCollections(c *cli.Context) error {
 }
 
 func CmdClaim(c *cli.Context) error {
-	u, err := config.LoadUser(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
+	u, err := config.LoadUser(c)
 	if err != nil {
 		return cli.NewExitError(fmt.Sprintf("couldn't load config: %v", err), 1)
 	}
