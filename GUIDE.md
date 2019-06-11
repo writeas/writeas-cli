@@ -24,23 +24,28 @@ COMMANDS:
      posts    List all of your posts
      claim    Claim local unsynced posts
      blogs    List blogs
+     claim    Claim local unsynced posts
      auth     Authenticate with Write.as
      logout   Log out of Write.as
      help, h  Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   -c value, -b value  Optional blog to post to
-   --tor, -t           Perform action on Tor hidden service
-   --tor-port value    Use a different port to connect to Tor (default: 9150)
-   --code              Specifies this post is code
-   --md                Returns post URL with Markdown enabled
-   --verbose, -v       Make the operation more talkative
-   --font value        Sets post font to given value (default: "mono")
-   --lang value        Sets post language to given ISO 639-1 language code
-   --user-agent value  Sets the User-Agent for API requests
-   --help, -h          show help
-   --version, -V       print the version
+   -c value, -b value      Optional blog to post to
+   --tor, -t               Perform action on Tor hidden service
+   --tor-port value        Use a different port to connect to Tor (default: 9150)
+   --code                  Specifies this post is code
+   --md                    Returns post URL with Markdown enabled
+   --verbose, -v           Make the operation more talkative
+   --font value            Sets post font to given value (default: "mono")
+   --lang value            Sets post language to given ISO 639-1 language code
+   --user-agent value      Sets the User-Agent for API requests
+   --host value, -H value  Operate against a custom hostname
+   --user value, -u value  Use authenticated user, other than default
+   --help, -h              show help
+   --version, -V           print the version
 ```
+
+> Note: the host and user flags are only available in `wf` the community edition
 
 #### Share something
 
