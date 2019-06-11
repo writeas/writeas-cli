@@ -106,6 +106,12 @@ func currentUser(c *cli.Context) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	if cfg.Default.User == "" {
+		cfg, err = LoadConfig(UserDataDir(c.App.ExtraInfo()["configDir"]))
+		if err != nil {
+			return "", err
+		}
+	}
 
 	if c.GlobalString("user") != "" {
 		return c.GlobalString("user"), nil
