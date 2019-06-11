@@ -57,15 +57,25 @@ func Collection(c *cli.Context) string {
 	return ""
 }
 
-// HostDirectory returns the sub directory string for the host flag if set
+// HostDirectory returns the sub directory string for the host. Order of
+// precedence is a host flag if any, then the configured default, if any
 func HostDirectory(c *cli.Context) (string, error) {
-	if host := c.GlobalString("host"); host != "" {
-		u, err := url.Parse(host)
+	cfg, err := LoadConfig(UserDataDir(c.App.ExtraInfo()["configDir"]))
+	if err != nil {
+		return "", err
+	}
+	// flag takes precedence over defaults
+	if hostFlag := c.GlobalString("host"); hostFlag != "" {
+		u, err := url.Parse(hostFlag)
 		if err != nil {
-			return "", err // TODO
+			return "", err
 		}
 		return u.Hostname(), nil
 	}
 
-	return "", nil
+	u, err := url.Parse(cfg.Default.Host)
+	if err != nil {
+		return "", err
+	}
+	return u.Hostname(), nil
 }

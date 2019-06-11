@@ -10,8 +10,12 @@ import (
 	"gopkg.in/urfave/cli.v1"
 )
 
-func LoadUser(c *cli.Context, username string) (*writeas.AuthUser, error) {
+func LoadUser(c *cli.Context) (*writeas.AuthUser, error) {
 	dir, err := userHostDir(c)
+	if err != nil {
+		return nil, err
+	}
+	username, err := currentUser(c)
 	if err != nil {
 		return nil, err
 	}
@@ -34,8 +38,13 @@ func LoadUser(c *cli.Context, username string) (*writeas.AuthUser, error) {
 	return u, nil
 }
 
-func DeleteUser(c *cli.Context, username string) error {
+func DeleteUser(c *cli.Context) error {
 	dir, err := userHostDir(c)
+	if err != nil {
+		return err
+	}
+
+	username, err := currentUser(c)
 	if err != nil {
 		return err
 	}
@@ -72,4 +81,17 @@ func userHostDir(c *cli.Context) (string, error) {
 		return "", err
 	}
 	return filepath.Join(dataDir, hostDir), nil
+}
+
+func currentUser(c *cli.Context) (string, error) {
+	cfg, err := LoadConfig(UserDataDir(c.App.ExtraInfo()["configDir"]))
+	if err != nil {
+		return "", err
+	}
+
+	if c.GlobalString("user") != "" {
+		return c.GlobalString("user"), nil
+	}
+
+	return cfg.Default.User, nil
 }
