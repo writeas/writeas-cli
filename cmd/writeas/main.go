@@ -184,6 +184,12 @@ func main() {
 			Usage:       "Claim local unsynced posts",
 			Action:      commands.CmdClaim,
 			Description: "This will claim any unsynced posts local to this machine. To see which posts these are run: writeas posts.",
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "verbose, v",
+					Usage: "Make the operation more talkative",
+				},
+			},
 		},
 		{
 			Name:   "auth",
