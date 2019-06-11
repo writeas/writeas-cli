@@ -279,6 +279,48 @@ func CmdCollections(c *cli.Context) error {
 	return nil
 }
 
+func CmdClaim(c *cli.Context) error {
+	u, err := config.LoadUser(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
+	if err != nil {
+		return cli.NewExitError(fmt.Sprintf("couldn't load config: %v", err), 1)
+	}
+	if u == nil {
+		return cli.NewExitError("You must be authenticated to claim local posts.\nLog in first with: writeas auth <username>", 1)
+	}
+
+	localPosts := api.GetPosts(c)
+	if len(*localPosts) == 0 {
+		return nil
+	}
+
+	log.Info(c, "Claiming %d post(s) for %s...", len(*localPosts), u.User.Username)
+	results, err := api.ClaimPosts(c, localPosts)
+	if err != nil {
+		return cli.NewExitError(fmt.Sprintf("Failed to claim posts: %v", err), 1)
+	}
+
+	var okCount, errCount int
+	for _, r := range *results {
+		id := r.ID
+		if id == "" {
+			// No top-level ID, so the claim was successful
+			id = r.Post.ID
+		}
+		status := fmt.Sprintf("Post %s...", id)
+		if r.ErrorMessage != "" {
+			log.Errorln("%serror: %v", status, r.ErrorMessage)
+			errCount++
+		} else {
+			log.Info(c, "%sOK", status)
+			okCount++
+			// only delete local if successful
+			api.RemovePost(c.App.ExtraInfo()["configDir"], id)
+		}
+	}
+	log.Info(c, "%d claimed, %d failed", okCount, errCount)
+	return nil
+}
+
 func CmdAuth(c *cli.Context) error {
 	// Check configuration
 	u, err := config.LoadUser(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
