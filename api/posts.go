@@ -42,7 +42,11 @@ type RemotePost struct {
 }
 
 func AddPost(c *cli.Context, id, token string) error {
-	f, err := os.OpenFile(filepath.Join(config.UserDataDir(c.App.ExtraInfo()["configDir"]), postsFile), os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0600)
+	hostDir, err := config.HostDirectory(c)
+	if err != nil {
+		return fmt.Errorf("Error checking for host directory: %v", err)
+	}
+	f, err := os.OpenFile(filepath.Join(config.UserDataDir(c.App.ExtraInfo()["configDir"]), hostDir, postsFile), os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0600)
 	if err != nil {
 		return fmt.Errorf("Error creating local posts list: %s", err)
 	}
@@ -76,7 +80,8 @@ func ClaimPosts(c *cli.Context, localPosts *[]Post) (*[]writeas.ClaimPostResult,
 }
 
 func TokenFromID(c *cli.Context, id string) string {
-	post := fileutils.FindLine(filepath.Join(config.UserDataDir(c.App.ExtraInfo()["configDir"]), postsFile), id)
+	hostDir, _ := config.HostDirectory(c)
+	post := fileutils.FindLine(filepath.Join(config.UserDataDir(c.App.ExtraInfo()["configDir"]), hostDir, postsFile), id)
 	if post == "" {
 		return ""
 	}
@@ -89,12 +94,15 @@ func TokenFromID(c *cli.Context, id string) string {
 	return parts[1]
 }
 
-func RemovePost(path, id string) {
-	fileutils.RemoveLine(filepath.Join(config.UserDataDir(path), postsFile), id)
+func RemovePost(c *cli.Context, id string) {
+	hostDir, _ := config.HostDirectory(c)
+	fullPath := filepath.Join(config.UserDataDir(c.App.ExtraInfo()["configDir"]), hostDir, postsFile)
+	fileutils.RemoveLine(fullPath, id)
 }
 
 func GetPosts(c *cli.Context) *[]Post {
-	lines := fileutils.ReadData(filepath.Join(config.UserDataDir(c.App.ExtraInfo()["configDir"]), postsFile))
+	hostDir, _ := config.HostDirectory(c)
+	lines := fileutils.ReadData(filepath.Join(config.UserDataDir(c.App.ExtraInfo()["configDir"]), hostDir, postsFile))
 
 	posts := []Post{}
 

@@ -15,7 +15,10 @@ import (
 
 func CmdPost(c *cli.Context) error {
 	_, err := api.HandlePost(api.ReadStdIn(), c)
-	return err
+	if err != nil {
+		cli.NewExitError(fmt.Sprintf("Could not post: %v", err), 1)
+	}
+	return nil
 }
 
 func CmdNew(c *cli.Context) error {
@@ -293,7 +296,7 @@ func CmdClaim(c *cli.Context) error {
 			log.Info(c, "%sOK", status)
 			okCount++
 			// only delete local if successful
-			api.RemovePost(c.App.ExtraInfo()["configDir"], id)
+			api.RemovePost(c, id)
 		}
 	}
 	log.Info(c, "%d claimed, %d failed", okCount, errCount)

@@ -126,14 +126,22 @@ func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) (
 		return nil, fmt.Errorf("Unable to post: %v", err)
 	}
 
+	cfg, err := config.LoadConfig(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
+	if err != nil {
+		return nil, fmt.Errorf("Couldn't check for config file: %v", err)
+	}
 	var url string
 	if p.Collection != nil {
 		url = p.Collection.URL + p.Slug
 	} else {
-		if tor {
-			url = config.TorBaseURL
+		if c.GlobalString("host") != "" {
+			url = c.GlobalString("host")
+		} else if cfg.Default.Host != "" {
+			url = cfg.Default.Host
 		} else if config.IsDev() {
 			url = config.DevBaseURL
+		} else if tor {
+			url = config.TorBaseURL
 		} else {
 			url = config.WriteasBaseURL
 		}
@@ -242,7 +250,7 @@ func DoDelete(c *cli.Context, friendlyID, token string, tor bool) error {
 	} else {
 		log.Info(c, "Post deleted.")
 	}
-	RemovePost(c.App.ExtraInfo()["configDir"], friendlyID)
+	RemovePost(c, friendlyID)
 
 	return nil
 }
