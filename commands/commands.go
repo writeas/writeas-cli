@@ -4,13 +4,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"text/tabwriter"
 
 	"github.com/howeyc/gopass"
 	"github.com/writeas/writeas-cli/api"
 	"github.com/writeas/writeas-cli/config"
-	"github.com/writeas/writeas-cli/fileutils"
 	"github.com/writeas/writeas-cli/log"
 	cli "gopkg.in/urfave/cli.v1"
 )
@@ -60,20 +58,10 @@ func CmdPublish(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	p, err := api.HandlePost(content, c)
-	if err != nil {
-		return err
-	}
+	_, err = api.HandlePost(content, c)
 
-	// Save post to posts folder
-	cfg, err := config.LoadConfig(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
-	if cfg.Posts.Directory != "" {
-		err = api.WritePost(cfg.Posts.Directory, p)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+	// TODO: write local file if directory is set
+	return err
 }
 
 func CmdDelete(c *cli.Context) error {
@@ -108,16 +96,7 @@ func CmdDelete(c *cli.Context) error {
 		return cli.NewExitError(fmt.Sprintf("Couldn't delete remote copy: %v", err), 1)
 	}
 
-	// Delete local file, if necessary
-	cfg, err := config.LoadConfig(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
-	if cfg.Posts.Directory != "" {
-		// TODO: handle deleting blog posts
-		err = fileutils.DeleteFile(filepath.Join(cfg.Posts.Directory, friendlyID+api.PostFileExt))
-		if err != nil {
-			return cli.NewExitError(fmt.Sprintf("Couldn't delete local copy: %v", err), 1)
-		}
-	}
-
+	// TODO: Delete local file, if necessary
 	return nil
 }
 
