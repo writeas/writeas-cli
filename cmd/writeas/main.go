@@ -152,10 +152,9 @@ func main() {
 			Action: commands.CmdAdd,
 		},
 		{
-			Name:        "posts",
-			Usage:       "List posts",
-			Description: `List all local posts.`,
-			Action:      commands.CmdList,
+			Name:   "list",
+			Usage:  "List local posts",
+			Action: commands.CmdList,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "id",
