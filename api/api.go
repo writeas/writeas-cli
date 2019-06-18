@@ -5,11 +5,11 @@ import (
 	"path/filepath"
 
 	"github.com/atotto/clipboard"
-	writeas "github.com/writeas/go-writeas/v2"
 	"github.com/writeas/web-core/posts"
 	"github.com/writeas/writeas-cli/config"
 	"github.com/writeas/writeas-cli/fileutils"
 	"github.com/writeas/writeas-cli/log"
+	writeas "go.code.as/writeas.v2"
 	cli "gopkg.in/urfave/cli.v1"
 )
 
