@@ -161,6 +161,10 @@ func main() {
 					Usage: "Show list with post IDs (default)",
 				},
 				cli.BoolFlag{
+					Name:  "d",
+					Usage: "Show detailed view of posts",
+				},
+				cli.BoolFlag{
 					Name:  "md",
 					Usage: "Use with --url to return URLs with Markdown enabled",
 				},
