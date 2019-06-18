@@ -1,17 +1,18 @@
-package main
+package api
 
 import (
-	"code.as/core/socks"
 	"fmt"
 	"net/http"
+
+	"code.as/core/socks"
 )
 
 var (
-	torPort = 9150
+	TorPort = 9150
 )
 
 func torClient() *http.Client {
-	dialSocksProxy := socks.DialSocksProxy(socks.SOCKS5, fmt.Sprintf("127.0.0.1:%d", torPort))
+	dialSocksProxy := socks.DialSocksProxy(socks.SOCKS5, fmt.Sprintf("127.0.0.1:%d", TorPort))
 	transport := &http.Transport{Dial: dialSocksProxy}
 	return &http.Client{Transport: transport}
 }

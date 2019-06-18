@@ -1,9 +1,10 @@
-package main
+package log
 
 import (
 	"fmt"
-	"gopkg.in/urfave/cli.v1"
 	"os"
+
+	cli "gopkg.in/urfave/cli.v1"
 )
 
 // Info logs general diagnostic messages, shown only when the -v or --verbose
@@ -20,7 +21,7 @@ func InfolnQuit(s string, p ...interface{}) {
 	os.Exit(0)
 }
 
-// Error
+// Errorln logs the message to stderr
 func Errorln(s string, p ...interface{}) {
 	fmt.Fprintf(os.Stderr, s+"\n", p...)
 }

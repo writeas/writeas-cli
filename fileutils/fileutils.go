@@ -9,7 +9,7 @@ import (
 
 // Exists returns whether or not the given file exists
 func Exists(p string) bool {
-	if _, err := os.Stat(p); err == nil {
+	if _, err := os.Stat(p); !os.IsNotExist(err) {
 		return true
 	}
 	return false
@@ -104,4 +104,8 @@ func FindLine(p, startsWith string) string {
 	}
 
 	return ""
+}
+
+func DeleteFile(p string) error {
+	return os.Remove(p)
 }

@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"fmt"
@@ -28,9 +28,9 @@ var postFontMap = map[string]postFont{
 	"code":      PostFontCode,
 }
 
-func getFont(code bool, font string) string {
+func GetFont(code bool, font string) string {
 	if code {
-		if font != "" && font != defaultFont {
+		if font != "" && font != DefaultFont {
 			fmt.Printf("A non-default font '%s' and --code flag given. 'code' type takes precedence.\n", font)
 		}
 		return "code"
@@ -41,6 +41,6 @@ func getFont(code bool, font string) string {
 		return string(f)
 	}
 
-	fmt.Printf("Font '%s' invalid. Using default '%s'\n", font, defaultFont)
-	return string(defaultFont)
+	fmt.Printf("Font '%s' invalid. Using default '%s'\n", font, DefaultFont)
+	return string(DefaultFont)
 }

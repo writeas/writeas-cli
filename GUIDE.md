@@ -4,8 +4,6 @@ The Write.as Command-Line Interface (CLI) is a cross-platform tool for publishin
 
 Write.as is a text-publishing service that protects your privacy. There's no sign up required to publish, but if you do sign up, you can access posts across devices and compile collections of them in what most people would call a "blog".
 
-**Note** accounts are not supported in CLI v1.0. They'll be available in [v2.0](https://github.com/writeas/writeas-cli/milestone/4).
-
 ## Uses
 
 These are a few common uses for `writeas`. If you get stuck or want to know more, run `writeas [command] --help`. If you still have questions, [ask us](https://write.as/contact).
@@ -13,26 +11,35 @@ These are a few common uses for `writeas`. If you get stuck or want to know more
 ### Overview
 
 ```
-writeas [global options] command [command options] [arguments...]
+   writeas [global options] command [command options] [arguments...]
 
 COMMANDS:
-   post     Alias for default action: create post from stdin
-   new      Compose a new post from the command-line and publish
-   delete   Delete a post
-   update   Update (overwrite) a post
-   get      Read a raw post
-   add      Add an existing post locally
-   list     List local posts
-   help, h  Shows a list of commands or help for one command
-   
+     post     Alias for default action: create post from stdin
+     new      Compose a new post from the command-line and publish
+     publish  Publish a file to Write.as
+     delete   Delete a post
+     update   Update (overwrite) a post
+     get      Read a raw post
+     add      Add an existing post locally
+     posts    List all of your posts
+     claim    Claim local unsynced posts
+     blogs    List blogs
+     auth     Authenticate with Write.as
+     logout   Log out of Write.as
+     help, h  Shows a list of commands or help for one command
+
 GLOBAL OPTIONS:
-   --tor, -t		 Perform action on Tor hidden service
-   --tor-port "9150" Use a different port to connect to Tor
-   --code            Specifies this post is code
-   --verbose, -v     Make the operation more talkative
-   --font value      Sets post font to given value (default: "mono")
-   --help, -h		 show help
-   --version, -v	 print the version
+   -c value, -b value  Optional blog to post to
+   --tor, -t           Perform action on Tor hidden service
+   --tor-port value    Use a different port to connect to Tor (default: 9150)
+   --code              Specifies this post is code
+   --md                Returns post URL with Markdown enabled
+   --verbose, -v       Make the operation more talkative
+   --font value        Sets post font to given value (default: "mono")
+   --lang value        Sets post language to given ISO 639-1 language code
+   --user-agent value  Sets the User-Agent for API requests
+   --help, -h          show help
+   --version, -V       print the version
 ```
 
 #### Share something
@@ -41,7 +48,7 @@ By default, `writeas` creates a post with a `monospace` typeface that doesn't wo
 
 ```bash
 $ echo "Hello world!" | writeas
-https://write.as/aaaaaaaaaaaa
+https://write.as/aaaazzzzzzzza
 ```
 
 This is generally more useful for posting terminal output or code, like so (the `--code` flag turns on syntax highlighting):
@@ -55,19 +62,41 @@ Windows: `type writeas/cli.go | writeas.exe --code`
 This outputs any Write.as post with the given ID.
 
 ```bash
-$ writeas get aaaaaaaaaaaa
+$ writeas get aaaazzzzzzzza
 Hello world!
+```
+
+#### Authenticate
+
+This will authenticate with write.as and store the user access token locally, until you explicitly logout.
+```bash
+$ writeas auth username
+Password: ************
+```
+
+#### List all blogs
+
+This will output a list of the authenticated user's blogs.
+```bash
+$ writeas blogs
+Alias    Title
+user     An Example Blog
+dev      My Dev Log
 ```
 
 #### List all published posts
 
-This lists all posts you've published from your device.
+This lists all posts you've published from your device, as well as any published by the authenticated user.
 
 Pass the `--url` flag to show the list with full post URLs, and the `--md` flag to return URLs with Markdown enabled.
 
 ```bash
-$ writeas list
-aaaaaaaaaaaa
+$ writeas posts
+Local     ID             Token                             
+unsynced  aaaazzzzzzzza  dhuieoj23894jhf984hdfs9834hdf84j  
+
+Account   ID                Title                         
+synced    mmmmmmmm33333333  This is a post                
 ```
 
 #### Delete a post
@@ -75,7 +104,7 @@ aaaaaaaaaaaa
 This permanently deletes a post you own.
 
 ```bash
-$ writeas delete aaaaaaaaaaaa
+$ writeas delete aaaazzzzzzzza
 ```
 
 #### Update a post
@@ -83,7 +112,14 @@ $ writeas delete aaaaaaaaaaaa
 This completely overwrites an existing post you own.
 
 ```bash
-$ echo "See you later!" | writeas update aaaaaaaaaaaa
+$ echo "See you later!" | writeas update aaaazzzzzzzza
+```
+
+#### Claim a post
+
+This moves an unsynced local post to a draft on your account. You will need to authenticate first.
+```bash
+$ writeas claim aaaazzzzzzzza
 ```
 
 ### Composing posts
