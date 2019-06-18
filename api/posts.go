@@ -37,7 +37,6 @@ type RemotePost struct {
 	Slug,
 	Collection,
 	EditToken string
-	Synced  bool
 	Updated time.Time
 }
 
@@ -114,7 +113,6 @@ func GetUserPosts(c *cli.Context) ([]RemotePost, error) {
 			Title:   p.Title,
 			Excerpt: getExcerpt(p.Content),
 			Slug:    p.Slug,
-			Synced:  p.Slug != "",
 			Updated: p.Updated,
 		}
 		if p.Collection != nil {
