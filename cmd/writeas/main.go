@@ -171,8 +171,8 @@ func main() {
 				},
 			},
 		}, {
-			Name:   "blogs",
-			Usage:  "List blogs",
+			Name:   "colls",
+			Usage:  "List collections",
 			Action: commands.CmdCollections,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
