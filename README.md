@@ -4,6 +4,8 @@ writeas-cli
 
 Command line interface for [Write.as](https://write.as). Works on Windows, macOS, and Linux.
 
+**NOTE: the `master` branch is currently unstable while we prepare the v2.0 release! You should install via official release channel, or build from the `v1.2` tag.**
+
 ## Features
 
 * Publish anonymously to Write.as
