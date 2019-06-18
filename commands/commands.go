@@ -262,7 +262,7 @@ func CmdCollections(c *cli.Context) error {
 		return cli.NewExitError(fmt.Sprintf("Couldn't get collections for user %s: %v", u.User.Username, err), 1)
 	}
 	urls := c.Bool("url")
-	tw := tabwriter.NewWriter(os.Stdout, 8, 0, 2, ' ', tabwriter.TabIndent)
+	tw := tabwriter.NewWriter(os.Stdout, 8, 2, 0, ' ', tabwriter.TabIndent)
 	detail := "Title"
 	if urls {
 		detail = "URL"
