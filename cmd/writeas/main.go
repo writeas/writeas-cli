@@ -153,7 +153,7 @@ func main() {
 		{
 			Name:        "posts",
 			Usage:       "List all of your posts",
-			Description: "This will list only local posts when not currently authenticated. To list remote posts as well, first run: writeas auth <username>.",
+			Description: "This will list only local posts.",
 			Action:      commands.CmdListPosts,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
@@ -167,6 +167,10 @@ func main() {
 				cli.BoolFlag{
 					Name:  "url",
 					Usage: "Show list with URLs",
+				},
+				cli.BoolFlag{
+					Name:  "verbose, v",
+					Usage: "Show verbose post listing, including Edit Tokens",
 				},
 			},
 		}, {
