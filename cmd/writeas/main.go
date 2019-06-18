@@ -179,11 +179,6 @@ func main() {
 					Usage: "Show list with URLs",
 				},
 			},
-		}, {
-			Name:        "claim",
-			Usage:       "Claim local unsynced posts",
-			Action:      commands.CmdClaim,
-			Description: "This will claim any unsynced posts local to this machine. To see which posts these are run: writeas posts.",
 		},
 		{
 			Name:   "auth",
