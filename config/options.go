@@ -8,7 +8,7 @@ import (
 
 // Application constants.
 const (
-	Version          = "2.0"
+	Version          = "1.99-dev"
 	defaultUserAgent = "writeas-cli v" + Version
 	// Defaults for posts on Write.as.
 	DefaultFont    = PostFontMono
