@@ -8,7 +8,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/writeas/writeas-cli/config"
 	"github.com/writeas/writeas-cli/fileutils"
@@ -26,18 +25,6 @@ const (
 type Post struct {
 	ID        string
 	EditToken string
-}
-
-// RemotePost holds addition information about published
-// posts
-type RemotePost struct {
-	Post
-	Title,
-	Excerpt,
-	Slug,
-	Collection,
-	EditToken string
-	Updated time.Time
 }
 
 func AddPost(c *cli.Context, id, token string) error {
@@ -91,55 +78,6 @@ func GetPosts(c *cli.Context) *[]Post {
 	}
 
 	return &posts
-}
-
-func GetUserPosts(c *cli.Context) ([]RemotePost, error) {
-	waposts, err := DoFetchPosts(c)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(waposts) == 0 {
-		return nil, nil
-	}
-
-	posts := []RemotePost{}
-	for _, p := range waposts {
-		post := RemotePost{
-			Post: Post{
-				ID:        p.ID,
-				EditToken: p.Token,
-			},
-			Title:   p.Title,
-			Excerpt: getExcerpt(p.Content),
-			Slug:    p.Slug,
-			Updated: p.Updated,
-		}
-		if p.Collection != nil {
-			post.Collection = p.Collection.Alias
-		}
-		posts = append(posts, post)
-	}
-
-	return posts, nil
-}
-
-// getExcerpt takes in a content string and returns
-// a concatenated version. limited to no more than
-// two lines of 80 chars each. delimited by '...'
-func getExcerpt(input string) string {
-	length := len(input)
-
-	if length <= 80 {
-		return input
-	}
-
-	if length <= 160 {
-		return input[:80] + "\n" + input[80:]
-	}
-
-	excerpt := input[:157]
-	return excerpt[:80] + "\n" + excerpt[80:] + "..."
 }
 
 func ComposeNewPost() (string, *[]byte) {
