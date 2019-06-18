@@ -132,42 +132,14 @@ func getExcerpt(input string) string {
 
 	if length <= 80 {
 		return input
-	} else if length <= 160 {
-		ln1, idx := trimToLength(input, 80)
-		if idx == -1 {
-			idx = 80
-		}
-		ln2, _ := trimToLength(input[idx:], 80)
-		return ln1 + "\n" + ln2
-	} else {
-		excerpt := input[:157]
-		ln1, idx := trimToLength(excerpt, 80)
-		if idx == -1 {
-			idx = 80
-		}
-		ln2, _ := trimToLength(excerpt[idx:], 80)
-		return ln1 + "\n" + ln2 + "..."
-	}
-}
-
-func trimToLength(in string, l int) (string, int) {
-	c := []rune(in)
-	spaceIdx := -1
-	length := len(c)
-	if length <= l {
-		return in, spaceIdx
 	}
 
-	for i := l; i > 0; i-- {
-		if c[i] == ' ' {
-			spaceIdx = i
-			break
-		}
+	if length <= 160 {
+		return input[:80] + "\n" + input[80:]
 	}
-	if spaceIdx > -1 {
-		c = c[:spaceIdx]
-	}
-	return string(c), spaceIdx
+
+	excerpt := input[:157]
+	return excerpt[:80] + "\n" + excerpt[80:] + "..."
 }
 
 func ComposeNewPost() (string, *[]byte) {
