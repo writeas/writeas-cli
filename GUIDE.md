@@ -4,6 +4,8 @@ The Write.as Command-Line Interface (CLI) is a cross-platform tool for publishin
 
 Write.as is a text-publishing service that protects your privacy. There's no sign up required to publish, but if you do sign up, you can access posts across devices and compile collections of them in what most people would call a "blog".
 
+**Note** accounts are not supported in CLI v1.0. They'll be available in [v2.0](https://github.com/writeas/writeas-cli/milestone/4).
+
 ## Uses
 
 These are a few common uses for `writeas`. If you get stuck or want to know more, run `writeas [command] --help`. If you still have questions, [ask us](https://write.as/contact).
@@ -22,7 +24,6 @@ COMMANDS:
      get      Read a raw post
      add      Add an existing post locally
      posts    List all of your posts
-     claim    Claim local unsynced posts
      blogs    List blogs
      auth     Authenticate with Write.as
      logout   Log out of Write.as
@@ -66,24 +67,6 @@ $ writeas get aaaazzzzzzzza
 Hello world!
 ```
 
-#### Authenticate
-
-This will authenticate with write.as and store the user access token locally, until you explicitly logout.
-```bash
-$ writeas auth username
-Password: ************
-```
-
-#### List all blogs
-
-This will output a list of the authenticated user's blogs.
-```bash
-$ writeas blogs
-Alias    Title
-user     An Example Blog
-dev      My Dev Log
-```
-
 #### List all published posts
 
 This lists all posts you've published from your device, as well as any published by the authenticated user.
@@ -113,13 +96,6 @@ This completely overwrites an existing post you own.
 
 ```bash
 $ echo "See you later!" | writeas update aaaazzzzzzzza
-```
-
-#### Claim a post
-
-This moves an unsynced local post to a draft on your account. You will need to authenticate first.
-```bash
-$ writeas claim aaaazzzzzzzza
 ```
 
 ### Composing posts
