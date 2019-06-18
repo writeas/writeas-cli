@@ -13,31 +13,26 @@ These are a few common uses for `writeas`. If you get stuck or want to know more
 ### Overview
 
 ```
-   writeas [global options] command [command options] [arguments...]
+writeas [global options] command [command options] [arguments...]
 
 COMMANDS:
-     post     Alias for default action: create post from stdin
-     new      Compose a new post from the command-line and publish
-     publish  Publish a file to Write.as
-     delete   Delete a post
-     update   Update (overwrite) a post
-     get      Read a raw post
-     add      Add an existing post locally
-     posts    List all of your posts
-     fetch    Fetch authenticated user's Write.as posts
-     auth     Authenticate with Write.as
-     logout   Log out of Write.as
-     help, h  Shows a list of commands or help for one command
+   post     Alias for default action: create post from stdin
+   new      Compose a new post from the command-line and publish
+   publish  Publish a file to Write.as
+   delete   Delete a post
+   update   Update (overwrite) a post
+   get      Read a raw post
+   add      Add an existing post locally
+   list     List local posts
+   auth     Authenticate with Write.as
+   help, h  Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   -c value, -b value  Optional blog to post to
    --tor, -t           Perform action on Tor hidden service
    --tor-port value    Use a different port to connect to Tor (default: 9150)
    --code              Specifies this post is code
-   --md                Returns post URL with Markdown enabled
    --verbose, -v       Make the operation more talkative
    --font value        Sets post font to given value (default: "mono")
-   --lang value        Sets post language to given ISO 639-1 language code
    --user-agent value  Sets the User-Agent for API requests
    --help, -h          show help
    --version, -V       print the version
@@ -49,7 +44,7 @@ By default, `writeas` creates a post with a `monospace` typeface that doesn't wo
 
 ```bash
 $ echo "Hello world!" | writeas
-https://write.as/aaaazzzzzzzza
+https://write.as/aaaaaaaaaaaa
 ```
 
 This is generally more useful for posting terminal output or code, like so (the `--code` flag turns on syntax highlighting):
@@ -63,23 +58,19 @@ Windows: `type writeas/cli.go | writeas.exe --code`
 This outputs any Write.as post with the given ID.
 
 ```bash
-$ writeas get aaaazzzzzzzza
+$ writeas get aaaaaaaaaaaa
 Hello world!
 ```
 
 #### List all published posts
 
-This lists all posts you've published from your device, as well as any published by the authenticated user.
+This lists all posts you've published from your device.
 
 Pass the `--url` flag to show the list with full post URLs, and the `--md` flag to return URLs with Markdown enabled.
 
 ```bash
-$ writeas posts
-Local     ID             Token                             
-unsynced  aaaazzzzzzzza  dhuieoj23894jhf984hdfs9834hdf84j  
-
-Account   ID                Title                         
-synced    mmmmmmmm33333333  This is a post                
+$ writeas list
+aaaaaaaaaaaa
 ```
 
 #### Delete a post
@@ -87,7 +78,7 @@ synced    mmmmmmmm33333333  This is a post
 This permanently deletes a post you own.
 
 ```bash
-$ writeas delete aaaazzzzzzzza
+$ writeas delete aaaaaaaaaaaa
 ```
 
 #### Update a post
@@ -95,7 +86,7 @@ $ writeas delete aaaazzzzzzzza
 This completely overwrites an existing post you own.
 
 ```bash
-$ echo "See you later!" | writeas update aaaazzzzzzzza
+$ echo "See you later!" | writeas update aaaaaaaaaaaa
 ```
 
 ### Composing posts
@@ -117,18 +108,3 @@ Customize your post's appearance with the `--font` flag:
 Put it all together, e.g. publish with a sans-serif font: `writeas new --font sans`
 
 If you're publishing Markdown, supply the `--md` flag to get a URL back that will render Markdown, e.g.: `writeas new --font sans --md`
-
-### Fetch posts
-
-This pulls down local copies of the authenticated user's posts.
-
-You will be prompted for a storage location the first time, if you have not already configured one.
-
-```bash
-$ writeas fetch
-Posts directory? [/home/username/present/directory]: /home/username/posts
-Created posts directory.
-Saved config.
-$ ls /home/username/posts
-blog/  aaaazzzzzzzza.txt
-```
