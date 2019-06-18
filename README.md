@@ -10,7 +10,7 @@ Command line interface for [Write.as](https://write.as). Works on Windows, macOS
 
 * Publish anonymously to Write.as
 * Authenticate with a Write.as account
-* A stable, easy back-end for your GUI app or desktop-based workflow
+* A stable, easy back-end for your [GUI app](https://write.as/apps/desktop) or desktop-based workflow
 * Compatible with our [Tor hidden service](http://writeas7pm7rcdqg.onion/)
 * Locally keeps track of any posts you make
 * Update and delete posts, anonymous and authenticated
