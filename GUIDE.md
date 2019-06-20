@@ -100,7 +100,8 @@ $ writeas posts -url
 https://write.as/aaaazzzzzzzza
 
 $ writeas posts -v
-aaaazzzzzzzza | dhuieoj23894jhf984hdfs9834hdf84j
+ID              Token
+aaaazzzzzzzza   dhuieoj23894jhf984hdfs9834hdf84j
 ```
 
 #### Delete a post
