@@ -15,6 +15,7 @@ const (
 	WriteasBaseURL = "https://write.as"
 	DevBaseURL     = "https://development.write.as"
 	TorBaseURL     = "http://writeas7pm7rcdqg.onion"
+	torPort        = 9150
 )
 
 func UserAgent(c *cli.Context) string {
@@ -27,6 +28,13 @@ func UserAgent(c *cli.Context) string {
 
 func IsTor(c *cli.Context) bool {
 	return c.Bool("tor") || c.Bool("t")
+}
+
+func TorPort(c *cli.Context) int {
+	if c.IsSet("tor-port") && c.Int("tor-port") != 0 {
+		return c.Int("tor-port")
+	}
+	return torPort
 }
 
 func Language(c *cli.Context, auto bool) string {
