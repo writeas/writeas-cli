@@ -14,13 +14,13 @@ import (
 )
 
 func CmdPost(c *cli.Context) error {
-	_, err := api.DoPost(c, api.ReadStdIn(), c.String("font"), false, c.Bool("code"))
 	if config.IsTor(c) {
 		log.Info(c, "Publishing via hidden service...")
 	} else {
 		log.Info(c, "Publishing...")
 	}
 
+	_, err := api.DoPost(c, api.ReadStdIn(), c.String("font"), false, c.Bool("code"))
 	return err
 }
 
