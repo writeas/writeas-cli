@@ -16,9 +16,9 @@ import (
 func CmdPost(c *cli.Context) error {
 	_, err := api.DoPost(c, api.ReadStdIn(), c.String("font"), false, c.Bool("code"))
 	if config.IsTor(c) {
-		log.Info(c, "Posted to hidden service...")
+		log.Info(c, "Publishing via hidden service...")
 	} else {
-		log.Info(c, "Posted...")
+		log.Info(c, "Publishing...")
 	}
 
 	return err
@@ -42,9 +42,9 @@ func CmdNew(c *cli.Context) error {
 	}
 
 	if config.IsTor(c) {
-		log.Info(c, "Posting to hidden service...")
+		log.Info(c, "Publishing via hidden service...")
 	} else {
-		log.Info(c, "Posting...")
+		log.Info(c, "Publishing...")
 	}
 
 	_, err := api.DoPost(c, *p, c.String("font"), false, c.Bool("code"))
@@ -72,7 +72,7 @@ func CmdPublish(c *cli.Context) error {
 	}
 
 	if config.IsTor(c) {
-		log.Info(c, "Publishing to hidden service...")
+		log.Info(c, "Publishing via hidden service...")
 	} else {
 		log.Info(c, "Publishing...")
 	}
@@ -270,9 +270,10 @@ func CmdClaim(c *cli.Context) error {
 		return nil
 	}
 
-	log.Info(c, "Claiming %d post(s) for %s...", len(*localPosts), u.User.Username)
 	if config.IsTor(c) {
-		log.Info(c, "...via hidden service...")
+		log.Info(c, "Claiming %d post(s) for %s via hidden service...", len(*localPosts), u.User.Username)
+	} else {
+		log.Info(c, "Claiming %d post(s) for %s...", len(*localPosts), u.User.Username)
 	}
 
 	results, err := api.ClaimPosts(c, localPosts)
@@ -330,7 +331,7 @@ func CmdAuth(c *cli.Context) error {
 	}
 
 	if config.IsTor(c) {
-		log.Info(c, "Logging in to hidden service...")
+		log.Info(c, "Logging in via hidden service...")
 	} else {
 		log.Info(c, "Logging in...")
 	}
@@ -344,7 +345,7 @@ func CmdAuth(c *cli.Context) error {
 
 func CmdLogOut(c *cli.Context) error {
 	if config.IsTor(c) {
-		log.Info(c, "Logging out of hidden service...")
+		log.Info(c, "Logging out via hidden service...")
 	} else {
 		log.Info(c, "Logging out...")
 	}
