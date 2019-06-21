@@ -21,7 +21,10 @@ func CmdPost(c *cli.Context) error {
 	}
 
 	_, err := api.DoPost(c, api.ReadStdIn(), c.String("font"), false, c.Bool("code"))
-	return err
+	if err != nil {
+		return cli.NewExitError(err.Error(), 1)
+	}
+	return nil
 }
 
 func CmdNew(c *cli.Context) error {
@@ -77,9 +80,12 @@ func CmdPublish(c *cli.Context) error {
 		log.Info(c, "Publishing...")
 	}
 	_, err = api.DoPost(c, content, c.String("font"), false, c.Bool("code"))
+	if err != nil {
+		return cli.NewExitError(err.Error(), 1)
+	}
 
 	// TODO: write local file if directory is set
-	return err
+	return nil
 }
 
 func CmdDelete(c *cli.Context) error {
@@ -139,8 +145,11 @@ func CmdUpdate(c *cli.Context) error {
 	} else {
 		log.Info(c, "Updating...")
 	}
-
-	return api.DoUpdate(c, fullPost, friendlyID, token, c.String("font"), c.Bool("code"))
+	err := api.DoUpdate(c, fullPost, friendlyID, token, c.String("font"), c.Bool("code"))
+	if err != nil {
+		return cli.NewExitError(fmt.Sprintf("%v", err), 1)
+	}
+	return nil
 }
 
 func CmdGet(c *cli.Context) error {
@@ -155,7 +164,11 @@ func CmdGet(c *cli.Context) error {
 		log.Info(c, "Getting...")
 	}
 
-	return api.DoFetch(c, friendlyID)
+	err := api.DoFetch(c, friendlyID)
+	if err != nil {
+		return cli.NewExitError(fmt.Sprintf("%v", err), 1)
+	}
+	return nil
 }
 
 func CmdAdd(c *cli.Context) error {
@@ -166,7 +179,10 @@ func CmdAdd(c *cli.Context) error {
 	}
 
 	err := api.AddPost(c, friendlyID, token)
-	return err
+	if err != nil {
+		return cli.NewExitError(fmt.Sprintf("%v", err), 1)
+	}
+	return nil
 }
 
 func CmdListPosts(c *cli.Context) error {
@@ -349,5 +365,9 @@ func CmdLogOut(c *cli.Context) error {
 	} else {
 		log.Info(c, "Logging out...")
 	}
-	return api.DoLogOut(c)
+	err := api.DoLogOut(c)
+	if err != nil {
+		return cli.NewExitError(fmt.Sprintf("error logging out: %v", err), 1)
+	}
+	return nil
 }
