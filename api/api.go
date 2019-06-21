@@ -13,26 +13,10 @@ import (
 	cli "gopkg.in/urfave/cli.v1"
 )
 
-func client(userAgent string, tor bool) *writeas.Client {
-	var client *writeas.Client
-	if tor {
-		client = writeas.NewTorClient(TorPort)
-	} else {
-		if config.IsDev() {
-			client = writeas.NewDevClient()
-		} else {
-			client = writeas.NewClient()
-		}
-	}
-	client.UserAgent = userAgent
-
-	return client
-}
-
-func NewClient(c *cli.Context, authRequired bool) (*writeas.Client, error) {
+func newClient(c *cli.Context, authRequired bool) (*writeas.Client, error) {
 	var client *writeas.Client
 	if config.IsTor(c) {
-		client = writeas.NewTorClient(TorPort)
+		client = writeas.NewTorClient(config.TorPort(c))
 	} else {
 		if config.IsDev() {
 			client = writeas.NewDevClient()
@@ -54,8 +38,11 @@ func NewClient(c *cli.Context, authRequired bool) (*writeas.Client, error) {
 
 // DoFetch retrieves the Write.as post with the given friendlyID,
 // optionally via the Tor hidden service.
-func DoFetch(friendlyID, ua string, tor bool) error {
-	cl := client(ua, tor)
+func DoFetch(c *cli.Context, friendlyID string) error {
+	cl, err := newClient(c, false)
+	if err != nil {
+		return err
+	}
 
 	p, err := cl.GetPost(friendlyID)
 	if err != nil {
@@ -72,9 +59,9 @@ func DoFetch(friendlyID, ua string, tor bool) error {
 // DoFetchPosts retrieves all remote posts for the
 // authenticated user
 func DoFetchPosts(c *cli.Context) ([]writeas.Post, error) {
-	cl, err := NewClient(c, true)
+	cl, err := newClient(c, true)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Unable to create client: %v", err)
 	}
 
 	posts, err := cl.GetUserPosts()
@@ -87,8 +74,11 @@ func DoFetchPosts(c *cli.Context) ([]writeas.Post, error) {
 
 // DoPost creates a Write.as post, returning an error if it was
 // unsuccessful.
-func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) (*writeas.Post, error) {
-	cl, _ := NewClient(c, false)
+func DoPost(c *cli.Context, post []byte, font string, encrypt, code bool) (*writeas.Post, error) {
+	cl, err := newClient(c, false)
+	if err != nil {
+		return nil, fmt.Errorf("Unable to create client: %v", err)
+	}
 
 	pp := &writeas.PostParams{
 		Font:       config.GetFont(code, font),
@@ -107,7 +97,7 @@ func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) (
 	if p.Collection != nil {
 		url = p.Collection.URL + p.Slug
 	} else {
-		if tor {
+		if config.IsTor(c) {
 			url = config.TorBaseURL
 		} else if config.IsDev() {
 			url = config.DevBaseURL
@@ -143,10 +133,10 @@ func DoPost(c *cli.Context, post []byte, font string, encrypt, tor, code bool) (
 // DoFetchCollections retrieves a list of the currently logged in users
 // collections.
 func DoFetchCollections(c *cli.Context) ([]RemoteColl, error) {
-	cl, err := NewClient(c, true)
+	cl, err := newClient(c, true)
 	if err != nil {
 		if config.Debug() {
-			log.ErrorlnQuit("could not create new client: %v", err)
+			log.ErrorlnQuit("could not create client: %v", err)
 		}
 		return nil, fmt.Errorf("Couldn't create new client")
 	}
@@ -156,7 +146,7 @@ func DoFetchCollections(c *cli.Context) ([]RemoteColl, error) {
 		if config.Debug() {
 			log.ErrorlnQuit("failed fetching user collections: %v", err)
 		}
-		return nil, fmt.Errorf("Couldn't get user collections")
+		return nil, fmt.Errorf("Couldn't get user blogs")
 	}
 
 	out := make([]RemoteColl, len(*colls))
@@ -174,8 +164,11 @@ func DoFetchCollections(c *cli.Context) ([]RemoteColl, error) {
 }
 
 // DoUpdate updates the given post on Write.as.
-func DoUpdate(c *cli.Context, post []byte, friendlyID, token, font string, tor, code bool) error {
-	cl, _ := NewClient(c, false)
+func DoUpdate(c *cli.Context, post []byte, friendlyID, token, font string, code bool) error {
+	cl, err := newClient(c, false)
+	if err != nil {
+		return fmt.Errorf("Unable to create client: %v", err)
+	}
 
 	params := writeas.PostParams{}
 	params.Title, params.Content = posts.ExtractTitle(string(post))
@@ -186,27 +179,24 @@ func DoUpdate(c *cli.Context, post []byte, friendlyID, token, font string, tor, 
 		params.Font = config.GetFont(code, font)
 	}
 
-	_, err := cl.UpdatePost(friendlyID, token, &params)
+	_, err = cl.UpdatePost(friendlyID, token, &params)
 	if err != nil {
 		if config.Debug() {
 			log.ErrorlnQuit("Problem updating: %v", err)
 		}
 		return fmt.Errorf("Post doesn't exist, or bad edit token given.")
 	}
-
-	if tor {
-		log.Info(c, "Post updated via hidden service.")
-	} else {
-		log.Info(c, "Post updated.")
-	}
 	return nil
 }
 
 // DoDelete deletes the given post on Write.as, and removes any local references
-func DoDelete(c *cli.Context, friendlyID, token string, tor bool) error {
-	cl, _ := NewClient(c, false)
+func DoDelete(c *cli.Context, friendlyID, token string) error {
+	cl, err := newClient(c, false)
+	if err != nil {
+		return fmt.Errorf("Unable to create client: %v", err)
+	}
 
-	err := cl.DeletePost(friendlyID, token)
+	err = cl.DeletePost(friendlyID, token)
 	if err != nil {
 		if config.Debug() {
 			log.ErrorlnQuit("Problem deleting: %v", err)
@@ -214,18 +204,16 @@ func DoDelete(c *cli.Context, friendlyID, token string, tor bool) error {
 		return fmt.Errorf("Post doesn't exist, or bad edit token given.")
 	}
 
-	if tor {
-		log.Info(c, "Post deleted from hidden service.")
-	} else {
-		log.Info(c, "Post deleted.")
-	}
 	RemovePost(c.App.ExtraInfo()["configDir"], friendlyID)
 
 	return nil
 }
 
 func DoLogIn(c *cli.Context, username, password string) error {
-	cl := client(config.UserAgent(c), config.IsTor(c))
+	cl, err := newClient(c, false)
+	if err != nil {
+		return fmt.Errorf("Unable to create client: %v", err)
+	}
 
 	u, err := cl.LogIn(username, password)
 	if err != nil {
@@ -244,9 +232,9 @@ func DoLogIn(c *cli.Context, username, password string) error {
 }
 
 func DoLogOut(c *cli.Context) error {
-	cl, err := NewClient(c, true)
+	cl, err := newClient(c, true)
 	if err != nil {
-		return err
+		return fmt.Errorf("Unable to create client: %v", err)
 	}
 
 	err = cl.LogOut()

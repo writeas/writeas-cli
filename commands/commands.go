@@ -14,8 +14,17 @@ import (
 )
 
 func CmdPost(c *cli.Context) error {
-	_, err := api.HandlePost(api.ReadStdIn(), c)
-	return err
+	if config.IsTor(c) {
+		log.Info(c, "Publishing via hidden service...")
+	} else {
+		log.Info(c, "Publishing...")
+	}
+
+	_, err := api.DoPost(c, api.ReadStdIn(), c.String("font"), false, c.Bool("code"))
+	if err != nil {
+		return cli.NewExitError(err.Error(), 1)
+	}
+	return nil
 }
 
 func CmdNew(c *cli.Context) error {
@@ -35,7 +44,13 @@ func CmdNew(c *cli.Context) error {
 		log.InfolnQuit("Empty post. Bye!")
 	}
 
-	_, err := api.HandlePost(*p, c)
+	if config.IsTor(c) {
+		log.Info(c, "Publishing via hidden service...")
+	} else {
+		log.Info(c, "Publishing...")
+	}
+
+	_, err := api.DoPost(c, *p, c.String("font"), false, c.Bool("code"))
 	if err != nil {
 		log.Errorln("Error posting: %s\n%s", err, config.MessageRetryCompose(fname))
 		return cli.NewExitError("", 1)
@@ -58,10 +73,19 @@ func CmdPublish(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	_, err = api.HandlePost(content, c)
+
+	if config.IsTor(c) {
+		log.Info(c, "Publishing via hidden service...")
+	} else {
+		log.Info(c, "Publishing...")
+	}
+	_, err = api.DoPost(c, content, c.String("font"), false, c.Bool("code"))
+	if err != nil {
+		return cli.NewExitError(err.Error(), 1)
+	}
 
 	// TODO: write local file if directory is set
-	return err
+	return nil
 }
 
 func CmdDelete(c *cli.Context) error {
@@ -81,17 +105,13 @@ func CmdDelete(c *cli.Context) error {
 		}
 	}
 
-	tor := config.IsTor(c)
-	if c.Int("tor-port") != 0 {
-		api.TorPort = c.Int("tor-port")
-	}
-	if tor {
+	if config.IsTor(c) {
 		log.Info(c, "Deleting via hidden service...")
 	} else {
 		log.Info(c, "Deleting...")
 	}
 
-	err := api.DoDelete(c, friendlyID, token, tor)
+	err := api.DoDelete(c, friendlyID, token)
 	if err != nil {
 		return cli.NewExitError(fmt.Sprintf("Couldn't delete remote copy: %v", err), 1)
 	}
@@ -120,17 +140,16 @@ func CmdUpdate(c *cli.Context) error {
 	// Read post body
 	fullPost := api.ReadStdIn()
 
-	tor := config.IsTor(c)
-	if c.Int("tor-port") != 0 {
-		api.TorPort = c.Int("tor-port")
-	}
-	if tor {
+	if config.IsTor(c) {
 		log.Info(c, "Updating via hidden service...")
 	} else {
 		log.Info(c, "Updating...")
 	}
-
-	return api.DoUpdate(c, fullPost, friendlyID, token, c.String("font"), tor, c.Bool("code"))
+	err := api.DoUpdate(c, fullPost, friendlyID, token, c.String("font"), c.Bool("code"))
+	if err != nil {
+		return cli.NewExitError(fmt.Sprintf("%v", err), 1)
+	}
+	return nil
 }
 
 func CmdGet(c *cli.Context) error {
@@ -139,17 +158,17 @@ func CmdGet(c *cli.Context) error {
 		return cli.NewExitError("usage: writeas get <postId>", 1)
 	}
 
-	tor := config.IsTor(c)
-	if c.Int("tor-port") != 0 {
-		api.TorPort = c.Int("tor-port")
-	}
-	if tor {
+	if config.IsTor(c) {
 		log.Info(c, "Getting via hidden service...")
 	} else {
 		log.Info(c, "Getting...")
 	}
 
-	return api.DoFetch(friendlyID, config.UserAgent(c), tor)
+	err := api.DoFetch(c, friendlyID)
+	if err != nil {
+		return cli.NewExitError(fmt.Sprintf("%v", err), 1)
+	}
+	return nil
 }
 
 func CmdAdd(c *cli.Context) error {
@@ -160,7 +179,10 @@ func CmdAdd(c *cli.Context) error {
 	}
 
 	err := api.AddPost(c, friendlyID, token)
-	return err
+	if err != nil {
+		return cli.NewExitError(fmt.Sprintf("%v", err), 1)
+	}
+	return nil
 }
 
 func CmdListPosts(c *cli.Context) error {
@@ -223,6 +245,11 @@ func CmdCollections(c *cli.Context) error {
 	if u == nil {
 		return cli.NewExitError("You must be authenticated to view collections.\nLog in first with: writeas auth <username>", 1)
 	}
+	if config.IsTor(c) {
+		log.Info(c, "Getting blogs via hidden service...")
+	} else {
+		log.Info(c, "Getting blogs...")
+	}
 	colls, err := api.DoFetchCollections(c)
 	if err != nil {
 		return cli.NewExitError(fmt.Sprintf("Couldn't get collections for user %s: %v", u.User.Username, err), 1)
@@ -259,7 +286,12 @@ func CmdClaim(c *cli.Context) error {
 		return nil
 	}
 
-	log.Info(c, "Claiming %d post(s) for %s...", len(*localPosts), u.User.Username)
+	if config.IsTor(c) {
+		log.Info(c, "Claiming %d post(s) for %s via hidden service...", len(*localPosts), u.User.Username)
+	} else {
+		log.Info(c, "Claiming %d post(s) for %s...", len(*localPosts), u.User.Username)
+	}
+
 	results, err := api.ClaimPosts(c, localPosts)
 	if err != nil {
 		return cli.NewExitError(fmt.Sprintf("Failed to claim posts: %v", err), 1)
@@ -313,6 +345,12 @@ func CmdAuth(c *cli.Context) error {
 	if len(pass) == 0 {
 		return cli.NewExitError("Please enter your password.", 1)
 	}
+
+	if config.IsTor(c) {
+		log.Info(c, "Logging in via hidden service...")
+	} else {
+		log.Info(c, "Logging in...")
+	}
 	err = api.DoLogIn(c, username, string(pass))
 	if err != nil {
 		return cli.NewExitError(fmt.Sprintf("error logging in: %v", err), 1)
@@ -322,5 +360,14 @@ func CmdAuth(c *cli.Context) error {
 }
 
 func CmdLogOut(c *cli.Context) error {
-	return api.DoLogOut(c)
+	if config.IsTor(c) {
+		log.Info(c, "Logging out via hidden service...")
+	} else {
+		log.Info(c, "Logging out...")
+	}
+	err := api.DoLogOut(c)
+	if err != nil {
+		return cli.NewExitError(fmt.Sprintf("error logging out: %v", err), 1)
+	}
+	return nil
 }

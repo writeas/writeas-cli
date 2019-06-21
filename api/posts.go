@@ -60,7 +60,7 @@ func AddPost(c *cli.Context, id, token string) error {
 // ClaimPost adds a local post to the authenticated user's account and deletes
 // the local reference
 func ClaimPosts(c *cli.Context, localPosts *[]Post) (*[]writeas.ClaimPostResult, error) {
-	cl, err := NewClient(c, true)
+	cl, err := newClient(c, true)
 	if err != nil {
 		return nil, err
 	}
@@ -258,20 +258,6 @@ func WritePost(postsDir string, p *writeas.Post) error {
 		txtFile = "# " + p.Title + "\n\n" + txtFile
 	}
 	return ioutil.WriteFile(filepath.Join(postsDir, collDir, postFilename), []byte(txtFile), 0644)
-}
-
-func HandlePost(fullPost []byte, c *cli.Context) (*writeas.Post, error) {
-	tor := config.IsTor(c)
-	if c.Int("tor-port") != 0 {
-		TorPort = c.Int("tor-port")
-	}
-	if tor {
-		log.Info(c, "Posting to hidden service...")
-	} else {
-		log.Info(c, "Posting...")
-	}
-
-	return DoPost(c, fullPost, c.String("font"), false, tor, c.Bool("code"))
 }
 
 func ReadStdIn() []byte {
