@@ -2,6 +2,7 @@ package config
 
 import (
 	"net/url"
+	"strings"
 
 	"github.com/cloudfoundry/jibber_jabber"
 	"github.com/writeas/writeas-cli/log"
@@ -36,6 +37,18 @@ func TorPort(c *cli.Context) int {
 		return c.Int("tor-port")
 	}
 	return torPort
+}
+
+func TorURL(c *cli.Context) string {
+	flagHost := c.String("host")
+	if flagHost != "" && strings.HasSuffix(flagHost, "onion") {
+		return flagHost
+	}
+	cfg, _ := LoadConfig(c.App.ExtraInfo()["configDir"])
+	if cfg != nil && cfg.Default.Host != "" && strings.HasSuffix(cfg.Default.Host, "onion") {
+		return cfg.Default.Host
+	}
+	return TorBaseURL
 }
 
 func Language(c *cli.Context, auto bool) string {

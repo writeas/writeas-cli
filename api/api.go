@@ -28,7 +28,7 @@ func newClient(c *cli.Context, authRequired bool) (*writeas.Client, error) {
 		clientConfig.URL = config.WriteasBaseURL + "/api"
 	}
 	if config.IsTor(c) {
-		clientConfig.URL = config.TorBaseURL
+		clientConfig.URL = config.TorURL(c)
 		clientConfig.TorPort = config.TorPort(c)
 	}
 
