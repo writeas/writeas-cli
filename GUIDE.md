@@ -45,7 +45,7 @@ GLOBAL OPTIONS:
    --version, -V           print the version
 ```
 
-> Note: the host and user flags are only available in `wf` the community edition
+> Note: the host and user flags are only available in `writefreely`.
 
 #### Share something
 
