@@ -156,7 +156,7 @@ func main() {
 		{
 			Name:        "posts",
 			Usage:       "List all of your posts",
-			Description: "This will list only local posts when not currently authenticated. To list remote posts as well, first run: writeas auth <username>.",
+			Description: "This will list only local posts.",
 			Action:      commands.CmdListPosts,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
@@ -171,12 +171,25 @@ func main() {
 					Name:  "url",
 					Usage: "Show list with URLs",
 				},
+				cli.BoolFlag{
+					Name:  "verbose, v",
+					Usage: "Show verbose post listing, including Edit Tokens",
+				},
 			},
 		}, {
 			Name:   "blogs",
 			Usage:  "List blogs",
 			Action: commands.CmdCollections,
 			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "tor, t",
+					Usage: "Authenticate via Tor hidden service",
+				},
+				cli.IntFlag{
+					Name:  "tor-port",
+					Usage: "Use a different port to connect to Tor",
+					Value: 9150,
+				},
 				cli.BoolFlag{
 					Name:  "url",
 					Usage: "Show list with URLs",
@@ -188,6 +201,15 @@ func main() {
 			Action:      commands.CmdClaim,
 			Description: "This will claim any unsynced posts local to this machine. To see which posts these are run: writeas posts.",
 			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "tor, t",
+					Usage: "Authenticate via Tor hidden service",
+				},
+				cli.IntFlag{
+					Name:  "tor-port",
+					Usage: "Use a different port to connect to Tor",
+					Value: 9150,
+				},
 				cli.BoolFlag{
 					Name:  "verbose, v",
 					Usage: "Make the operation more talkative",

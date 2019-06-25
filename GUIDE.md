@@ -89,19 +89,24 @@ user     An Example Blog
 dev      My Dev Log
 ```
 
-#### List all published posts
+#### List posts
 
-This lists all posts you've published from your device, as well as any published by the authenticated user.
+This lists all posts you've published from your device
 
 Pass the `--url` flag to show the list with full post URLs, and the `--md` flag to return URLs with Markdown enabled.
 
+To see post IDs with their Edit Tokens pass the `--v` flag.
+
 ```bash
 $ writeas posts
-Local     ID             Token                             
-unsynced  aaaazzzzzzzza  dhuieoj23894jhf984hdfs9834hdf84j  
+aaaazzzzzzzza
 
-Account   ID                Title                         
-synced    mmmmmmmm33333333  This is a post                
+$ writeas posts -url
+https://write.as/aaaazzzzzzzza
+
+$ writeas posts -v
+ID              Token
+aaaazzzzzzzza   dhuieoj23894jhf984hdfs9834hdf84j
 ```
 
 #### Delete a post

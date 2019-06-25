@@ -28,12 +28,12 @@ func CmdPull(c *cli.Context) error {
 		syncSetUp(c, cfg)
 	}
 
-	// Fetch posts
-	cl, err := NewClient(c, true)
+	cl, err := newClient(c, true)
 	if err != nil {
 		return err
 	}
 
+	// Fetch posts
 	posts, err := cl.GetUserPosts()
 	if err != nil {
 		return err
