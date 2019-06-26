@@ -165,6 +165,10 @@ func main() {
 					Usage: "Use with --url to return URLs with Markdown enabled",
 				},
 				cli.BoolFlag{
+					Name:  "tor, t",
+					Usage: "Get posts via Tor hidden service, if authenticated",
+				},
+				cli.BoolFlag{
 					Name:  "url",
 					Usage: "Show list with URLs",
 				},

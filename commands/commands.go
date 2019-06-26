@@ -192,6 +192,42 @@ func CmdListPosts(c *cli.Context) error {
 
 	posts := api.GetPosts(c)
 
+	u, _ := config.LoadUser(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
+	if u != nil {
+		if config.IsTor(c) {
+			log.Info(c, "Getting posts via hidden service...")
+		} else {
+			log.Info(c, "Getting posts...")
+		}
+		remotePosts, err := api.GetUserPosts(c, true)
+		if err != nil {
+			return cli.NewExitError(fmt.Sprintf("error getting posts: %v", err), 1)
+		}
+
+		if len(remotePosts) > 0 {
+			fmt.Println("Anonymous Posts")
+			if details {
+				identifier := "URL"
+				if ids || !urls {
+					identifier = "ID"
+				}
+				fmt.Println(identifier)
+			}
+		}
+		for _, p := range remotePosts {
+			identifier := getPostURL(c, p.ID)
+			if ids || !urls {
+				identifier = p.ID
+			}
+
+			fmt.Println(identifier)
+		}
+
+		if len(*posts) > 0 {
+			fmt.Printf("\nUnclaimed Posts\n")
+		}
+	}
+
 	if details {
 		var p api.Post
 		tw := tabwriter.NewWriter(os.Stdout, 10, 0, 2, ' ', tabwriter.TabIndent)

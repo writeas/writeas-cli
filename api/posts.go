@@ -112,7 +112,7 @@ func GetPosts(c *cli.Context) *[]Post {
 	return &posts
 }
 
-func GetUserPosts(c *cli.Context) ([]RemotePost, error) {
+func GetUserPosts(c *cli.Context, draftsOnly bool) ([]RemotePost, error) {
 	waposts, err := DoFetchPosts(c)
 	if err != nil {
 		return nil, err
@@ -124,6 +124,9 @@ func GetUserPosts(c *cli.Context) ([]RemotePost, error) {
 
 	posts := []RemotePost{}
 	for _, p := range waposts {
+		if draftsOnly && p.Collection != nil {
+			continue
+		}
 		post := RemotePost{
 			Post: Post{
 				ID:        p.ID,
