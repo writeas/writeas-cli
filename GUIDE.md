@@ -86,7 +86,7 @@ dev      My Dev Log
 
 #### List posts
 
-This lists all posts you've published from your device
+This lists all anonymous posts you've published. If authenticated, it will include posts on your account as well as any local / unclaimed posts.
 
 Pass the `--url` flag to show the list with full post URLs, and the `--md` flag to return URLs with Markdown enabled.
 
