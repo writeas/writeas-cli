@@ -4,8 +4,6 @@ writeas-cli
 
 Command line interface for [Write.as](https://write.as). Works on Windows, macOS, and Linux.
 
-**NOTE: the `master` branch is currently unstable while we prepare the v2.0 release! You should install via official release channel, or build from the `v1.2` tag.**
-
 ## Features
 
 * Publish anonymously to Write.as
@@ -26,10 +24,10 @@ The easiest way to get the CLI is to download a pre-built executable for your OS
 Get the latest version for your operating system as a standalone executable.
 
 **Windows**<br />
-Download the [64-bit](https://github.com/writeas/writeas-cli/releases/download/v1.2/writeas_1.2_windows_amd64.zip) or [32-bit](https://github.com/writeas/writeas-cli/releases/download/v1.2/writeas_1.2_windows_386.zip) executable and put it somewhere in your `%PATH%`.
+Download the [64-bit](https://github.com/writeas/writeas-cli/releases/download/v2.0.0/writeas_2.0.0_windows_amd64.zip) or [32-bit](https://github.com/writeas/writeas-cli/releases/download/v2.0.0/writeas_2.0.0_windows_386.zip) executable and put it somewhere in your `%PATH%`.
 
 **macOS**<br />
-Download the [64-bit](https://github.com/writeas/writeas-cli/releases/download/v1.2/writeas_1.2_darwin_amd64.tar.gz) executable and put it somewhere in your `$PATH`, like `/usr/local/bin`.
+Download the [64-bit](https://github.com/writeas/writeas-cli/releases/download/v2.0.0/writeas_2.0.0_darwin_amd64.tar.gz) executable and put it somewhere in your `$PATH`, like `/usr/local/bin`.
 
 **Debian-based Linux**<br />
 ```bash
@@ -39,7 +37,7 @@ sudo apt-get update && sudo apt-get install writeas-cli
 ```
 
 **Linux (other)**<br />
-Download the [64-bit](https://github.com/writeas/writeas-cli/releases/download/v1.2/writeas_1.2_linux_amd64.tar.gz) or [32-bit](https://github.com/writeas/writeas-cli/releases/download/v1.2/writeas_1.2_linux_386.tar.gz) executable and put it somewhere in your `$PATH`, like `/usr/local/bin`.
+Download the [64-bit](https://github.com/writeas/writeas-cli/releases/download/v2.0.0/writeas_2.0.0_linux_amd64.tar.gz) or [32-bit](https://github.com/writeas/writeas-cli/releases/download/v2.0.0/writeas_2.0.0_linux_386.tar.gz) executable and put it somewhere in your `$PATH`, like `/usr/local/bin`.
 
 ### Go get it
 ```bash
