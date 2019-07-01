@@ -23,7 +23,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "wf"
 	app.Version = appInfo["version"]
-	app.Usage = "Publish text quickly"
+	app.Usage = "Publish to any WriteFreely instance from the command-line."
 	// TODO: who is the author? the contributors? link to GH?
 	app.Authors = []cli.Author{
 		{
@@ -42,7 +42,7 @@ func main() {
 			Usage:  "Alias for default action: create post from stdin",
 			Action: commands.CmdPost,
 			Flags:  config.PostFlags,
-			Description: `Create a new post on Write.as from stdin.
+			Description: `Create a new post on WriteFreely from stdin.
 
    Use the --code flag to indicate that the post should use syntax 
    highlighting. Or use the --font [value] argument to set the post's 
@@ -65,14 +65,14 @@ func main() {
    appearance, where [value] is mono, monospace (default), wrap (monospace 
    font with word wrapping), serif, or sans.
    
-   If posting fails for any reason, 'writeas' will show you the temporary file
-   location and how to pipe it to 'writeas' to retry.`,
+   If posting fails for any reason, 'wf' will show you the temporary file
+   location and how to pipe it to 'wf' to retry.`,
 			Action: commands.CmdNew,
 			Flags:  config.PostFlags,
 		},
 		{
 			Name:   "publish",
-			Usage:  "Publish a file to Write.as",
+			Usage:  "Publish a file",
 			Action: commands.CmdPublish,
 			Flags:  config.PostFlags,
 		},
@@ -149,8 +149,8 @@ func main() {
 			Usage: "Add an existing post locally",
 			Description: `A way to add an existing post to your local store for easy editing later.
 			
-   This requires a post ID (from https://write.as/[ID]) and an Edit Token
-   (exported from another Write.as client, such as the Android app).
+   This requires a post ID (from e.g. https://write.as/[ID]) and an Edit Token
+   (exported from another WriteFreely client, such as the Android app).
 `,
 			Action: commands.CmdAdd,
 		},
@@ -200,7 +200,7 @@ func main() {
 			Name:        "claim",
 			Usage:       "Claim local unsynced posts",
 			Action:      commands.CmdClaim,
-			Description: "This will claim any unsynced posts local to this machine. To see which posts these are run: writeas posts.",
+			Description: "This will claim any unsynced posts local to this machine. To see which posts these are run: wf posts.",
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "tor, t",
@@ -218,7 +218,7 @@ func main() {
 			},
 		}, {
 			Name:   "auth",
-			Usage:  "Authenticate with Write.as",
+			Usage:  "Authenticate with a WriteFreely instance",
 			Action: commands.CmdAuth,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
@@ -238,7 +238,7 @@ func main() {
 		},
 		{
 			Name:   "logout",
-			Usage:  "Log out of Write.as",
+			Usage:  "Log out of a WriteFreely instance",
 			Action: commands.CmdLogOut,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
@@ -262,7 +262,7 @@ func main() {
    {{.Name}} - {{.Usage}}
 
 USAGE:
-   writeas {{.Name}}{{if .Flags}} [command options]{{end}} [arguments...]{{if .Description}}
+   wf {{.Name}}{{if .Flags}} [command options]{{end}} [arguments...]{{if .Description}}
 
 DESCRIPTION:
    {{.Description}}{{end}}{{if .Flags}}
