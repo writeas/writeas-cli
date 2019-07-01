@@ -70,7 +70,7 @@ func DoFetch(c *cli.Context, friendlyID string) error {
 func DoFetchPosts(c *cli.Context) ([]writeas.Post, error) {
 	cl, err := newClient(c, true)
 	if err != nil {
-		return nil, fmt.Errorf("Unable to create client: %v", err)
+		return nil, fmt.Errorf("%v", err)
 	}
 
 	posts, err := cl.GetUserPosts()
@@ -86,7 +86,7 @@ func DoFetchPosts(c *cli.Context) ([]writeas.Post, error) {
 func DoPost(c *cli.Context, post []byte, font string, encrypt, code bool) (*writeas.Post, error) {
 	cl, err := newClient(c, false)
 	if err != nil {
-		return nil, fmt.Errorf("Unable to create client: %v", err)
+		return nil, fmt.Errorf("%v", err)
 	}
 
 	pp := &writeas.PostParams{
@@ -184,7 +184,7 @@ func DoFetchCollections(c *cli.Context) ([]RemoteColl, error) {
 func DoUpdate(c *cli.Context, post []byte, friendlyID, token, font string, code bool) error {
 	cl, err := newClient(c, false)
 	if err != nil {
-		return fmt.Errorf("Unable to create client: %v", err)
+		return fmt.Errorf("%v", err)
 	}
 
 	params := writeas.PostParams{}
@@ -210,7 +210,7 @@ func DoUpdate(c *cli.Context, post []byte, friendlyID, token, font string, code 
 func DoDelete(c *cli.Context, friendlyID, token string) error {
 	cl, err := newClient(c, false)
 	if err != nil {
-		return fmt.Errorf("Unable to create client: %v", err)
+		return fmt.Errorf("%v", err)
 	}
 
 	err = cl.DeletePost(friendlyID, token)
@@ -229,7 +229,7 @@ func DoDelete(c *cli.Context, friendlyID, token string) error {
 func DoLogIn(c *cli.Context, username, password string) error {
 	cl, err := newClient(c, false)
 	if err != nil {
-		return fmt.Errorf("Unable to create client: %v", err)
+		return fmt.Errorf("%v", err)
 	}
 
 	u, err := cl.LogIn(username, password)
@@ -251,7 +251,7 @@ func DoLogIn(c *cli.Context, username, password string) error {
 func DoLogOut(c *cli.Context) error {
 	cl, err := newClient(c, true)
 	if err != nil {
-		return fmt.Errorf("Unable to create client: %v", err)
+		return fmt.Errorf("%v", err)
 	}
 
 	err = cl.LogOut()
