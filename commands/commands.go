@@ -192,7 +192,7 @@ func CmdListPosts(c *cli.Context) error {
 
 	posts := api.GetPosts(c)
 
-	u, _ := config.LoadUser(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
+	u, _ := config.LoadUser(c)
 	if u != nil {
 		if config.IsTor(c) {
 			log.Info(c, "Getting posts via hidden service...")
