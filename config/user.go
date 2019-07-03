@@ -15,6 +15,7 @@ func LoadUser(c *cli.Context) (*writeas.AuthUser, error) {
 	if err != nil {
 		return nil, err
 	}
+	DirMustExist(dir)
 	username, err := currentUser(c)
 	if err != nil {
 		return nil, err
