@@ -9,6 +9,7 @@ import (
 	"github.com/howeyc/gopass"
 	"github.com/writeas/writeas-cli/api"
 	"github.com/writeas/writeas-cli/config"
+	"github.com/writeas/writeas-cli/executable"
 	"github.com/writeas/writeas-cli/log"
 	cli "gopkg.in/urfave/cli.v1"
 )
@@ -67,7 +68,7 @@ func CmdNew(c *cli.Context) error {
 func CmdPublish(c *cli.Context) error {
 	filename := c.Args().Get(0)
 	if filename == "" {
-		return cli.NewExitError("usage: writeas publish <filename>", 1)
+		return cli.NewExitError("usage: "+executable.Name()+" publish <filename>", 1)
 	}
 	content, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -92,7 +93,7 @@ func CmdDelete(c *cli.Context) error {
 	friendlyID := c.Args().Get(0)
 	token := c.Args().Get(1)
 	if friendlyID == "" {
-		return cli.NewExitError("usage: writeas delete <postId> [<token>]", 1)
+		return cli.NewExitError("usage: "+executable.Name()+" delete <postId> [<token>]", 1)
 	}
 
 	u, _ := config.LoadUser(c)
@@ -101,7 +102,7 @@ func CmdDelete(c *cli.Context) error {
 		token = api.TokenFromID(c, friendlyID)
 		if token == "" && u == nil {
 			log.Errorln("Couldn't find an edit token locally. Did you create this post here?")
-			log.ErrorlnQuit("If you have an edit token, use: writeas delete %s <token>", friendlyID)
+			log.ErrorlnQuit("If you have an edit token, use: "+executable.Name()+" delete %s <token>", friendlyID)
 		}
 	}
 
@@ -124,7 +125,7 @@ func CmdUpdate(c *cli.Context) error {
 	friendlyID := c.Args().Get(0)
 	token := c.Args().Get(1)
 	if friendlyID == "" {
-		return cli.NewExitError("usage: writeas update <postId> [<token>]", 1)
+		return cli.NewExitError("usage: "+executable.Name()+" update <postId> [<token>]", 1)
 	}
 
 	u, _ := config.LoadUser(c)
@@ -133,7 +134,7 @@ func CmdUpdate(c *cli.Context) error {
 		token = api.TokenFromID(c, friendlyID)
 		if token == "" && u == nil {
 			log.Errorln("Couldn't find an edit token locally. Did you create this post here?")
-			log.ErrorlnQuit("If you have an edit token, use: writeas update %s <token>", friendlyID)
+			log.ErrorlnQuit("If you have an edit token, use: "+executable.Name()+" update %s <token>", friendlyID)
 		}
 	}
 
@@ -155,7 +156,7 @@ func CmdUpdate(c *cli.Context) error {
 func CmdGet(c *cli.Context) error {
 	friendlyID := c.Args().Get(0)
 	if friendlyID == "" {
-		return cli.NewExitError("usage: writeas get <postId>", 1)
+		return cli.NewExitError("usage: "+executable.Name()+" get <postId>", 1)
 	}
 
 	if config.IsTor(c) {
@@ -175,7 +176,7 @@ func CmdAdd(c *cli.Context) error {
 	friendlyID := c.Args().Get(0)
 	token := c.Args().Get(1)
 	if friendlyID == "" || token == "" {
-		return cli.NewExitError("usage: writeas add <postId> <token>", 1)
+		return cli.NewExitError("usage: "+executable.Name()+" add <postId> <token>", 1)
 	}
 
 	err := api.AddPost(c, friendlyID, token)
@@ -279,7 +280,7 @@ func CmdCollections(c *cli.Context) error {
 		return cli.NewExitError(fmt.Sprintf("couldn't load config: %v", err), 1)
 	}
 	if u == nil {
-		return cli.NewExitError("You must be authenticated to view collections.\nLog in first with: writeas auth <username>", 1)
+		return cli.NewExitError("You must be authenticated to view collections.\nLog in first with: "+executable.Name()+" auth <username>", 1)
 	}
 	if config.IsTor(c) {
 		log.Info(c, "Getting blogs via hidden service...")
@@ -314,7 +315,7 @@ func CmdClaim(c *cli.Context) error {
 		return cli.NewExitError(fmt.Sprintf("couldn't load config: %v", err), 1)
 	}
 	if u == nil {
-		return cli.NewExitError("You must be authenticated to claim local posts.\nLog in first with: writeas auth <username>", 1)
+		return cli.NewExitError("You must be authenticated to claim local posts.\nLog in first with: "+executable.Name()+" auth <username>", 1)
 	}
 
 	localPosts := api.GetPosts(c)
@@ -362,14 +363,14 @@ func CmdAuth(c *cli.Context) error {
 		return cli.NewExitError(fmt.Sprintf("couldn't load config: %v", err), 1)
 	}
 	if u != nil && u.AccessToken != "" {
-		return cli.NewExitError("You're already authenticated as "+u.User.Username+". Log out with: writeas logout", 1)
+		return cli.NewExitError("You're already authenticated as "+u.User.Username+". Log out with: "+executable.Name()+" logout", 1)
 	}
 
 	// Validate arguments and get password
 	// TODO: after global config, check for default user
 	username := c.Args().Get(0)
 	if username == "" {
-		return cli.NewExitError("usage: writeas auth <username>", 1)
+		return cli.NewExitError("usage: "+executable.Name()+" auth <username>", 1)
 	}
 
 	fmt.Print("Password: ")

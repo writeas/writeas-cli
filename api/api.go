@@ -7,6 +7,7 @@ import (
 	writeas "github.com/writeas/go-writeas/v2"
 	"github.com/writeas/web-core/posts"
 	"github.com/writeas/writeas-cli/config"
+	"github.com/writeas/writeas-cli/executable"
 	"github.com/writeas/writeas-cli/log"
 	cli "gopkg.in/urfave/cli.v1"
 )
@@ -39,7 +40,7 @@ func newClient(c *cli.Context, authRequired bool) (*writeas.Client, error) {
 	if u != nil {
 		client.SetToken(u.AccessToken)
 	} else if authRequired {
-		return nil, fmt.Errorf("Not currently logged in. Authenticate with: writeas auth <username>")
+		return nil, fmt.Errorf("Not currently logged in. Authenticate with: " + executable.Name() + " auth <username>")
 	}
 
 	return client, nil
@@ -136,7 +137,7 @@ func DoPost(c *cli.Context, post []byte, font string, encrypt, code bool) (*writ
 	// Copy URL to clipboard
 	err = clipboard.WriteAll(string(url))
 	if err != nil {
-		log.Errorln("writeas: Didn't copy to clipboard: %s", err)
+		log.Errorln(executable.Name()+": Didn't copy to clipboard: %s", err)
 	} else {
 		log.Info(c, "Copied to clipboard.")
 	}
