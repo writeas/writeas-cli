@@ -219,7 +219,7 @@ func main() {
 		}, {
 			Name:   "auth",
 			Usage:  "Authenticate with a WriteFreely instance",
-			Action: commands.CmdAuth,
+			Action: cmdAuth,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "tor, t",
@@ -239,7 +239,7 @@ func main() {
 		{
 			Name:   "logout",
 			Usage:  "Log out of a WriteFreely instance",
-			Action: commands.CmdLogOut,
+			Action: cmdLogOut,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "tor, t",

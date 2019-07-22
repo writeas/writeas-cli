@@ -16,7 +16,7 @@ func LoadUser(c *cli.Context) (*writeas.AuthUser, error) {
 		return nil, err
 	}
 	DirMustExist(dir)
-	username, err := currentUser(c)
+	username, err := CurrentUser(c)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func DeleteUser(c *cli.Context) error {
 		return err
 	}
 
-	username, err := currentUser(c)
+	username, err := CurrentUser(c)
 	if err != nil {
 		return err
 	}
@@ -72,7 +72,7 @@ func SaveUser(c *cli.Context, u *writeas.AuthUser) error {
 		return err
 	}
 	// Save file
-	username, err := currentUser(c)
+	username, err := CurrentUser(c)
 	if err != nil {
 		return err
 	}
@@ -98,7 +98,10 @@ func userHostDir(c *cli.Context) (string, error) {
 	return filepath.Join(dataDir, hostDir), nil
 }
 
-func currentUser(c *cli.Context) (string, error) {
+// CurrentUser returns the username of the user taking action in the current
+// cli.Context.
+func CurrentUser(c *cli.Context) (string, error) {
+	// Load host-level config, if host flag is set
 	hostDir, err := userHostDir(c)
 	if err != nil {
 		return "", err
@@ -108,12 +111,14 @@ func currentUser(c *cli.Context) (string, error) {
 		return "", err
 	}
 	if cfg.Default.User == "" {
+		// Load app-level config
 		cfg, err = LoadConfig(UserDataDir(c.App.ExtraInfo()["configDir"]))
 		if err != nil {
 			return "", err
 		}
 	}
 
+	// Use user flag value
 	if c.GlobalString("user") != "" {
 		return c.GlobalString("user"), nil
 	}

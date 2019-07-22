@@ -3,8 +3,11 @@ package main
 import (
 	"fmt"
 
+	"github.com/writeas/writeas-cli/api"
+	"github.com/writeas/writeas-cli/commands"
 	"github.com/writeas/writeas-cli/config"
 	"github.com/writeas/writeas-cli/executable"
+	"github.com/writeas/writeas-cli/log"
 	cli "gopkg.in/urfave/cli.v1"
 )
 
@@ -20,4 +23,70 @@ func requireAuth(f cli.ActionFunc, action string) cli.ActionFunc {
 
 		return f(c)
 	}
+}
+
+func cmdAuth(c *cli.Context) error {
+	err := commands.CmdAuth(c)
+	if err != nil {
+		return err
+	}
+
+	// Get the username from the command, just like commands.CmdAuth does
+	username := c.Args().Get(0)
+
+	// Update config if this is user's first auth
+	cfg, err := config.LoadConfig(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
+	if err != nil {
+		log.Errorln("Not saving config. Unable to load config: %s", err)
+		return err
+	}
+	if cfg.Default.Host == "" && cfg.Default.User == "" {
+		// This is user's first auth, so save defaults
+		cfg.Default.Host = api.HostURL(c)
+		cfg.Default.User = username
+		err = config.SaveConfig(config.UserDataDir(c.App.ExtraInfo()["configDir"]), cfg)
+		if err != nil {
+			log.Errorln("Not saving config. Unable to save config: %s", err)
+			return err
+		}
+		fmt.Printf("Set %s on %s as default account.\n", username, c.GlobalString("host"))
+	}
+
+	return nil
+}
+
+func cmdLogOut(c *cli.Context) error {
+	err := commands.CmdLogOut(c)
+	if err != nil {
+		return err
+	}
+
+	// Remove this from config if it's the default account
+	cfg, err := config.LoadConfig(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
+	if err != nil {
+		log.Errorln("Not updating config. Unable to load: %s", err)
+		return err
+	}
+	username, err := config.CurrentUser(c)
+	if err != nil {
+		log.Errorln("Not updating config. Unable to load current user: %s", err)
+		return err
+	}
+	reqHost := api.HostURL(c)
+	if reqHost == "" {
+		// No --host given, so we're using the default host
+		reqHost = cfg.Default.Host
+	}
+	if cfg.Default.Host == reqHost && cfg.Default.User == username {
+		// We're logging out of default username + host, so remove from config file
+		cfg.Default.Host = ""
+		cfg.Default.User = ""
+		err = config.SaveConfig(config.UserDataDir(c.App.ExtraInfo()["configDir"]), cfg)
+		if err != nil {
+			log.Errorln("Not updating config. Unable to save config: %s", err)
+			return err
+		}
+	}
+
+	return nil
 }
