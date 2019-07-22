@@ -90,11 +90,7 @@ func HostDirectory(c *cli.Context) (string, error) {
 	}
 	// flag takes precedence over defaults
 	if hostFlag := c.GlobalString("host"); hostFlag != "" {
-		u, err := url.Parse(hostFlag)
-		if err != nil {
-			return "", err
-		}
-		return u.Hostname(), nil
+		return hostFlag, nil
 	}
 
 	u, err := url.Parse(cfg.Default.Host)

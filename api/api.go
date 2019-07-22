@@ -12,6 +12,19 @@ import (
 	cli "gopkg.in/urfave/cli.v1"
 )
 
+func HostURL(c *cli.Context) string {
+	host := c.GlobalString("host")
+	if host == "" {
+		return ""
+	}
+	insecure := c.Bool("insecure")
+	scheme := "https://"
+	if insecure {
+		scheme = "http://"
+	}
+	return scheme + host
+}
+
 func newClient(c *cli.Context, authRequired bool) (*writeas.Client, error) {
 	var client *writeas.Client
 	var clientConfig writeas.Config
@@ -19,8 +32,8 @@ func newClient(c *cli.Context, authRequired bool) (*writeas.Client, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Failed to load configuration file: %v", err)
 	}
-	if c.GlobalString("host") != "" {
-		clientConfig.URL = c.GlobalString("host") + "/api"
+	if host := HostURL(c); host != "" {
+		clientConfig.URL = host + "/api"
 	} else if cfg.Default.Host != "" {
 		clientConfig.URL = cfg.Default.Host + "/api"
 	} else if config.IsDev() {
