@@ -126,8 +126,8 @@ func DoPost(c *cli.Context, post []byte, font string, encrypt, code bool) (*writ
 	if p.Collection != nil {
 		url = p.Collection.URL + p.Slug
 	} else {
-		if c.GlobalString("host") != "" {
-			url = c.GlobalString("host")
+		if host := HostURL(c); host != "" {
+			url = host
 		} else if cfg.Default.Host != "" {
 			url = cfg.Default.Host
 		} else if config.IsDev() {
