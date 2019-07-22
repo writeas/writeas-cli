@@ -38,8 +38,10 @@ func newClient(c *cli.Context, authRequired bool) (*writeas.Client, error) {
 		clientConfig.URL = cfg.Default.Host + "/api"
 	} else if config.IsDev() {
 		clientConfig.URL = config.DevBaseURL + "/api"
-	} else {
+	} else if c.App.Name == "writeas" {
 		clientConfig.URL = config.WriteasBaseURL + "/api"
+	} else {
+		return nil, fmt.Errorf("Must supply a host. Example: %s --host example.com %s", executable.Name(), c.Command.Name)
 	}
 	if config.IsTor(c) {
 		clientConfig.URL = config.TorURL(c)
