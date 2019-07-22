@@ -11,7 +11,8 @@ import (
 
 // Application constants.
 const (
-	defaultUserAgent = "writeas-cli v"
+	writeasUserAgent = "writeas-cli v"
+	wfUserAgent      = "wf-cli v"
 	// Defaults for posts on Write.as.
 	DefaultFont    = PostFontMono
 	WriteasBaseURL = "https://write.as"
@@ -21,11 +22,16 @@ const (
 )
 
 func UserAgent(c *cli.Context) string {
+	client := wfUserAgent
+	if c.App.Name == "writeas" {
+		client = writeasUserAgent
+	}
+
 	ua := c.String("user-agent")
 	if ua == "" {
-		return defaultUserAgent + c.App.ExtraInfo()["version"]
+		return client + c.App.ExtraInfo()["version"]
 	}
-	return ua + " (" + defaultUserAgent + c.App.ExtraInfo()["version"] + ")"
+	return ua + " (" + client + c.App.ExtraInfo()["version"] + ")"
 }
 
 func IsTor(c *cli.Context) bool {
