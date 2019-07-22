@@ -34,13 +34,13 @@ func main() {
 	app.ExtraInfo = func() map[string]string {
 		return appInfo
 	}
-	app.Action = commands.CmdPost
+	app.Action = requireAuth(commands.CmdPost, "publish")
 	app.Flags = append(config.PostFlags, flags...)
 	app.Commands = []cli.Command{
 		{
 			Name:   "post",
 			Usage:  "Alias for default action: create post from stdin",
-			Action: commands.CmdPost,
+			Action: requireAuth(commands.CmdPost, "publish"),
 			Flags:  config.PostFlags,
 			Description: `Create a new post on WriteFreely from stdin.
 
@@ -67,19 +67,19 @@ func main() {
    
    If posting fails for any reason, 'wf' will show you the temporary file
    location and how to pipe it to 'wf' to retry.`,
-			Action: commands.CmdNew,
+			Action: requireAuth(commands.CmdNew, "publish"),
 			Flags:  config.PostFlags,
 		},
 		{
 			Name:   "publish",
 			Usage:  "Publish a file",
-			Action: commands.CmdPublish,
+			Action: requireAuth(commands.CmdPublish, "publish"),
 			Flags:  config.PostFlags,
 		},
 		{
 			Name:   "delete",
 			Usage:  "Delete a post",
-			Action: commands.CmdDelete,
+			Action: requireAuth(commands.CmdDelete, "delete"),
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "tor, t",
@@ -99,7 +99,7 @@ func main() {
 		{
 			Name:   "update",
 			Usage:  "Update (overwrite) a post",
-			Action: commands.CmdUpdate,
+			Action: requireAuth(commands.CmdUpdate, "update"),
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "tor, t",
