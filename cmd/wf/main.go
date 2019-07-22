@@ -145,16 +145,6 @@ func main() {
 			},
 		},
 		{
-			Name:  "add",
-			Usage: "Add an existing post locally",
-			Description: `A way to add an existing post to your local store for easy editing later.
-			
-   This requires a post ID (from e.g. https://write.as/[ID]) and an Edit Token
-   (exported from another WriteFreely client, such as the Android app).
-`,
-			Action: commands.CmdAdd,
-		},
-		{
 			Name:        "posts",
 			Usage:       "List all of your posts",
 			Description: "This will list only local posts.",
