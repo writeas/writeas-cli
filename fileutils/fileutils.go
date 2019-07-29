@@ -3,6 +3,7 @@ package fileutils
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 )
@@ -108,4 +109,19 @@ func FindLine(p, startsWith string) string {
 
 func DeleteFile(p string) error {
 	return os.Remove(p)
+}
+
+// IsEmpty returns whether or not the given directory is empty
+func IsEmpty(d string) (bool, error) {
+	f, err := os.Open(d)
+	if err != nil {
+		return false, err
+	}
+	defer f.Close()
+
+	_, err = f.Readdirnames(1)
+	if err == io.EOF {
+		return true, nil
+	}
+	return false, err
 }

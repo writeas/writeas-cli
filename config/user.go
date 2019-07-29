@@ -57,7 +57,42 @@ func DeleteUser(c *cli.Context) error {
 		username = ""
 	}
 
-	return fileutils.DeleteFile(filepath.Join(dir, username, "user.json"))
+	// Delete user data
+	err = fileutils.DeleteFile(filepath.Join(dir, username, "user.json"))
+	if err != nil {
+		return err
+	}
+
+	// Do additional cleanup in wf-cli
+	if c.App.Name == "wf" {
+		// Delete user dir if it's empty
+		userEmpty, err := fileutils.IsEmpty(filepath.Join(dir, username))
+		if err != nil {
+			return err
+		}
+		if !userEmpty {
+			return nil
+		}
+		err = fileutils.DeleteFile(filepath.Join(dir, username))
+		if err != nil {
+			return err
+		}
+
+		// Delete host dir if it's empty
+		hostEmpty, err := fileutils.IsEmpty(dir)
+		if err != nil {
+			return err
+		}
+		if !hostEmpty {
+			return nil
+		}
+		err = fileutils.DeleteFile(dir)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func SaveUser(c *cli.Context, u *writeas.AuthUser) error {
