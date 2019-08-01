@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/writeas/writeas-cli/config"
+	"github.com/writeas/writeas-cli/executable"
 	"github.com/writeas/writeas-cli/fileutils"
 	"github.com/writeas/writeas-cli/log"
 	cli "gopkg.in/urfave/cli.v1"
@@ -28,9 +29,16 @@ func CmdPull(c *cli.Context) error {
 		syncSetUp(c, cfg)
 	}
 
-	cl, err := newClient(c, true)
+	cl, err := newClient(c)
 	if err != nil {
 		return err
+	}
+
+	u, _ := config.LoadUser(c)
+	if u != nil {
+		cl.SetToken(u.AccessToken)
+	} else {
+		return fmt.Errorf("Not currently logged in. Authenticate with: " + executable.Name() + " auth <username>")
 	}
 
 	// Fetch posts

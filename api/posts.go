@@ -12,6 +12,7 @@ import (
 
 	writeas "github.com/writeas/go-writeas/v2"
 	"github.com/writeas/writeas-cli/config"
+	"github.com/writeas/writeas-cli/executable"
 	"github.com/writeas/writeas-cli/fileutils"
 	"github.com/writeas/writeas-cli/log"
 	cli "gopkg.in/urfave/cli.v1"
@@ -64,10 +65,18 @@ func AddPost(c *cli.Context, id, token string) error {
 // ClaimPost adds a local post to the authenticated user's account and deletes
 // the local reference
 func ClaimPosts(c *cli.Context, localPosts *[]Post) (*[]writeas.ClaimPostResult, error) {
-	cl, err := newClient(c, true)
+	cl, err := newClient(c)
 	if err != nil {
 		return nil, err
 	}
+
+	u, _ := config.LoadUser(c)
+	if u != nil {
+		cl.SetToken(u.AccessToken)
+	} else {
+		return nil, fmt.Errorf("Not currently logged in. Authenticate with: " + executable.Name() + " auth <username>")
+	}
+
 	postsToClaim := make([]writeas.OwnedPostParams, len(*localPosts))
 	for i, post := range *localPosts {
 		postsToClaim[i] = writeas.OwnedPostParams{

@@ -25,7 +25,7 @@ func HostURL(c *cli.Context) string {
 	return scheme + host
 }
 
-func newClient(c *cli.Context, authRequired bool) (*writeas.Client, error) {
+func newClient(c *cli.Context) (*writeas.Client, error) {
 	var client *writeas.Client
 	var clientConfig writeas.Config
 	cfg, err := config.LoadConfig(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
@@ -50,13 +50,6 @@ func newClient(c *cli.Context, authRequired bool) (*writeas.Client, error) {
 
 	client = writeas.NewClientWith(clientConfig)
 	client.UserAgent = config.UserAgent(c)
-	// TODO: load user into var shared across the app
-	u, _ := config.LoadUser(c)
-	if u != nil {
-		client.SetToken(u.AccessToken)
-	} else if authRequired {
-		return nil, fmt.Errorf("Not currently logged in. Authenticate with: " + executable.Name() + " auth <username>")
-	}
 
 	return client, nil
 }
@@ -64,7 +57,7 @@ func newClient(c *cli.Context, authRequired bool) (*writeas.Client, error) {
 // DoFetch retrieves the Write.as post with the given friendlyID,
 // optionally via the Tor hidden service.
 func DoFetch(c *cli.Context, friendlyID string) error {
-	cl, err := newClient(c, false)
+	cl, err := newClient(c)
 	if err != nil {
 		return err
 	}
@@ -84,9 +77,16 @@ func DoFetch(c *cli.Context, friendlyID string) error {
 // DoFetchPosts retrieves all remote posts for the
 // authenticated user
 func DoFetchPosts(c *cli.Context) ([]writeas.Post, error) {
-	cl, err := newClient(c, true)
+	cl, err := newClient(c)
 	if err != nil {
 		return nil, fmt.Errorf("%v", err)
+	}
+
+	u, _ := config.LoadUser(c)
+	if u != nil {
+		cl.SetToken(u.AccessToken)
+	} else {
+		return nil, fmt.Errorf("Not currently logged in. Authenticate with: " + executable.Name() + " auth <username>")
 	}
 
 	posts, err := cl.GetUserPosts()
@@ -100,7 +100,7 @@ func DoFetchPosts(c *cli.Context) ([]writeas.Post, error) {
 // DoPost creates a Write.as post, returning an error if it was
 // unsuccessful.
 func DoPost(c *cli.Context, post []byte, font string, encrypt, code bool) (*writeas.Post, error) {
-	cl, err := newClient(c, false)
+	cl, err := newClient(c)
 	if err != nil {
 		return nil, fmt.Errorf("%v", err)
 	}
@@ -166,12 +166,19 @@ func DoPost(c *cli.Context, post []byte, font string, encrypt, code bool) (*writ
 // DoFetchCollections retrieves a list of the currently logged in users
 // collections.
 func DoFetchCollections(c *cli.Context) ([]RemoteColl, error) {
-	cl, err := newClient(c, true)
+	cl, err := newClient(c)
 	if err != nil {
 		if config.Debug() {
 			log.ErrorlnQuit("could not create client: %v", err)
 		}
 		return nil, fmt.Errorf("Couldn't create new client")
+	}
+
+	u, _ := config.LoadUser(c)
+	if u != nil {
+		cl.SetToken(u.AccessToken)
+	} else {
+		return nil, fmt.Errorf("Not currently logged in. Authenticate with: " + executable.Name() + " auth <username>")
 	}
 
 	colls, err := cl.GetUserCollections()
@@ -198,7 +205,7 @@ func DoFetchCollections(c *cli.Context) ([]RemoteColl, error) {
 
 // DoUpdate updates the given post on Write.as.
 func DoUpdate(c *cli.Context, post []byte, friendlyID, token, font string, code bool) error {
-	cl, err := newClient(c, false)
+	cl, err := newClient(c)
 	if err != nil {
 		return fmt.Errorf("%v", err)
 	}
@@ -224,7 +231,7 @@ func DoUpdate(c *cli.Context, post []byte, friendlyID, token, font string, code 
 
 // DoDelete deletes the given post on Write.as, and removes any local references
 func DoDelete(c *cli.Context, friendlyID, token string) error {
-	cl, err := newClient(c, false)
+	cl, err := newClient(c)
 	if err != nil {
 		return fmt.Errorf("%v", err)
 	}
@@ -243,7 +250,7 @@ func DoDelete(c *cli.Context, friendlyID, token string) error {
 }
 
 func DoLogIn(c *cli.Context, username, password string) error {
-	cl, err := newClient(c, false)
+	cl, err := newClient(c)
 	if err != nil {
 		return fmt.Errorf("%v", err)
 	}
@@ -265,9 +272,16 @@ func DoLogIn(c *cli.Context, username, password string) error {
 }
 
 func DoLogOut(c *cli.Context) error {
-	cl, err := newClient(c, true)
+	cl, err := newClient(c)
 	if err != nil {
 		return fmt.Errorf("%v", err)
+	}
+
+	u, _ := config.LoadUser(c)
+	if u != nil {
+		cl.SetToken(u.AccessToken)
+	} else if c.App.Name == "writeas" {
+		return fmt.Errorf("Not currently logged in. Authenticate with: " + executable.Name() + " auth <username>")
 	}
 
 	err = cl.LogOut()
