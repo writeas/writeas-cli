@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 
 	"github.com/writeas/writeas-cli/api"
 	"github.com/writeas/writeas-cli/commands"
@@ -23,6 +25,33 @@ func requireAuth(f cli.ActionFunc, action string) cli.ActionFunc {
 
 		return f(c)
 	}
+}
+
+// usersLoggedIn checks for logged in users for the set host flag
+// it returns the number of users and a slice of usernames
+func usersLoggedIn(c *cli.Context) (int, []string, error) {
+	path, err := config.UserHostDir(c)
+	if err != nil {
+		return 0, nil, err
+	}
+	dir, err := os.Open(path)
+	if err != nil {
+		return 0, nil, err
+	}
+	contents, err := dir.Readdir(0)
+	if err != nil {
+		return 0, nil, err
+	}
+	var names []string
+	for _, file := range contents {
+		if file.IsDir() {
+			// stat user.json
+			if _, err := os.Stat(filepath.Join(path, file.Name(), "user.json")); err == nil {
+				names = append(names, file.Name())
+			}
+		}
+	}
+	return len(names), names, nil
 }
 
 func cmdAuth(c *cli.Context) error {
