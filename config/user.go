@@ -11,7 +11,7 @@ import (
 )
 
 func LoadUser(c *cli.Context) (*writeas.AuthUser, error) {
-	dir, err := userHostDir(c)
+	dir, err := UserHostDir(c)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func LoadUser(c *cli.Context) (*writeas.AuthUser, error) {
 }
 
 func DeleteUser(c *cli.Context) error {
-	dir, err := userHostDir(c)
+	dir, err := UserHostDir(c)
 	if err != nil {
 		return err
 	}
@@ -102,7 +102,7 @@ func SaveUser(c *cli.Context, u *writeas.AuthUser) error {
 		return err
 	}
 
-	dir, err := userHostDir(c)
+	dir, err := UserHostDir(c)
 	if err != nil {
 		return err
 	}
@@ -122,9 +122,9 @@ func SaveUser(c *cli.Context, u *writeas.AuthUser) error {
 	return nil
 }
 
-// userHostDir returns the path to the user data directory with the host based
+// UserHostDir returns the path to the user data directory with the host based
 // subpath if the host flag is set
-func userHostDir(c *cli.Context) (string, error) {
+func UserHostDir(c *cli.Context) (string, error) {
 	dataDir := UserDataDir(c.App.ExtraInfo()["configDir"])
 	hostDir, err := HostDirectory(c)
 	if err != nil {
@@ -137,7 +137,7 @@ func userHostDir(c *cli.Context) (string, error) {
 // cli.Context.
 func CurrentUser(c *cli.Context) (string, error) {
 	// Load host-level config, if host flag is set
-	hostDir, err := userHostDir(c)
+	hostDir, err := UserHostDir(c)
 	if err != nil {
 		return "", err
 	}
