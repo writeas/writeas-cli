@@ -147,9 +147,16 @@ func CurrentUser(c *cli.Context) (string, error) {
 	}
 	if cfg.Default.User == "" {
 		// Load app-level config
-		cfg, err = LoadConfig(UserDataDir(c.App.ExtraInfo()["configDir"]))
+		globalCFG, err := LoadConfig(UserDataDir(c.App.ExtraInfo()["configDir"]))
 		if err != nil {
 			return "", err
+		}
+		// only user global defaults when both are set and hosts match
+		if globalCFG.Default.User != "" &&
+			globalCFG.Default.Host != "" &&
+			c.GlobalIsSet("host") &&
+			globalCFG.Default.Host == c.GlobalString("host") {
+			cfg = globalCFG
 		}
 	}
 
