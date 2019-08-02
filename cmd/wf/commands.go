@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/writeas/writeas-cli/api"
 	"github.com/writeas/writeas-cli/commands"
@@ -19,14 +20,14 @@ func requireAuth(f cli.ActionFunc, action string) cli.ActionFunc {
 		if c.GlobalIsSet("host") && !c.GlobalIsSet("user") {
 			// multiple users should display a list
 			if num, users, err := usersLoggedIn(c); num > 1 && err == nil {
-				return cli.NewExitError(fmt.Sprintf("Multiple logged in users, please use '-u' or '-user' to specify one of:\n%s", users), 1)
+				return cli.NewExitError(fmt.Sprintf("Multiple logged in users, please use '-u' or '-user' to specify one of:\n%s", strings.Join(users, ", ")), 1)
 			} else if num == 1 && err == nil {
 				// single user found for host should be set as user flag so LoadUser can
 				// succeed, and notify the client
 				if err := c.GlobalSet("user", users[0]); err != nil {
 					return cli.NewExitError(fmt.Sprintf("Failed to set user flag for only logged in user at host %s: %v", users[0], err), 1)
 				}
-				fmt.Printf("Host specified without user flag, using logged in user: %s\n", users[0])
+				log.Info(c, "Host specified without user flag, using logged in user: %s\n", users[0])
 			} else if err != nil {
 				return cli.NewExitError(fmt.Sprintf("Failed to check for logged in users: %v", err), 1)
 			}
