@@ -148,7 +148,7 @@ func main() {
 			Name:        "posts",
 			Usage:       "List all of your posts",
 			Description: "This will list only local posts.",
-			Action:      commands.CmdListPosts,
+			Action:      requireAuth(commands.CmdListPosts, "posts"),
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "id",
@@ -170,7 +170,7 @@ func main() {
 		}, {
 			Name:   "blogs",
 			Usage:  "List blogs",
-			Action: commands.CmdCollections,
+			Action: requireAuth(commands.CmdCollections, "blogs"),
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "tor, t",
@@ -189,7 +189,7 @@ func main() {
 		}, {
 			Name:        "claim",
 			Usage:       "Claim local unsynced posts",
-			Action:      commands.CmdClaim,
+			Action:      requireAuth(commands.CmdClaim, "claim"),
 			Description: "This will claim any unsynced posts local to this machine. To see which posts these are run: wf posts.",
 			Flags: []cli.Flag{
 				cli.BoolFlag{
@@ -229,7 +229,7 @@ func main() {
 		{
 			Name:   "logout",
 			Usage:  "Log out of a WriteFreely instance",
-			Action: cmdLogOut,
+			Action: requireAuth(cmdLogOut, "logout"),
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "tor, t",

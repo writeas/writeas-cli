@@ -357,18 +357,18 @@ func CmdClaim(c *cli.Context) error {
 }
 
 func CmdAuth(c *cli.Context) error {
+	username := c.Args().Get(0)
 	// Check configuration
 	u, err := config.LoadUser(c)
 	if err != nil {
 		return cli.NewExitError(fmt.Sprintf("couldn't load config: %v", err), 1)
 	}
-	if u != nil && u.AccessToken != "" {
-		return cli.NewExitError("You're already authenticated as "+u.User.Username+". Log out with: "+executable.Name()+" logout", 1)
+	if u != nil && u.AccessToken != "" && username == u.User.Username {
+		return cli.NewExitError("You're already authenticated as "+u.User.Username, 1)
 	}
 
 	// Validate arguments and get password
 	// TODO: after global config, check for default user
-	username := c.Args().Get(0)
 	if username == "" {
 		return cli.NewExitError("usage: "+executable.Name()+" auth <username>", 1)
 	}
