@@ -1,7 +1,6 @@
 package config
 
 import (
-	"net/url"
 	"strings"
 
 	"github.com/cloudfoundry/jibber_jabber"
@@ -99,9 +98,9 @@ func HostDirectory(c *cli.Context) (string, error) {
 		return hostFlag, nil
 	}
 
-	u, err := url.Parse(cfg.Default.Host)
-	if err != nil {
-		return "", err
+	if cfg.Default.Host != "" && cfg.Default.User != "" {
+		return cfg.Default.Host, nil
 	}
-	return u.Hostname(), nil
+
+	return "", nil
 }
