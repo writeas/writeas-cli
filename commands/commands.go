@@ -368,9 +368,17 @@ func CmdAuth(c *cli.Context) error {
 	}
 
 	// Validate arguments and get password
-	// TODO: after global config, check for default user
 	if username == "" {
-		return cli.NewExitError("usage: "+executable.Name()+" auth <username>", 1)
+		cfg, err := config.LoadConfig(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
+		if err != nil {
+			return cli.NewExitError(fmt.Sprintf("Failed to load config: %v", err), 1)
+		}
+		if cfg.Default.Host != "" && cfg.Default.User != "" {
+			username = cfg.Default.User
+			fmt.Printf("No user provided, using default user %s for host %s...\n", cfg.Default.User, cfg.Default.Host)
+		} else {
+			return cli.NewExitError("usage: "+executable.Name()+" auth <username>", 1)
+		}
 	}
 
 	fmt.Print("Password: ")
