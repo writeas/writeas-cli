@@ -136,6 +136,11 @@ func UserHostDir(c *cli.Context) (string, error) {
 // CurrentUser returns the username of the user taking action in the current
 // cli.Context.
 func CurrentUser(c *cli.Context) (string, error) {
+	// Use user flag value
+	if c.GlobalString("user") != "" {
+		return c.GlobalString("user"), nil
+	}
+
 	// Load host-level config, if host flag is set
 	hostDir, err := UserHostDir(c)
 	if err != nil {
@@ -158,11 +163,6 @@ func CurrentUser(c *cli.Context) (string, error) {
 			globalCFG.Default.Host == c.GlobalString("host") {
 			cfg = globalCFG
 		}
-	}
-
-	// Use user flag value
-	if c.GlobalString("user") != "" {
-		return c.GlobalString("user"), nil
 	}
 
 	return cfg.Default.User, nil
