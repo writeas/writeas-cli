@@ -358,6 +358,9 @@ func CmdClaim(c *cli.Context) error {
 
 func CmdAuth(c *cli.Context) error {
 	username := c.Args().Get(0)
+	if username == "" && c.GlobalIsSet("user") {
+		username = c.GlobalString("user")
+	}
 	// Check configuration
 	u, err := config.LoadUser(c)
 	if err != nil {
