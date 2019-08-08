@@ -31,6 +31,24 @@ func requireAuth(f cli.ActionFunc, action string) cli.ActionFunc {
 			} else if err != nil {
 				return cli.NewExitError(fmt.Sprintf("Failed to check for logged in users: %v", err), 1)
 			}
+		} else if !c.GlobalIsSet("host") && !c.GlobalIsSet("user") {
+			// check for global configured pair host/user
+			cfg, err := config.LoadConfig(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
+			if err != nil {
+				return cli.NewExitError(fmt.Sprintf("Failed to load config from file: %v", err), 1)
+				// set flags if found
+			}
+			// set flags if both were found in config
+			if cfg.Default.Host != "" && cfg.Default.User != "" {
+				err = c.GlobalSet("host", cfg.Default.Host)
+				if err != nil {
+					return cli.NewExitError(fmt.Sprintf("Failed to set host from global config: %v", err), 1)
+				}
+				err = c.GlobalSet("user", cfg.Default.User)
+				if err != nil {
+					return cli.NewExitError(fmt.Sprintf("Failed to set user from global config: %v", err), 1)
+				}
+			}
 		}
 		u, err := config.LoadUser(c)
 		if err != nil {
