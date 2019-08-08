@@ -34,8 +34,8 @@ func newClient(c *cli.Context) (*writeas.Client, error) {
 	}
 	if host := HostURL(c); host != "" {
 		clientConfig.URL = host + "/api"
-	} else if cfg.Default.Host != "" {
-		clientConfig.URL = cfg.Default.Host + "/api"
+	} else if cfg.Default.Host != "" && cfg.Default.User != "" {
+		clientConfig.URL = "https://" + cfg.Default.Host + "/api"
 	} else if config.IsDev() {
 		clientConfig.URL = config.DevBaseURL + "/api"
 	} else if c.App.Name == "writeas" {
