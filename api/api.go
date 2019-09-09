@@ -105,6 +105,13 @@ func DoPost(c *cli.Context, post []byte, font string, encrypt, code bool) (*writ
 		return nil, fmt.Errorf("%v", err)
 	}
 
+	u, _ := config.LoadUser(c)
+	if u != nil && c.App.Name == "wf" {
+		cl.SetToken(u.AccessToken)
+	} else {
+		return nil, fmt.Errorf("Not currently logged in. Authenticate with: " + executable.Name() + " auth <username>")
+	}
+
 	pp := &writeas.PostParams{
 		Font:       config.GetFont(code, font),
 		Collection: config.Collection(c),
