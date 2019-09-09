@@ -48,6 +48,14 @@ func requireAuth(f cli.ActionFunc, action string) cli.ActionFunc {
 				if err != nil {
 					return cli.NewExitError(fmt.Sprintf("Failed to set user from global config: %v", err), 1)
 				}
+			} else {
+				num, err := totalUsersLoggedIn(c)
+				if err != nil {
+					return cli.NewExitError(fmt.Sprintf("Failed to check for logged in users: %v", err), 1)
+				} else if num > 0 {
+					return cli.NewExitError("You are authenticated, but have no default user/host set. Supply -user and -host flags.", 1)
+				}
+				fmt.Println(num)
 			}
 		}
 		u, err := config.LoadUser(c)
@@ -87,6 +95,41 @@ func usersLoggedIn(c *cli.Context) (int, []string, error) {
 		}
 	}
 	return len(names), names, nil
+}
+
+// totalUsersLoggedIn checks for logged in users for any host
+// it returns the number of users and an error if any
+func totalUsersLoggedIn(c *cli.Context) (int, error) {
+	path := config.UserDataDir(c.App.ExtraInfo()["configDir"])
+	dir, err := os.Open(path)
+	if err != nil {
+		return 0, err
+	}
+	contents, err := dir.Readdir(0)
+	if err != nil {
+		return 0, err
+	}
+	count := 0
+	for _, file := range contents {
+		if file.IsDir() {
+			subDir, err := os.Open(filepath.Join(path, file.Name()))
+			if err != nil {
+				return 0, err
+			}
+			subContents, err := subDir.Readdir(0)
+			if err != nil {
+				return 0, err
+			}
+			for _, subFile := range subContents {
+				if subFile.IsDir() {
+					if _, err := os.Stat(filepath.Join(path, file.Name(), subFile.Name(), "user.json")); err == nil {
+						count++
+					}
+				}
+			}
+		}
+	}
+	return count, nil
 }
 
 func cmdAuth(c *cli.Context) error {
