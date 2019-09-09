@@ -55,7 +55,6 @@ func requireAuth(f cli.ActionFunc, action string) cli.ActionFunc {
 				} else if num > 0 {
 					return cli.NewExitError("You are authenticated, but have no default user/host set. Supply -user and -host flags.", 1)
 				}
-				fmt.Println(num)
 			}
 		}
 		u, err := config.LoadUser(c)
