@@ -106,7 +106,7 @@ func DoPost(c *cli.Context, post []byte, font string, encrypt, code bool) (*writ
 	}
 
 	u, _ := config.LoadUser(c)
-	if u != nil && c.App.Name == "wf" {
+	if u != nil {
 		cl.SetToken(u.AccessToken)
 	} else {
 		return nil, fmt.Errorf("Not currently logged in. Authenticate with: " + executable.Name() + " auth <username>")

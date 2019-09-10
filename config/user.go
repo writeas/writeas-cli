@@ -136,6 +136,9 @@ func UserHostDir(c *cli.Context) (string, error) {
 // CurrentUser returns the username of the user taking action in the current
 // cli.Context.
 func CurrentUser(c *cli.Context) (string, error) {
+	if c.App.Name == "writeas" {
+		return "user", nil
+	}
 	// Use user flag value
 	if c.GlobalString("user") != "" {
 		return c.GlobalString("user"), nil
