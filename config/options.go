@@ -95,10 +95,16 @@ func HostDirectory(c *cli.Context) (string, error) {
 	}
 	// flag takes precedence over defaults
 	if hostFlag := c.GlobalString("host"); hostFlag != "" {
+		if parts := strings.Split(hostFlag, "://"); len(parts) > 1 {
+			return parts[1], nil
+		}
 		return hostFlag, nil
 	}
 
 	if cfg.Default.Host != "" && cfg.Default.User != "" {
+		if parts := strings.Split(cfg.Default.Host, "://"); len(parts) > 1 {
+			return parts[1], nil
+		}
 		return cfg.Default.Host, nil
 	}
 

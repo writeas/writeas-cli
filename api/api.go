@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/atotto/clipboard"
 	writeas "github.com/writeas/go-writeas/v2"
@@ -18,6 +19,9 @@ func HostURL(c *cli.Context) string {
 		return ""
 	}
 	insecure := c.Bool("insecure")
+	if parts := strings.Split(host, "://"); len(parts) > 1 {
+		host = parts[1]
+	}
 	scheme := "https://"
 	if insecure {
 		scheme = "http://"
@@ -35,7 +39,11 @@ func newClient(c *cli.Context) (*writeas.Client, error) {
 	if host := HostURL(c); host != "" {
 		clientConfig.URL = host + "/api"
 	} else if cfg.Default.Host != "" && cfg.Default.User != "" {
-		clientConfig.URL = "https://" + cfg.Default.Host + "/api"
+		if parts := strings.Split(cfg.Default.Host, "://"); len(parts) > 1 {
+			clientConfig.URL = cfg.Default.Host + "/api"
+		} else {
+			clientConfig.URL = "https://" + cfg.Default.Host + "/api"
+		}
 	} else if config.IsDev() {
 		clientConfig.URL = config.DevBaseURL + "/api"
 	} else if c.App.Name == "writeas" {
