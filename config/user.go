@@ -159,11 +159,10 @@ func CurrentUser(c *cli.Context) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		// only user global defaults when both are set and hosts match
+		// only use global defaults when both are set and no host flag
 		if globalCFG.Default.User != "" &&
 			globalCFG.Default.Host != "" &&
-			c.GlobalIsSet("host") &&
-			globalCFG.Default.Host == c.GlobalString("host") {
+			!c.GlobalIsSet("host") {
 			cfg = globalCFG
 		}
 	}
