@@ -225,6 +225,15 @@ func DoUpdate(c *cli.Context, post []byte, friendlyID, token, font string, code 
 		return fmt.Errorf("%v", err)
 	}
 
+	if token == "" {
+		u, _ := config.LoadUser(c)
+		if u != nil {
+			cl.SetToken(u.AccessToken)
+		} else {
+			return fmt.Errorf("You must either provide and edit token or log in to delete a post.")
+		}
+	}
+
 	params := writeas.PostParams{}
 	params.Title, params.Content = posts.ExtractTitle(string(post))
 	if lang := config.Language(c, false); lang != "" {
@@ -249,6 +258,15 @@ func DoDelete(c *cli.Context, friendlyID, token string) error {
 	cl, err := newClient(c)
 	if err != nil {
 		return fmt.Errorf("%v", err)
+	}
+
+	if token == "" {
+		u, _ := config.LoadUser(c)
+		if u != nil {
+			cl.SetToken(u.AccessToken)
+		} else {
+			return fmt.Errorf("You must either provide and edit token or log in to delete a post.")
+		}
 	}
 
 	err = cl.DeletePost(friendlyID, token)
