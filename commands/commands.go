@@ -207,7 +207,11 @@ func CmdListPosts(c *cli.Context) error {
 		}
 
 		if len(remotePosts) > 0 {
-			fmt.Println("Anonymous Posts")
+			if c.App.Name == "wf" {
+				fmt.Println("Draft Posts")
+			} else {
+				fmt.Println("Anonymous Posts")
+			}
 			if details {
 				identifier := "URL"
 				if ids || !urls {
