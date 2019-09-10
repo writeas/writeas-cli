@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 	"text/tabwriter"
 
 	"github.com/howeyc/gopass"
@@ -262,9 +263,28 @@ func CmdListPosts(c *cli.Context) error {
 }
 
 func getPostURL(c *cli.Context, slug string) string {
-	base := config.WriteasBaseURL
-	if config.IsDev() {
-		base = config.DevBaseURL
+	var base string
+	if c.App.Name == "writeas" {
+		if config.IsDev() {
+			base = config.DevBaseURL
+		} else {
+			base = config.WriteasBaseURL
+		}
+	} else {
+		if host := api.HostURL(c); host != "" {
+			base = host
+		} else {
+			// TODO handle error, or load config globally, see T601
+			// https://phabricator.write.as/T601
+			cfg, _ := config.LoadConfig(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
+			if cfg.Default.Host != "" && cfg.Default.User != "" {
+				if parts := strings.Split(cfg.Default.Host, "://"); len(parts) > 1 {
+					base = cfg.Default.Host
+				} else {
+					base = "https://" + cfg.Default.Host
+				}
+			}
+		}
 	}
 	ext := ""
 	// Output URL in requested format
