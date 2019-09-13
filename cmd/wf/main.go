@@ -207,6 +207,16 @@ func main() {
 				},
 			},
 		}, {
+			Name:   "accounts",
+			Usage:  "List all currently logged in accounts",
+			Action: cmdAccounts,
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "verbose, v",
+					Usage: "Make the operation more talkative",
+				},
+			},
+		}, {
 			Name:   "auth",
 			Usage:  "Authenticate with a WriteFreely instance",
 			Action: cmdAuth,

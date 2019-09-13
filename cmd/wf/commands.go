@@ -2,10 +2,13 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
+	"text/tabwriter"
 
+	"github.com/hashicorp/go-multierror"
 	"github.com/writeas/writeas-cli/api"
 	"github.com/writeas/writeas-cli/commands"
 	"github.com/writeas/writeas-cli/config"
@@ -195,4 +198,79 @@ func cmdLogOut(c *cli.Context) error {
 	}
 
 	return nil
+}
+
+func cmdAccounts(c *cli.Context) error {
+	// get user config dir
+	userDir := config.UserDataDir(c.App.ExtraInfo()["configDir"])
+	// load defaults
+	cfg, err := config.LoadConfig(userDir)
+	if err != nil {
+		return cli.NewExitError("Could not load default user configuration", 1)
+	}
+	defaultUser := cfg.Default.User
+	defaultHost := cfg.Default.Host
+	if parts := strings.Split(defaultHost, "://"); len(parts) > 1 {
+		defaultHost = parts[1]
+	}
+	// get each host dir
+	files, err := ioutil.ReadDir(userDir)
+	if err != nil {
+		return cli.NewExitError("Could not read user configuration directory", 1)
+	}
+	// accounts will be a slice of slices of string. the first string in
+	// a subslice should always be the hostname
+	accounts := [][]string{}
+	for _, file := range files {
+		if file.IsDir() {
+			dirName := file.Name()
+			// get each user in host dir
+			users, err := usersFromDir(filepath.Join(userDir, dirName))
+			if err != nil {
+				log.Info(c, "Failed to get users from %s: %v", dirName, err)
+				continue
+			}
+			if len(users) != 0 {
+				// append the slice of users as a new slice in accounts w/ the host prepended
+				accounts = append(accounts, append([]string{dirName}, users...))
+			}
+		}
+	}
+
+	// print out all logged in accounts
+	tw := tabwriter.NewWriter(os.Stdout, 10, 2, 2, ' ', tabwriter.TabIndent)
+	if len(accounts) == 0 {
+		fmt.Fprintf(tw, "%s\t", "No authenticated accounts found.")
+	}
+	for _, userList := range accounts {
+		host := userList[0]
+		for _, username := range userList[1:] {
+			if host == defaultHost && username == defaultUser {
+				fmt.Fprintf(tw, "[%s]\t%s (default)\n", host, username)
+				continue
+			}
+			fmt.Fprintf(tw, "[%s]\t%s\n", host, username)
+		}
+	}
+	return tw.Flush()
+}
+
+func usersFromDir(path string) ([]string, error) {
+	users := make([]string, 0, 4)
+	files, err := ioutil.ReadDir(path)
+	if err != nil {
+		return nil, err
+	}
+	var errs error
+	for _, file := range files {
+		if file.IsDir() {
+			_, err := os.Stat(filepath.Join(path, file.Name(), "user.json"))
+			if err != nil {
+				err = multierror.Append(errs, err)
+				continue
+			}
+			users = append(users, file.Name())
+		}
+	}
+	return users, errs
 }
