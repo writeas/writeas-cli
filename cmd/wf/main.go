@@ -79,7 +79,7 @@ func main() {
 		{
 			Name:   "delete",
 			Usage:  "Delete a post",
-			Action: requireAuth(commands.CmdDelete, "delete"),
+			Action: requireAuth(commands.CmdDelete, "delete a post"),
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "tor, t",
@@ -99,7 +99,7 @@ func main() {
 		{
 			Name:   "update",
 			Usage:  "Update (overwrite) a post",
-			Action: requireAuth(commands.CmdUpdate, "update"),
+			Action: requireAuth(commands.CmdUpdate, "update a post"),
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "tor, t",
@@ -148,7 +148,7 @@ func main() {
 			Name:        "posts",
 			Usage:       "List all of your posts",
 			Description: "This will list only local posts.",
-			Action:      requireAuth(commands.CmdListPosts, "posts"),
+			Action:      requireAuth(commands.CmdListPosts, "view posts"),
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "id",
@@ -170,7 +170,7 @@ func main() {
 		}, {
 			Name:   "blogs",
 			Usage:  "List blogs",
-			Action: requireAuth(commands.CmdCollections, "blogs"),
+			Action: requireAuth(commands.CmdCollections, "view blogs"),
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "tor, t",
@@ -189,7 +189,7 @@ func main() {
 		}, {
 			Name:        "claim",
 			Usage:       "Claim local unsynced posts",
-			Action:      requireAuth(commands.CmdClaim, "claim"),
+			Action:      requireAuth(commands.CmdClaim, "claim unsynced posts"),
 			Description: "This will claim any unsynced posts local to this machine. To see which posts these are run: wf posts.",
 			Flags: []cli.Flag{
 				cli.BoolFlag{
