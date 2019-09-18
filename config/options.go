@@ -79,10 +79,6 @@ func Collection(c *cli.Context) string {
 	if coll := c.String("b"); coll != "" {
 		return coll
 	}
-	u, _ := LoadUser(c)
-	if u != nil {
-		return u.User.Username
-	}
 	return ""
 }
 
