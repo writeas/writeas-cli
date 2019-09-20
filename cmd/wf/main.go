@@ -187,26 +187,6 @@ func main() {
 				},
 			},
 		}, {
-			Name:        "claim",
-			Usage:       "Claim local unsynced posts",
-			Action:      requireAuth(commands.CmdClaim, "claim unsynced posts"),
-			Description: "This will claim any unsynced posts local to this machine. To see which posts these are run: wf posts.",
-			Flags: []cli.Flag{
-				cli.BoolFlag{
-					Name:  "tor, t",
-					Usage: "Authenticate via Tor hidden service",
-				},
-				cli.IntFlag{
-					Name:  "tor-port",
-					Usage: "Use a different port to connect to Tor",
-					Value: 9150,
-				},
-				cli.BoolFlag{
-					Name:  "verbose, v",
-					Usage: "Make the operation more talkative",
-				},
-			},
-		}, {
 			Name:   "auth",
 			Usage:  "Authenticate with a WriteFreely instance",
 			Action: cmdAuth,
