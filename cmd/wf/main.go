@@ -145,18 +145,13 @@ func main() {
 			},
 		},
 		{
-			Name:        "posts",
-			Usage:       "List all of your posts",
-			Description: "This will list only local posts.",
-			Action:      requireAuth(commands.CmdListPosts, "view posts"),
+			Name:   "posts",
+			Usage:  "List draft posts",
+			Action: requireAuth(commands.CmdListPosts, "view posts"),
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "id",
 					Usage: "Show list with post IDs (default)",
-				},
-				cli.BoolFlag{
-					Name:  "md",
-					Usage: "Use with --url to return URLs with Markdown enabled",
 				},
 				cli.BoolFlag{
 					Name:  "url",
@@ -164,7 +159,7 @@ func main() {
 				},
 				cli.BoolFlag{
 					Name:  "verbose, v",
-					Usage: "Show verbose post listing, including Edit Tokens",
+					Usage: "Show verbose post listing",
 				},
 			},
 		}, {
