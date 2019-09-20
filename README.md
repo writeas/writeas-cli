@@ -23,10 +23,10 @@ The easiest way to get the CLI is to download a pre-built executable for your OS
 Get the latest version for your operating system as a standalone executable.
 
 **Write.as CLI**<br />
-See the [writeas-cli README](https://github.com/writeas/writeas-cli/cmd/writeas#readme)
+See the [writeas-cli README](https://github.com/writeas/writeas-cli/blob/master/cmd/writeas#readme)
 
 **WriteFreely CLI**<br />
-See the [wf-cli README](https://github.com/writeas/writeas-cli/cmd/wf#readme)
+See the [wf-cli README](https://github.com/writeas/writeas-cli/blob/master/cmd/wf#readme)
 
 ## Usage
 
