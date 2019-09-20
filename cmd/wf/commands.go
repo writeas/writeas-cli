@@ -239,8 +239,8 @@ func cmdAccounts(c *cli.Context) error {
 
 	// print out all logged in accounts
 	tw := tabwriter.NewWriter(os.Stdout, 10, 2, 2, ' ', tabwriter.TabIndent)
-	if len(accounts) == 0 {
-		fmt.Fprintf(tw, "%s\t", "No authenticated accounts found.")
+	if len(accounts) == 0 && (c.Bool("v") || c.Bool("verbose") || c.GlobalBool("v") || c.GlobalBool("verbose")) {
+		fmt.Fprintf(tw, "%s\t", "No authenticated accounts found.\n")
 	}
 	for _, userList := range accounts {
 		host := userList[0]
