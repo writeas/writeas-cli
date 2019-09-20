@@ -11,7 +11,7 @@ import (
 func main() {
 	appInfo := map[string]string{
 		"configDir": configDir,
-		"version":   "2.0",
+		"version":   "1.0",
 	}
 	config.DirMustExist(config.UserDataDir(appInfo["configDir"]))
 	cli.VersionFlag = cli.BoolFlag{
@@ -21,9 +21,10 @@ func main() {
 
 	// Run the app
 	app := cli.NewApp()
-	app.Name = "writeas"
+	app.Name = "wf"
 	app.Version = appInfo["version"]
-	app.Usage = "Publish text quickly"
+	app.Usage = "Publish to any WriteFreely instance from the command-line."
+	// TODO: who is the author? the contributors? link to GH?
 	app.Authors = []cli.Author{
 		{
 			Name:  "Write.as",
@@ -33,15 +34,15 @@ func main() {
 	app.ExtraInfo = func() map[string]string {
 		return appInfo
 	}
-	app.Action = commands.CmdPost
+	app.Action = requireAuth(commands.CmdPost, "publish")
 	app.Flags = append(config.PostFlags, flags...)
 	app.Commands = []cli.Command{
 		{
 			Name:   "post",
 			Usage:  "Alias for default action: create post from stdin",
-			Action: commands.CmdPost,
+			Action: requireAuth(commands.CmdPost, "publish"),
 			Flags:  config.PostFlags,
-			Description: `Create a new post on Write.as from stdin.
+			Description: `Create a new post on WriteFreely from stdin.
 
    Use the --code flag to indicate that the post should use syntax 
    highlighting. Or use the --font [value] argument to set the post's 
@@ -64,21 +65,21 @@ func main() {
    appearance, where [value] is mono, monospace (default), wrap (monospace 
    font with word wrapping), serif, or sans.
    
-   If posting fails for any reason, 'writeas' will show you the temporary file
-   location and how to pipe it to 'writeas' to retry.`,
-			Action: commands.CmdNew,
+   If posting fails for any reason, 'wf' will show you the temporary file
+   location and how to pipe it to 'wf' to retry.`,
+			Action: requireAuth(commands.CmdNew, "publish"),
 			Flags:  config.PostFlags,
 		},
 		{
 			Name:   "publish",
-			Usage:  "Publish a file to Write.as",
-			Action: commands.CmdPublish,
+			Usage:  "Publish a file",
+			Action: requireAuth(commands.CmdPublish, "publish"),
 			Flags:  config.PostFlags,
 		},
 		{
 			Name:   "delete",
 			Usage:  "Delete a post",
-			Action: commands.CmdDelete,
+			Action: requireAuth(commands.CmdDelete, "delete a post"),
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "tor, t",
@@ -98,7 +99,7 @@ func main() {
 		{
 			Name:   "update",
 			Usage:  "Update (overwrite) a post",
-			Action: commands.CmdUpdate,
+			Action: requireAuth(commands.CmdUpdate, "update a post"),
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "tor, t",
@@ -144,20 +145,10 @@ func main() {
 			},
 		},
 		{
-			Name:  "add",
-			Usage: "Add an existing post locally",
-			Description: `A way to add an existing post to your local store for easy editing later.
-			
-   This requires a post ID (from https://write.as/[ID]) and an Edit Token
-   (exported from another Write.as client, such as the Android app).
-`,
-			Action: commands.CmdAdd,
-		},
-		{
 			Name:        "posts",
 			Usage:       "List all of your posts",
 			Description: "This will list only local posts.",
-			Action:      commands.CmdListPosts,
+			Action:      requireAuth(commands.CmdListPosts, "view posts"),
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "id",
@@ -166,10 +157,6 @@ func main() {
 				cli.BoolFlag{
 					Name:  "md",
 					Usage: "Use with --url to return URLs with Markdown enabled",
-				},
-				cli.BoolFlag{
-					Name:  "tor, t",
-					Usage: "Get posts via Tor hidden service, if authenticated",
 				},
 				cli.BoolFlag{
 					Name:  "url",
@@ -183,7 +170,7 @@ func main() {
 		}, {
 			Name:   "blogs",
 			Usage:  "List blogs",
-			Action: commands.CmdCollections,
+			Action: requireAuth(commands.CmdCollections, "view blogs"),
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "tor, t",
@@ -202,8 +189,8 @@ func main() {
 		}, {
 			Name:        "claim",
 			Usage:       "Claim local unsynced posts",
-			Action:      commands.CmdClaim,
-			Description: "This will claim any unsynced posts local to this machine. To see which posts these are run: writeas posts.",
+			Action:      requireAuth(commands.CmdClaim, "claim unsynced posts"),
+			Description: "This will claim any unsynced posts local to this machine. To see which posts these are run: wf posts.",
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "tor, t",
@@ -219,11 +206,10 @@ func main() {
 					Usage: "Make the operation more talkative",
 				},
 			},
-		},
-		{
+		}, {
 			Name:   "auth",
-			Usage:  "Authenticate with Write.as",
-			Action: commands.CmdAuth,
+			Usage:  "Authenticate with a WriteFreely instance",
+			Action: cmdAuth,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "tor, t",
@@ -242,8 +228,8 @@ func main() {
 		},
 		{
 			Name:   "logout",
-			Usage:  "Log out of Write.as",
-			Action: commands.CmdLogOut,
+			Usage:  "Log out of a WriteFreely instance",
+			Action: requireAuth(cmdLogOut, "logout"),
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "tor, t",
@@ -266,7 +252,7 @@ func main() {
    {{.Name}} - {{.Usage}}
 
 USAGE:
-   writeas {{.Name}}{{if .Flags}} [command options]{{end}} [arguments...]{{if .Description}}
+   wf {{.Name}}{{if .Flags}} [command options]{{end}} [arguments...]{{if .Description}}
 
 DESCRIPTION:
    {{.Description}}{{end}}{{if .Flags}}

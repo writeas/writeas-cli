@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+
+	"github.com/writeas/writeas-cli/executable"
 )
 
 const (
@@ -22,5 +24,5 @@ func EditPostCmd(fname string) *exec.Cmd {
 }
 
 func MessageRetryCompose(fname string) string {
-	return fmt.Sprintf("To retry this post, run:\n  type %s | writeas.exe", fname)
+	return fmt.Sprintf("To retry this post, run:\n  type %s | %s", fname, executable.Name())
 }

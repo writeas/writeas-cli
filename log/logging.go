@@ -10,7 +10,7 @@ import (
 // Info logs general diagnostic messages, shown only when the -v or --verbose
 // flag is provided.
 func Info(c *cli.Context, s string, p ...interface{}) {
-	if c.Bool("v") || c.Bool("verbose") {
+	if c.Bool("v") || c.Bool("verbose") || c.GlobalBool("v") || c.GlobalBool("verbose") {
 		fmt.Fprintf(os.Stderr, s+"\n", p...)
 	}
 }

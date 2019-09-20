@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 	"text/tabwriter"
 
 	"github.com/howeyc/gopass"
 	"github.com/writeas/writeas-cli/api"
 	"github.com/writeas/writeas-cli/config"
+	"github.com/writeas/writeas-cli/executable"
 	"github.com/writeas/writeas-cli/log"
 	cli "gopkg.in/urfave/cli.v1"
 )
@@ -67,7 +69,7 @@ func CmdNew(c *cli.Context) error {
 func CmdPublish(c *cli.Context) error {
 	filename := c.Args().Get(0)
 	if filename == "" {
-		return cli.NewExitError("usage: writeas publish <filename>", 1)
+		return cli.NewExitError("usage: "+executable.Name()+" publish <filename>", 1)
 	}
 	content, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -92,16 +94,16 @@ func CmdDelete(c *cli.Context) error {
 	friendlyID := c.Args().Get(0)
 	token := c.Args().Get(1)
 	if friendlyID == "" {
-		return cli.NewExitError("usage: writeas delete <postId> [<token>]", 1)
+		return cli.NewExitError("usage: "+executable.Name()+" delete <postId> [<token>]", 1)
 	}
 
-	u, _ := config.LoadUser(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
+	u, _ := config.LoadUser(c)
 	if token == "" {
 		// Search for the token locally
 		token = api.TokenFromID(c, friendlyID)
 		if token == "" && u == nil {
 			log.Errorln("Couldn't find an edit token locally. Did you create this post here?")
-			log.ErrorlnQuit("If you have an edit token, use: writeas delete %s <token>", friendlyID)
+			log.ErrorlnQuit("If you have an edit token, use: "+executable.Name()+" delete %s <token>", friendlyID)
 		}
 	}
 
@@ -124,16 +126,16 @@ func CmdUpdate(c *cli.Context) error {
 	friendlyID := c.Args().Get(0)
 	token := c.Args().Get(1)
 	if friendlyID == "" {
-		return cli.NewExitError("usage: writeas update <postId> [<token>]", 1)
+		return cli.NewExitError("usage: "+executable.Name()+" update <postId> [<token>]", 1)
 	}
 
-	u, _ := config.LoadUser(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
+	u, _ := config.LoadUser(c)
 	if token == "" {
 		// Search for the token locally
 		token = api.TokenFromID(c, friendlyID)
 		if token == "" && u == nil {
 			log.Errorln("Couldn't find an edit token locally. Did you create this post here?")
-			log.ErrorlnQuit("If you have an edit token, use: writeas update %s <token>", friendlyID)
+			log.ErrorlnQuit("If you have an edit token, use: "+executable.Name()+" update %s <token>", friendlyID)
 		}
 	}
 
@@ -155,7 +157,7 @@ func CmdUpdate(c *cli.Context) error {
 func CmdGet(c *cli.Context) error {
 	friendlyID := c.Args().Get(0)
 	if friendlyID == "" {
-		return cli.NewExitError("usage: writeas get <postId>", 1)
+		return cli.NewExitError("usage: "+executable.Name()+" get <postId>", 1)
 	}
 
 	if config.IsTor(c) {
@@ -175,7 +177,7 @@ func CmdAdd(c *cli.Context) error {
 	friendlyID := c.Args().Get(0)
 	token := c.Args().Get(1)
 	if friendlyID == "" || token == "" {
-		return cli.NewExitError("usage: writeas add <postId> <token>", 1)
+		return cli.NewExitError("usage: "+executable.Name()+" add <postId> <token>", 1)
 	}
 
 	err := api.AddPost(c, friendlyID, token)
@@ -192,7 +194,7 @@ func CmdListPosts(c *cli.Context) error {
 
 	posts := api.GetPosts(c)
 
-	u, _ := config.LoadUser(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
+	u, _ := config.LoadUser(c)
 	if u != nil {
 		if config.IsTor(c) {
 			log.Info(c, "Getting posts via hidden service...")
@@ -205,7 +207,11 @@ func CmdListPosts(c *cli.Context) error {
 		}
 
 		if len(remotePosts) > 0 {
-			fmt.Println("Anonymous Posts")
+			if c.App.Name == "wf" {
+				fmt.Println("Draft Posts")
+			} else {
+				fmt.Println("Anonymous Posts")
+			}
 			if details {
 				identifier := "URL"
 				if ids || !urls {
@@ -261,9 +267,28 @@ func CmdListPosts(c *cli.Context) error {
 }
 
 func getPostURL(c *cli.Context, slug string) string {
-	base := config.WriteasBaseURL
-	if config.IsDev() {
-		base = config.DevBaseURL
+	var base string
+	if c.App.Name == "writeas" {
+		if config.IsDev() {
+			base = config.DevBaseURL
+		} else {
+			base = config.WriteasBaseURL
+		}
+	} else {
+		if host := api.HostURL(c); host != "" {
+			base = host
+		} else {
+			// TODO handle error, or load config globally, see T601
+			// https://phabricator.write.as/T601
+			cfg, _ := config.LoadConfig(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
+			if cfg.Default.Host != "" && cfg.Default.User != "" {
+				if parts := strings.Split(cfg.Default.Host, "://"); len(parts) > 1 {
+					base = cfg.Default.Host
+				} else {
+					base = "https://" + cfg.Default.Host
+				}
+			}
+		}
 	}
 	ext := ""
 	// Output URL in requested format
@@ -274,12 +299,12 @@ func getPostURL(c *cli.Context, slug string) string {
 }
 
 func CmdCollections(c *cli.Context) error {
-	u, err := config.LoadUser(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
+	u, err := config.LoadUser(c)
 	if err != nil {
 		return cli.NewExitError(fmt.Sprintf("couldn't load config: %v", err), 1)
 	}
 	if u == nil {
-		return cli.NewExitError("You must be authenticated to view collections.\nLog in first with: writeas auth <username>", 1)
+		return cli.NewExitError("You must be authenticated to view collections.\nLog in first with: "+executable.Name()+" auth <username>", 1)
 	}
 	if config.IsTor(c) {
 		log.Info(c, "Getting blogs via hidden service...")
@@ -309,12 +334,12 @@ func CmdCollections(c *cli.Context) error {
 }
 
 func CmdClaim(c *cli.Context) error {
-	u, err := config.LoadUser(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
+	u, err := config.LoadUser(c)
 	if err != nil {
 		return cli.NewExitError(fmt.Sprintf("couldn't load config: %v", err), 1)
 	}
 	if u == nil {
-		return cli.NewExitError("You must be authenticated to claim local posts.\nLog in first with: writeas auth <username>", 1)
+		return cli.NewExitError("You must be authenticated to claim local posts.\nLog in first with: "+executable.Name()+" auth <username>", 1)
 	}
 
 	localPosts := api.GetPosts(c)
@@ -348,7 +373,7 @@ func CmdClaim(c *cli.Context) error {
 			log.Info(c, "%sOK", status)
 			okCount++
 			// only delete local if successful
-			api.RemovePost(c.App.ExtraInfo()["configDir"], id)
+			api.RemovePost(c, id)
 		}
 	}
 	log.Info(c, "%d claimed, %d failed", okCount, errCount)
@@ -356,19 +381,31 @@ func CmdClaim(c *cli.Context) error {
 }
 
 func CmdAuth(c *cli.Context) error {
+	username := c.Args().Get(0)
+	if username == "" && c.GlobalIsSet("user") {
+		username = c.GlobalString("user")
+	}
 	// Check configuration
-	u, err := config.LoadUser(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
+	u, err := config.LoadUser(c)
 	if err != nil {
 		return cli.NewExitError(fmt.Sprintf("couldn't load config: %v", err), 1)
 	}
-	if u != nil && u.AccessToken != "" {
-		return cli.NewExitError("You're already authenticated as "+u.User.Username+". Log out with: writeas logout", 1)
+	if u != nil && u.AccessToken != "" && username == u.User.Username {
+		return cli.NewExitError("You're already authenticated as "+u.User.Username, 1)
 	}
 
 	// Validate arguments and get password
-	username := c.Args().Get(0)
 	if username == "" {
-		return cli.NewExitError("usage: writeas auth <username>", 1)
+		cfg, err := config.LoadConfig(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
+		if err != nil {
+			return cli.NewExitError(fmt.Sprintf("Failed to load config: %v", err), 1)
+		}
+		if cfg.Default.Host != "" && cfg.Default.User != "" {
+			username = cfg.Default.User
+			fmt.Printf("No user provided, using default user %s for host %s...\n", cfg.Default.User, cfg.Default.Host)
+		} else {
+			return cli.NewExitError("usage: "+executable.Name()+" auth <username>", 1)
+		}
 	}
 
 	fmt.Print("Password: ")

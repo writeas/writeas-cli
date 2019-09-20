@@ -4,8 +4,6 @@ writeas-cli
 
 Command line interface for [Write.as](https://write.as). Works on Windows, macOS, and Linux.
 
-**NOTE: the `master` branch is currently unstable while we prepare the v2.0 release! You should install via official release channel, or build from the `v1.2` tag.**
-
 ## Features
 
 * Publish anonymously to Write.as
@@ -26,10 +24,10 @@ The easiest way to get the CLI is to download a pre-built executable for your OS
 Get the latest version for your operating system as a standalone executable.
 
 **Windows**<br />
-Download the [64-bit](https://github.com/writeas/writeas-cli/releases/download/v1.2/writeas_1.2_windows_amd64.zip) or [32-bit](https://github.com/writeas/writeas-cli/releases/download/v1.2/writeas_1.2_windows_386.zip) executable and put it somewhere in your `%PATH%`.
+Download the [64-bit](https://github.com/writeas/writeas-cli/releases/download/v2.0.0/writeas_2.0.0_windows_amd64.zip) or [32-bit](https://github.com/writeas/writeas-cli/releases/download/v2.0.0/writeas_2.0.0_windows_386.zip) executable and put it somewhere in your `%PATH%`.
 
 **macOS**<br />
-Download the [64-bit](https://github.com/writeas/writeas-cli/releases/download/v1.2/writeas_1.2_darwin_amd64.tar.gz) executable and put it somewhere in your `$PATH`, like `/usr/local/bin`.
+Download the [64-bit](https://github.com/writeas/writeas-cli/releases/download/v2.0.0/writeas_2.0.0_darwin_amd64.zip) executable and put it somewhere in your `$PATH`, like `/usr/local/bin`.
 
 **Debian-based Linux**<br />
 ```bash
@@ -39,7 +37,7 @@ sudo apt-get update && sudo apt-get install writeas-cli
 ```
 
 **Linux (other)**<br />
-Download the [64-bit](https://github.com/writeas/writeas-cli/releases/download/v1.2/writeas_1.2_linux_amd64.tar.gz) or [32-bit](https://github.com/writeas/writeas-cli/releases/download/v1.2/writeas_1.2_linux_386.tar.gz) executable and put it somewhere in your `$PATH`, like `/usr/local/bin`.
+Download the [64-bit](https://github.com/writeas/writeas-cli/releases/download/v2.0.0/writeas_2.0.0_linux_amd64.tar.gz) or [32-bit](https://github.com/writeas/writeas-cli/releases/download/v2.0.0/writeas_2.0.0_linux_386.tar.gz) executable and put it somewhere in your `$PATH`, like `/usr/local/bin`.
 
 ### Go get it
 ```bash
@@ -81,18 +79,22 @@ COMMANDS:
      help, h  Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   -c value, -b value  Optional blog to post to
-   --tor, -t           Perform action on Tor hidden service
-   --tor-port value    Use a different port to connect to Tor (default: 9150)
-   --code              Specifies this post is code
-   --md                Returns post URL with Markdown enabled
-   --verbose, -v       Make the operation more talkative
-   --font value        Sets post font to given value (default: "mono")
-   --lang value        Sets post language to given ISO 639-1 language code
-   --user-agent value  Sets the User-Agent for API requests
-   --help, -h          show help
-   --version, -V       print the version
+   -c value, -b value      Optional blog to post to
+   --tor, -t               Perform action on Tor hidden service
+   --tor-port value        Use a different port to connect to Tor (default: 9150)
+   --code                  Specifies this post is code
+   --md                    Returns post URL with Markdown enabled
+   --verbose, -v           Make the operation more talkative
+   --font value            Sets post font to given value (default: "mono")
+   --lang value            Sets post language to given ISO 639-1 language code
+   --user-agent value      Sets the User-Agent for API requests
+   --host value, -H value  Operate against a custom hostname
+   --user value, -u value  Use authenticated user, other than default
+   --help, -h              show help
+   --version, -V           print the version
 ```
+
+> Note: the host and user flags are only available in `wf` the community edition
 
 ## Contributing to the CLI
 
