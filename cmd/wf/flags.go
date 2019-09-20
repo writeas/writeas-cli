@@ -7,10 +7,10 @@ import (
 var flags = []cli.Flag{
 	cli.StringFlag{
 		Name:  "host, H",
-		Usage: "Operate against a custom hostname",
+		Usage: "Use the given WriteFreely instance hostname",
 	},
 	cli.StringFlag{
 		Name:  "user, u",
-		Usage: "Use authenticated user, other than default",
+		Usage: "Use the given account username",
 	},
 }
