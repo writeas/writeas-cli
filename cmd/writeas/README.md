@@ -93,17 +93,3 @@ GLOBAL OPTIONS:
    --help, -h              show help
    --version, -V           print the version
 ```
-
-## Contributing to the CLI
-
-For a complete guide to contributing, see the [Contribution Guide](.github/CONTRIBUTING.md).
-
-We welcome any kind of contributions including documentation, organizational improvements, tutorials, bug reports, feature requests, new features, answering questions, etc.
-
-### Getting Support
-
-We're available on [several channels](https://write.as/contact), and prefer our [forum](https://discuss.write.as) for project discussion. Please don't use the GitHub issue tracker to ask questions.
-
-### Reporting Issues
-
-If you believe you have found a bug in the CLI or its documentation, file an issue on this repo. If you're not sure if it's a bug or not, [reach out to us](https://write.as/contact) in one way or another. Be sure to provide the version of the CLI (with `writeas --version`) in your report.
