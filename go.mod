@@ -5,6 +5,7 @@ require (
 	github.com/atotto/clipboard v0.1.1
 	github.com/cloudfoundry/jibber_jabber v0.0.0-20151120183258-bcc4c8345a21
 	github.com/gopherjs/gopherjs v0.0.0-20181103185306-d547d1d9531e // indirect
+	github.com/hashicorp/go-multierror v1.0.0
 	github.com/howeyc/gopass v0.0.0-20170109162249-bf9dde6d0d2c
 	github.com/jtolds/gls v4.2.1+incompatible // indirect
 	github.com/microcosm-cc/bluemonday v1.0.1 // indirect
