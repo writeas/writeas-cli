@@ -7,6 +7,7 @@ import (
 	"os/exec"
 
 	homedir "github.com/mitchellh/go-homedir"
+	"github.com/writeas/writeas-cli/executable"
 )
 
 const (
@@ -39,5 +40,5 @@ func EditPostCmd(fname string) *exec.Cmd {
 }
 
 func MessageRetryCompose(fname string) string {
-	return fmt.Sprintf("To retry this post, run:\n  cat %s | writeas", fname)
+	return fmt.Sprintf("To retry this post, run:\n  cat %s | %s", fname, executable.Name())
 }

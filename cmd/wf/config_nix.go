@@ -2,4 +2,4 @@
 
 package main
 
-const configDir = ".writeas"
+const configDir = ".writefreely"

@@ -2,36 +2,62 @@ package api
 
 import (
 	"fmt"
-	"path/filepath"
+	"strings"
 
 	"github.com/atotto/clipboard"
 	writeas "github.com/writeas/go-writeas/v2"
 	"github.com/writeas/web-core/posts"
 	"github.com/writeas/writeas-cli/config"
-	"github.com/writeas/writeas-cli/fileutils"
+	"github.com/writeas/writeas-cli/executable"
 	"github.com/writeas/writeas-cli/log"
 	cli "gopkg.in/urfave/cli.v1"
 )
 
-func newClient(c *cli.Context, authRequired bool) (*writeas.Client, error) {
+func HostURL(c *cli.Context) string {
+	host := c.GlobalString("host")
+	if host == "" {
+		return ""
+	}
+	insecure := c.Bool("insecure")
+	if parts := strings.Split(host, "://"); len(parts) > 1 {
+		host = parts[1]
+	}
+	scheme := "https://"
+	if insecure {
+		scheme = "http://"
+	}
+	return scheme + host
+}
+
+func newClient(c *cli.Context) (*writeas.Client, error) {
 	var client *writeas.Client
-	if config.IsTor(c) {
-		client = writeas.NewTorClient(config.TorPort(c))
-	} else {
-		if config.IsDev() {
-			client = writeas.NewDevClient()
+	var clientConfig writeas.Config
+	cfg, err := config.LoadConfig(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
+	if err != nil {
+		return nil, fmt.Errorf("Failed to load configuration file: %v", err)
+	}
+	if host := HostURL(c); host != "" {
+		clientConfig.URL = host + "/api"
+	} else if cfg.Default.Host != "" && cfg.Default.User != "" {
+		if parts := strings.Split(cfg.Default.Host, "://"); len(parts) > 1 {
+			clientConfig.URL = cfg.Default.Host + "/api"
 		} else {
-			client = writeas.NewClient()
+			clientConfig.URL = "https://" + cfg.Default.Host + "/api"
 		}
+	} else if config.IsDev() {
+		clientConfig.URL = config.DevBaseURL + "/api"
+	} else if c.App.Name == "writeas" {
+		clientConfig.URL = config.WriteasBaseURL + "/api"
+	} else {
+		return nil, fmt.Errorf("Must supply a host. Example: %s --host example.com %s", executable.Name(), c.Command.Name)
 	}
+	if config.IsTor(c) {
+		clientConfig.URL = config.TorURL(c)
+		clientConfig.TorPort = config.TorPort(c)
+	}
+
+	client = writeas.NewClientWith(clientConfig)
 	client.UserAgent = config.UserAgent(c)
-	// TODO: load user into var shared across the app
-	u, _ := config.LoadUser(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
-	if u != nil {
-		client.SetToken(u.AccessToken)
-	} else if authRequired {
-		return nil, fmt.Errorf("Not currently logged in. Authenticate with: writeas auth <username>")
-	}
 
 	return client, nil
 }
@@ -39,7 +65,7 @@ func newClient(c *cli.Context, authRequired bool) (*writeas.Client, error) {
 // DoFetch retrieves the Write.as post with the given friendlyID,
 // optionally via the Tor hidden service.
 func DoFetch(c *cli.Context, friendlyID string) error {
-	cl, err := newClient(c, false)
+	cl, err := newClient(c)
 	if err != nil {
 		return err
 	}
@@ -59,9 +85,16 @@ func DoFetch(c *cli.Context, friendlyID string) error {
 // DoFetchPosts retrieves all remote posts for the
 // authenticated user
 func DoFetchPosts(c *cli.Context) ([]writeas.Post, error) {
-	cl, err := newClient(c, true)
+	cl, err := newClient(c)
 	if err != nil {
 		return nil, fmt.Errorf("%v", err)
+	}
+
+	u, _ := config.LoadUser(c)
+	if u != nil {
+		cl.SetToken(u.AccessToken)
+	} else {
+		return nil, fmt.Errorf("Not currently logged in. Authenticate with: " + executable.Name() + " auth <username>")
 	}
 
 	posts, err := cl.GetUserPosts()
@@ -75,9 +108,16 @@ func DoFetchPosts(c *cli.Context) ([]writeas.Post, error) {
 // DoPost creates a Write.as post, returning an error if it was
 // unsuccessful.
 func DoPost(c *cli.Context, post []byte, font string, encrypt, code bool) (*writeas.Post, error) {
-	cl, err := newClient(c, false)
+	cl, err := newClient(c)
 	if err != nil {
 		return nil, fmt.Errorf("%v", err)
+	}
+
+	u, _ := config.LoadUser(c)
+	if u != nil {
+		cl.SetToken(u.AccessToken)
+	} else {
+		return nil, fmt.Errorf("Not currently logged in. Authenticate with: " + executable.Name() + " auth <username>")
 	}
 
 	pp := &writeas.PostParams{
@@ -93,14 +133,22 @@ func DoPost(c *cli.Context, post []byte, font string, encrypt, code bool) (*writ
 		return nil, fmt.Errorf("Unable to post: %v", err)
 	}
 
+	cfg, err := config.LoadConfig(config.UserDataDir(c.App.ExtraInfo()["configDir"]))
+	if err != nil {
+		return nil, fmt.Errorf("Couldn't check for config file: %v", err)
+	}
 	var url string
 	if p.Collection != nil {
 		url = p.Collection.URL + p.Slug
 	} else {
-		if config.IsTor(c) {
-			url = config.TorBaseURL
+		if host := HostURL(c); host != "" {
+			url = host
+		} else if cfg.Default.Host != "" {
+			url = cfg.Default.Host
 		} else if config.IsDev() {
 			url = config.DevBaseURL
+		} else if config.IsTor(c) {
+			url = config.TorBaseURL
 		} else {
 			url = config.WriteasBaseURL
 		}
@@ -119,7 +167,7 @@ func DoPost(c *cli.Context, post []byte, font string, encrypt, code bool) (*writ
 	// Copy URL to clipboard
 	err = clipboard.WriteAll(string(url))
 	if err != nil {
-		log.Errorln("writeas: Didn't copy to clipboard: %s", err)
+		log.Errorln(executable.Name()+": Didn't copy to clipboard: %s", err)
 	} else {
 		log.Info(c, "Copied to clipboard.")
 	}
@@ -133,12 +181,19 @@ func DoPost(c *cli.Context, post []byte, font string, encrypt, code bool) (*writ
 // DoFetchCollections retrieves a list of the currently logged in users
 // collections.
 func DoFetchCollections(c *cli.Context) ([]RemoteColl, error) {
-	cl, err := newClient(c, true)
+	cl, err := newClient(c)
 	if err != nil {
 		if config.Debug() {
 			log.ErrorlnQuit("could not create client: %v", err)
 		}
 		return nil, fmt.Errorf("Couldn't create new client")
+	}
+
+	u, _ := config.LoadUser(c)
+	if u != nil {
+		cl.SetToken(u.AccessToken)
+	} else {
+		return nil, fmt.Errorf("Not currently logged in. Authenticate with: " + executable.Name() + " auth <username>")
 	}
 
 	colls, err := cl.GetUserCollections()
@@ -165,9 +220,18 @@ func DoFetchCollections(c *cli.Context) ([]RemoteColl, error) {
 
 // DoUpdate updates the given post on Write.as.
 func DoUpdate(c *cli.Context, post []byte, friendlyID, token, font string, code bool) error {
-	cl, err := newClient(c, false)
+	cl, err := newClient(c)
 	if err != nil {
 		return fmt.Errorf("%v", err)
+	}
+
+	if token == "" {
+		u, _ := config.LoadUser(c)
+		if u != nil {
+			cl.SetToken(u.AccessToken)
+		} else {
+			return fmt.Errorf("You must either provide and edit token or log in to delete a post.")
+		}
 	}
 
 	params := writeas.PostParams{}
@@ -191,9 +255,18 @@ func DoUpdate(c *cli.Context, post []byte, friendlyID, token, font string, code 
 
 // DoDelete deletes the given post on Write.as, and removes any local references
 func DoDelete(c *cli.Context, friendlyID, token string) error {
-	cl, err := newClient(c, false)
+	cl, err := newClient(c)
 	if err != nil {
 		return fmt.Errorf("%v", err)
+	}
+
+	if token == "" {
+		u, _ := config.LoadUser(c)
+		if u != nil {
+			cl.SetToken(u.AccessToken)
+		} else {
+			return fmt.Errorf("You must either provide and edit token or log in to delete a post.")
+		}
 	}
 
 	err = cl.DeletePost(friendlyID, token)
@@ -204,13 +277,13 @@ func DoDelete(c *cli.Context, friendlyID, token string) error {
 		return fmt.Errorf("Post doesn't exist, or bad edit token given.")
 	}
 
-	RemovePost(c.App.ExtraInfo()["configDir"], friendlyID)
+	RemovePost(c, friendlyID)
 
 	return nil
 }
 
 func DoLogIn(c *cli.Context, username, password string) error {
-	cl, err := newClient(c, false)
+	cl, err := newClient(c)
 	if err != nil {
 		return fmt.Errorf("%v", err)
 	}
@@ -223,7 +296,7 @@ func DoLogIn(c *cli.Context, username, password string) error {
 		return err
 	}
 
-	err = config.SaveUser(config.UserDataDir(c.App.ExtraInfo()["configDir"]), u)
+	err = config.SaveUser(c, u)
 	if err != nil {
 		return err
 	}
@@ -232,9 +305,16 @@ func DoLogIn(c *cli.Context, username, password string) error {
 }
 
 func DoLogOut(c *cli.Context) error {
-	cl, err := newClient(c, true)
+	cl, err := newClient(c)
 	if err != nil {
 		return fmt.Errorf("%v", err)
+	}
+
+	u, _ := config.LoadUser(c)
+	if u != nil {
+		cl.SetToken(u.AccessToken)
+	} else if c.App.Name == "writeas" {
+		return fmt.Errorf("Not currently logged in. Authenticate with: " + executable.Name() + " auth <username>")
 	}
 
 	err = cl.LogOut()
@@ -245,11 +325,6 @@ func DoLogOut(c *cli.Context) error {
 		return err
 	}
 
-	// Delete local user data
-	err = fileutils.DeleteFile(filepath.Join(config.UserDataDir(c.App.ExtraInfo()["configDir"]), config.UserFile))
-	if err != nil {
-		return err
-	}
-
-	return nil
+	// delete local user file
+	return config.DeleteUser(c)
 }

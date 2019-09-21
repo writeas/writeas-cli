@@ -12,6 +12,10 @@ var PostFlags = []cli.Flag{
 		Value: "",
 	},
 	cli.BoolFlag{
+		Name:  "insecure",
+		Usage: "Send request insecurely.",
+	},
+	cli.BoolFlag{
 		Name:  "tor, t",
 		Usage: "Perform action on Tor hidden service",
 	},
