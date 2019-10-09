@@ -429,7 +429,7 @@ func CmdAuth(c *cli.Context) error {
 	} else {
 		log.Info(c, "Logging in...")
 	}
-	err = api.DoLogIn(c, username, string(pass))
+	err = api.DoLogIn(c, username, pass)
 	if err != nil {
 		return cli.NewExitError(fmt.Sprintf("error logging in: %v", err), 1)
 	}
