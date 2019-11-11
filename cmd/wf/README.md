@@ -4,7 +4,7 @@ wf-cli
 
 Command line utility for publishing to any [WriteFreely](https://writefreely.org) instance. Works on Windows, macOS, and Linux.
 
-**The WriteFreely CLI is compatible with WriteFreely v0.11 or later.**
+**The WriteFreely CLI is compatible with [WriteFreely v0.11](https://github.com/writeas/writefreely/releases/tag/v0.11.0) or later.**
 
 ## Features
 
