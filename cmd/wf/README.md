@@ -4,7 +4,7 @@ wf-cli
 
 Command line utility for publishing to any [WriteFreely](https://writefreely.org) instance. Works on Windows, macOS, and Linux.
 
-**The WriteFreely CLI is compatible with WriteFreely v0.11 or later.**
+**The WriteFreely CLI is compatible with [WriteFreely v0.11](https://github.com/writeas/writefreely/releases/tag/v0.11.0) or later.**
 
 ## Features
 
@@ -29,13 +29,6 @@ Download the [64-bit](https://github.com/writeas/writeas-cli/releases/download/v
 
 **macOS**<br />
 Download the [64-bit](https://github.com/writeas/writeas-cli/releases/download/v2.0.0/wf_1.0.0_darwin_amd64.zip) executable and put it somewhere in your `$PATH`, like `/usr/local/bin`.
-
-**Debian-based Linux**<br />
-```bash
-sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys DBE07445
-sudo add-apt-repository "deb http://updates.writeas.org xenial main"
-sudo apt-get update && sudo apt-get install wf-cli
-```
 
 **Linux (other)**<br />
 Download the [64-bit](https://github.com/writeas/writeas-cli/releases/download/v2.0.0/wf_1.0.0_linux_amd64.tar.gz) or [32-bit](https://github.com/writeas/writeas-cli/releases/download/v2.0.0/wf_1.0.0_linux_386.tar.gz) executable and put it somewhere in your `$PATH`, like `/usr/local/bin`.
