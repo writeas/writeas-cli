@@ -78,7 +78,7 @@ GLOBAL OPTIONS:
    --code                  Specifies this post is code
    --md                    Returns post URL with Markdown enabled
    --verbose, -v           Make the operation more talkative
-   --font value            Sets post font to given value (default: "mono")
+   --font value            Sets post font to given value (default: "mono", options: "sans", "serif") 
    --lang value            Sets post language to given ISO 639-1 language code
    --user-agent value      Sets the User-Agent for API requests
    --host value, -H value  Operate against a custom hostname
