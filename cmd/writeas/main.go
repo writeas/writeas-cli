@@ -238,6 +238,10 @@ func main() {
 					Name:  "verbose, v",
 					Usage: "Make the operation more talkative",
 				},
+				cli.StringFlag{
+					Name:  "password, p",
+					Usage: "The password for the account being logged into",
+				},
 			},
 		},
 		{

@@ -408,15 +408,20 @@ func CmdAuth(c *cli.Context) error {
 		}
 	}
 
-	fmt.Print("Password: ")
-	pass, err := gopass.GetPasswdMasked()
-	if err != nil {
-		return cli.NewExitError(fmt.Sprintf("error reading password: %v", err), 1)
-	}
+	// Take password from argument, and fall back to input
+	pass := c.String("p")
+	if pass == "" {
+		fmt.Print("Password: ")
+		enteredPass, err := gopass.GetPasswdMasked()
+		if err != nil {
+			return cli.NewExitError(fmt.Sprintf("error reading password: %v", err), 1)
+		}
 
-	// Validate password
-	if len(pass) == 0 {
-		return cli.NewExitError("Please enter your password.", 1)
+		// Validate password
+		if len(enteredPass) == 0 {
+			return cli.NewExitError("Please enter your password.", 1)
+		}
+		pass = string(enteredPass)
 	}
 
 	if config.IsTor(c) {
@@ -424,7 +429,7 @@ func CmdAuth(c *cli.Context) error {
 	} else {
 		log.Info(c, "Logging in...")
 	}
-	err = api.DoLogIn(c, username, string(pass))
+	err = api.DoLogIn(c, username, pass)
 	if err != nil {
 		return cli.NewExitError(fmt.Sprintf("error logging in: %v", err), 1)
 	}
