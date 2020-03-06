@@ -1,7 +1,6 @@
 module github.com/writeas/writeas-cli
 
 require (
-	code.as/core/socks v1.0.0
 	github.com/atotto/clipboard v0.1.1
 	github.com/cloudfoundry/jibber_jabber v0.0.0-20151120183258-bcc4c8345a21
 	github.com/gopherjs/gopherjs v0.0.0-20181103185306-d547d1d9531e // indirect
@@ -24,3 +23,5 @@ require (
 	gopkg.in/ini.v1 v1.39.3
 	gopkg.in/urfave/cli.v1 v1.20.0
 )
+
+go 1.13
