@@ -24,14 +24,18 @@ github.com/writeas/impart
 github.com/writeas/saturday
 # github.com/writeas/web-core v0.0.0-20181111165528-05f387ffa1b3
 github.com/writeas/web-core/posts
-# golang.org/x/crypto v0.0.0-20181203042331-505ab145d0a9
+# golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
 golang.org/x/crypto/ssh/terminal
-# golang.org/x/net v0.0.0-20181217023233-e147a9138326
+# golang.org/x/net v0.7.0
 golang.org/x/net/html
 golang.org/x/net/html/atom
-# golang.org/x/sys v0.0.0-20181213200352-4d1cda033e06
+# golang.org/x/sys v0.5.0
+golang.org/x/sys/internal/unsafeheader
+golang.org/x/sys/plan9
 golang.org/x/sys/unix
 golang.org/x/sys/windows
+# golang.org/x/term v0.5.0
+golang.org/x/term
 # gopkg.in/ini.v1 v1.39.3
 gopkg.in/ini.v1
 # gopkg.in/urfave/cli.v1 v1.20.0
