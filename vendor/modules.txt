@@ -29,7 +29,8 @@ golang.org/x/crypto/ssh/terminal
 # golang.org/x/net v0.0.0-20181217023233-e147a9138326
 golang.org/x/net/html
 golang.org/x/net/html/atom
-# golang.org/x/sys v0.0.0-20181213200352-4d1cda033e06
+# golang.org/x/sys v0.1.0
+golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/unix
 golang.org/x/sys/windows
 # gopkg.in/ini.v1 v1.39.3
