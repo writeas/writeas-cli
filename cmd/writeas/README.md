@@ -39,9 +39,9 @@ sudo apt-get update && sudo apt-get install writeas-cli
 **Linux (other)**<br />
 Download the [64-bit](https://github.com/writeas/writeas-cli/releases/download/v2.0.0/writeas_2.0.0_linux_amd64.tar.gz) or [32-bit](https://github.com/writeas/writeas-cli/releases/download/v2.0.0/writeas_2.0.0_linux_386.tar.gz) executable and put it somewhere in your `$PATH`, like `/usr/local/bin`.
 
-### Go get it
+### Install with Go
 ```bash
-go get github.com/writeas/writeas-cli/cmd/writeas
+go install github.com/writeas/writeas-cli/cmd/writeas
 ```
 
 Once this finishes, you'll see `writeas` or `writeas.exe` inside `$GOPATH/bin/`.
@@ -50,10 +50,10 @@ Once this finishes, you'll see `writeas` or `writeas.exe` inside `$GOPATH/bin/`.
 
 To upgrade the CLI, download and replace the executable you downloaded before.
 
-If you previously installed with `go get`, run it again with the `-u` option.
+If you previously installed with `go install`, simply run it again.
 
 ```bash
-go get -u github.com/writeas/writeas-cli/cmd/writeas
+go install github.com/writeas/writeas-cli/cmd/writeas
 ```
 
 ## Usage

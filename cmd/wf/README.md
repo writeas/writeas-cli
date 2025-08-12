@@ -33,9 +33,9 @@ Download the [64-bit](https://github.com/writeas/writeas-cli/releases/download/v
 **Linux (other)**<br />
 Download the [64-bit](https://github.com/writeas/writeas-cli/releases/download/v2.0.0/wf_1.0.0_linux_amd64.tar.gz) or [32-bit](https://github.com/writeas/writeas-cli/releases/download/v2.0.0/wf_1.0.0_linux_386.tar.gz) executable and put it somewhere in your `$PATH`, like `/usr/local/bin`.
 
-### Go get it
+### Install with Go
 ```bash
-go get github.com/writeas/writeas-cli/cmd/wf
+go install github.com/writeas/writeas-cli/cmd/wf
 ```
 
 Once this finishes, you'll see `wf` or `wf.exe` inside `$GOPATH/bin/`.
@@ -44,10 +44,10 @@ Once this finishes, you'll see `wf` or `wf.exe` inside `$GOPATH/bin/`.
 
 To upgrade the CLI, download and replace the executable you downloaded before.
 
-If you previously installed with `go get`, run it again with the `-u` option.
+If you previously installed with `go install`, simply run it again.
 
 ```bash
-go get -u github.com/writeas/writeas-cli/cmd/wf
+go install github.com/writeas/writeas-cli/cmd/wf
 ```
 
 ## Usage
