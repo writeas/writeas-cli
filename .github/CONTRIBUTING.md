@@ -4,9 +4,9 @@ We're happy you're considering contributing to the Write.as command-line client!
 
 It won't take long to get up to speed on this. Here are our development resources:
 
-* We do our project management in [Phabricator](https://phabricator.write.as/tag/write.as_cli/).
+* We do our project management in [Phabricator](https://todo.musing.studio/tag/write.as_cli/).
 * We accept and respond to bugs here on [GitHub](https://github.com/writeas/writeas-cli/issues).
-* We're usually in #writeas on freenode, but if not, find us on our [Slack channel](http://slack.write.as).
+* Ask any questions you have on [our forum](https://discuss.write.as).
 
 ## Testing
 
