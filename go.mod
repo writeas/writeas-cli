@@ -27,7 +27,7 @@ require (
 	github.com/writeas/saturday v1.7.1 // indirect
 	github.com/writeas/slug v1.2.0 // indirect
 	golang.org/x/crypto v0.52.0 // indirect
-	golang.org/x/net v0.54.0 // indirect
+	golang.org/x/net v0.55.0 // indirect
 	golang.org/x/sys v0.45.0 // indirect
 	golang.org/x/term v0.43.0 // indirect
 	h12.io/socks v1.0.3 // indirect
